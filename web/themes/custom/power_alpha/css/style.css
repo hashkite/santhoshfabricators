@@ -1,0 +1,390 @@
+/**
+ * @file
+ * Premium styling for Power Alpha theme.
+ */
+
+:root {
+  --primary-gradient: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+  --surface-color: #ffffff;
+  --background-color: #f8fafc;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-lg: 1rem;
+  --radius-md: 0.5rem;
+}
+
+body.theme-power-alpha {
+  background-color: var(--background-color);
+  color: var(--text-main);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.sticky-shadow {
+  display: none;
+}
+
+nav.tabs-wrapper .tabs--primary {
+  padding: 7px;
+}
+
+.project-wrapper {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem 1.5rem;
+}
+
+.card {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.project-header h1 {
+  margin: 0;
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: var(--primary-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.project-meta-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.project-meta p {
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.status-badge {
+  background: #e0e7ff;
+  color: #4338ca;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Tabs Styling */
+/* .tabs-container {
+  margin-bottom: 1.5rem;
+} */
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  background: #f1f5f9;
+  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  width: -webkit-fill-available;
+  margin-bottom: 0px;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  border-radius: calc(var(--radius-md) - 0.25rem);
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tab:hover {
+  color: var(--text-main);
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.tab.active {
+  background: var(--surface-color);
+  color: var(--text-main);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.view-container {
+  background: var(--surface-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+}
+
+.button--primary {
+  background: #0ea5e9 !important;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.button--primary:hover {
+  background: #0284c7;
+}
+
+/* =========================
+   PROJECT DASHBOARD GRID
+========================= */
+.view-project-dashboard .view-content .item-list ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  padding: 0;
+  margin: 0;
+}
+
+/* =========================
+   CARD STYLE
+========================= */
+.view-project-dashboard .view-content .item-list ul li {
+  list-style: none;
+  border-radius: 14px;
+  background: var(--gin-bg-layer);
+  border: 1px solid var(--gin-border-color);
+  padding: 18px;
+  margin: 0;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Hover effect */
+.view-project-dashboard .view-content .item-list ul li:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Clickable card (optional) */
+.view-project-dashboard .view-content .item-list ul li a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =========================
+   TITLE
+========================= */
+.view-project-dashboard .views-field-title {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+/* =========================
+   META GRID (FIELDS)
+========================= */
+.project-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 12px;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+/* Individual field spacing */
+.view-project-dashboard .views-field-field-project-code,
+.view-project-dashboard .views-field-field-location,
+.view-project-dashboard .views-field-field-start-date,
+.view-project-dashboard .views-field-field-end-date,
+.view-project-dashboard .views-field-field-project-manager {
+  margin-bottom: 6px;
+}
+
+.view-project-dashboard .views-field-field-project-code,
+.view-project-dashboard .views-field-field-location,
+.view-project-dashboard .views-field-field-start-date,
+.view-project-dashboard .views-field-field-end-date,
+.view-project-dashboard .views-field-field-project-manager,
+.view-project-dashboard .views-field-field-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+
+  font-size: 0.9rem;
+  padding: 6px 0;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+/* Remove border from last field */
+.view-project-dashboard .views-field-field-project-manager {
+  border-bottom: none;
+}
+
+/* Label styling */
+.view-project-dashboard .views-field-field-project-code .views-label,
+.view-project-dashboard .views-field-field-location .views-label,
+.view-project-dashboard .views-field-field-start-date .views-label,
+.view-project-dashboard .views-field-field-end-date .views-label,
+.view-project-dashboard .views-field-field-project-manager .views-label {
+  color: #6b7280;
+  font-weight: 500;
+  min-width: 100px;
+}
+
+/* Value styling */
+.view-project-dashboard .views-field-field-project-code .field-content,
+.view-project-dashboard .views-field-field-location .field-content,
+.view-project-dashboard .views-field-field-start-date .field-content,
+.view-project-dashboard .views-field-field-end-date .field-content,
+.view-project-dashboard .views-field-field-project-manager .field-content {
+  color: #111827;
+  font-weight: 500;
+  text-align: right;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+
+  .view-project-dashboard .views-field-field-project-code,
+  .view-project-dashboard .views-field-field-location,
+  .view-project-dashboard .views-field-field-start-date,
+  .view-project-dashboard .views-field-field-end-date,
+  .view-project-dashboard .views-field-field-project-manager {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .view-project-dashboard .field-content {
+    text-align: left;
+  }
+}
+
+/* =========================
+   STATUS BADGE
+========================= */
+.project-status,
+.view-project-dashboard .views-field-field-status {
+  margin-top: 10px;
+}
+
+.view-project-dashboard .views-field-field-status .field-content {
+  display: inline-block;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 20px;
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Status variations */
+.status-active {
+  background: #dcfce7 !important;
+  color: #166534 !important;
+}
+
+.status-completed {
+  background: #e0e7ff !important;
+  color: #3730a3 !important;
+}
+
+.status-pending {
+  background: #fef9c3 !important;
+  color: #854d0e !important;
+}
+
+/* =========================
+   CARD TOP BORDER ACCENT
+========================= */
+.view-project-dashboard .view-content .item-list ul li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 100%;
+  background: #0ea5e9;
+  border-radius: 14px 14px 0 0;
+}
+
+/* =========================
+   TEXT IMPROVEMENTS
+========================= */
+.view-project-dashboard strong {
+  color: #374151;
+  font-weight: 500;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+.view-project-dashboard .view-empty {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+@media (max-width: 1024px) {
+  .view-project-dashboard .view-content .item-list ul {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .project-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .view-project-dashboard .view-content .item-list ul {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .view-project-dashboard .view-content .item-list ul {
+    grid-template-columns: 1fr;
+  }
+}

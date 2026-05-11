@@ -1,0 +1,5 @@
+name: Power Alpha
+type: module
+description: Handles project auto-fill for multiple content types
+core_version_requirement: ^10
+package: Custom

@@ -1,0 +1,62 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * @file
+ * Functions to support theming in the Power Alpha theme.
+ */
+
+/**
+ * Implements hook_preprocess_HOOK() for node templates.
+ */
+function power_alpha_preprocess_node(&$variables) {
+  $node = $variables['node'];
+  if ($node->getType() == 'project_sites' && $variables['view_mode'] == 'full') {
+    // Load Views blocks manually since twig_tweak is not present.
+    $variables['expenses_block'] = [
+      '#type' => 'view',
+      '#name' => 'expenses_report',
+      '#display_id' => 'block_1',
+    ];
+    
+    $variables['documents_block'] = [
+      '#type' => 'view',
+      '#name' => 'documents',
+      '#display_id' => 'block_1',
+    ];
+    
+    $variables['esi_block'] = [
+      '#type' => 'view',
+      '#name' => 'esi_compliance',
+      '#display_id' => 'block_1',
+    ];
+    $variables['purchase_order_block'] = [
+      '#type' => 'view',
+      '#name' => 'purchase_order',
+      '#display_id' => 'block_1',
+    ];
+    $variables['attendance_block'] = [
+      '#type' => 'view',
+      '#name' => 'attendance_report',
+      '#display_id' => 'block_1',
+    ];
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function power_alpha_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Target document node form
+  if ($form_id == 'node_documents_form' || $form_id == 'node_expenses_form' || $form_id == 'node_esi_compliance_data_form' || $form_id == 'node_purchase_order_form' || $form_id == 'node_attendance_form') {
+
+    $request = \Drupal::request();
+    $project_id = $request->query->get('project_id');
+
+    if ($project_id && isset($form['field_project'])) {
+      $form['field_project']['widget'][0]['target_id']['#default_value'] =
+        \Drupal\node\Entity\Node::load($project_id);
+    }
+  }
+}

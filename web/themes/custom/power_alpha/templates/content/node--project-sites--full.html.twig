@@ -1,0 +1,77 @@
+<div class="project-wrapper">
+
+	<!-- Project Header -->
+	{# <div class="project-header card">
+																																																																																<h1>{{ label }}</h1>
+																																																																															</div> #}
+		<div class="project-meta-grid"> <div class="project-meta ">
+			<p>
+				<strong>Project ID:</strong>
+				{{ node.id }}</p>
+			<p>
+				<strong>Status:</strong>
+				<span class="status-badge">{{ content.field_status.0 }}</span>
+			</p>
+		</div>
+		<div class="project-meta">
+			<p>
+				<strong>Start Date:</strong>
+				{{ content.field_start_date.0 }}</p>
+			<p>
+				<strong>End Date:</strong>
+				{{ content.field_end_date.0 }}</p>
+		</div>
+	</div>
+
+	<!-- Tabs -->
+	<div class="tabs-container">
+		<div class="tabs">
+			<button class="tab active" data-tab="expenses">💰 Expenses</button>
+			<button class="tab" data-tab="documents">📂 Documents</button>
+			<button class="tab" data-tab="esi">📊 ESI / Compliance</button>
+			<button class="tab" data-tab="purchase_order">📦 Purchase Order</button>
+			<button class="tab" data-tab="attendance">👷 Attendance</button>
+		</div>
+	</div>
+
+	<!-- Tab Content -->
+	<div class="tab-contents">
+		<div class="tab-content active" id="expenses">
+			<div class="view-container">
+				{{ expenses_block }}
+				<a href="/node/add/expenses?project_id={{ node.id }}" class="button button--primary">+ Add Expenses</a>
+			</div>
+		</div>
+
+		<div class="tab-content" id="documents">
+			<div class="view-container">
+				{{ documents_block }}
+				<a href="/node/add/documents?project_id={{ node.id }}" class="button button--primary">+ Add Document</a>
+			</div>
+		</div>
+
+		<div class="tab-content" id="esi">
+			<div class="view-container">
+				{{ esi_block }}
+				<a href="/node/add/esi_compliance_data?project_id={{ node.id }}" class="button button--primary">+ Add ESI / Compliance</a>
+			</div>
+		</div>
+
+		<div class="tab-content" id="purchase_order">
+			<div class="view-container">
+				{{ purchase_order_block }}
+				<a href="/node/add/purchase_order?project_id={{ node.id }}" class="button button--primary">+ Add Purchase Order</a>
+			</div>
+		</div>
+
+		<div class="tab-content" id="attendance">
+			<div class="view-container">
+				{{ drupal_view('attendance_report', 'block_1') }}
+				<a href="/node/add/attendance?project_id={{ node.id }}" class="button button--primary">
+					+ Add Attendance
+				</a>
+			</div>
+
+		</div>
+
+	</div>

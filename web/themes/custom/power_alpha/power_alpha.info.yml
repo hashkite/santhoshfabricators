@@ -1,0 +1,21 @@
+name: 'Power Alpha'
+type: theme
+description: 'Custom theme based on Gin.'
+package: Custom
+base theme: gin
+core_version_requirement: ^10 || ^11
+
+libraries:
+  - power_alpha/global-styling
+
+regions:
+  header: Header
+  pre_content: 'Pre-content'
+  breadcrumb: Breadcrumb
+  highlighted: Highlighted
+  content: Content
+  page_top: 'Page top'
+  page_bottom: 'Page bottom'
+  sidebar_first: 'First sidebar'
+  sidebar_second: 'Second sidebar'
+  footer: Footer

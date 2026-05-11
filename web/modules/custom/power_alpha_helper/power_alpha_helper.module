@@ -1,0 +1,47 @@
+<?php
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_form_alter().
+ */
+function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+
+  // Step 3.1: Define target forms
+  $target_forms = [
+    'node_documents_form',
+    'node_expenses_form',
+    'node_esi_compliance_data_form',
+    'node_purchase_order_form',
+    'node_attendance_form',
+  ];
+
+  // Step 3.2: Skip if not matching form
+  if (!in_array($form_id, $target_forms)) {
+    return;
+  }
+
+  // Step 3.3: Get project_id from URL
+  $project_id = \Drupal::request()->query->get('project_id');
+
+  if (empty($project_id)) {
+    return;
+  }
+
+  // Step 3.4: Load project node safely
+  $project_node = Node::load($project_id);
+
+  if (!$project_node) {
+    return;
+  }
+
+  // Step 3.5: Set default value
+  if (isset($form['field_project']['widget'][0]['target_id'])) {
+
+    $form['field_project']['widget'][0]['target_id']['#default_value'] = $project_node;
+
+    // Step 3.6: Hide field (optional but recommended)
+    $form['field_project']['#access'] = FALSE;
+  }
+}
