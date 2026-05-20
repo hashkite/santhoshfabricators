@@ -1,0 +1,777 @@
+// =========================
+// NODE EDIT FORM STYLES
+// =========================
+// Premium enterprise-grade form styling for Drupal node edit pages.
+// Overrides Gin/Claro admin theme defaults with the FabriTrack design system.
+
+// ─────────────────────────────────────────
+// FORM CONTAINER
+// ─────────────────────────────────────────
+.node-form,
+.node-expenses-form,
+.node-expenses-edit-form,
+.node-purchase-order-form,
+.node-purchase-order-edit-form,
+.node-project-sites-form,
+.node-project-sites-edit-form {
+  max-width: 960px;
+
+  // Overrides for Gin layout-region
+  .layout-region-node-main {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .layout-region-node-secondary {
+    width: 100%;
+    max-width: 100%;
+    margin-top: $space-6;
+  }
+
+  // Two-column layout on larger screens
+  @media (min-width: 1200px) {
+    .layout-region {
+      display: flex;
+      gap: $space-8;
+    }
+
+    .layout-region-node-main {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .layout-region-node-secondary {
+      width: 320px;
+      flex-shrink: 0;
+      margin-top: 0;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// FIELDSETS / DETAILS (collapsible sections)
+// ─────────────────────────────────────────
+.node-form details,
+.node-form fieldset {
+  background: $color-white;
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  margin-bottom: $space-5;
+  overflow: hidden;
+  transition: $transition-base;
+
+  &:hover {
+    border-color: rgba($color-primary, 0.15);
+  }
+
+  &[open] {
+    box-shadow: $shadow-md;
+  }
+
+  summary,
+  legend {
+    font-family: $font-headline;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+    padding: $space-4 $space-6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    background: $color-neutral;
+    border-bottom: 1px solid $border-color-light;
+    transition: $transition-base;
+    user-select: none;
+    margin: 0;
+    width: 100%;
+
+    &:hover {
+      background: $color-neutral-200;
+      color: $color-primary;
+    }
+
+    &::before,
+    &::marker {
+      color: $color-primary;
+    }
+  }
+
+  .details-wrapper,
+  .fieldset-wrapper {
+    padding: $space-6;
+  }
+}
+
+// ─────────────────────────────────────────
+// FORM ITEMS (individual field wrappers)
+// ─────────────────────────────────────────
+.form-item {
+  margin-bottom: $space-5;
+
+  label {
+    display: block;
+    font-family: $font-headline;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+    margin-bottom: $space-2;
+  }
+
+  .description {
+    font-family: $font-body;
+    font-size: $font-size-xs;
+    color: $color-neutral-600;
+    margin-top: $space-1;
+    line-height: $line-height-relaxed;
+  }
+
+  .form-required::after {
+    content: ' *';
+    color: $color-danger;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// ─────────────────────────────────────────
+// TEXT INPUTS, SELECTS, TEXTAREAS
+// ─────────────────────────────────────────
+.node-form {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="url"],
+  input[type="tel"],
+  input[type="search"],
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"],
+  input[type="month"],
+  input[type="week"],
+  textarea,
+  select {
+    width: 100%;
+    padding: $space-3 $space-4;
+    font-family: $font-body;
+    font-size: $font-size-base;
+    font-weight: $font-weight-medium;
+    color: $color-secondary;
+    background: $color-white;
+    border: 1.5px solid $color-neutral-300;
+    border-radius: $radius-md;
+    outline: none;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    &::placeholder {
+      color: $color-neutral-500;
+      font-weight: $font-weight-regular;
+    }
+
+    &:hover {
+      border-color: $color-neutral-400;
+    }
+
+    &:focus {
+      border-color: $color-primary;
+      box-shadow: 0 0 0 3px rgba($color-primary, 0.12);
+    }
+
+    &:disabled,
+    &[readonly] {
+      background: $color-neutral-100;
+      color: $color-neutral-600;
+      cursor: not-allowed;
+      border-color: $color-neutral-200;
+    }
+
+    &.error {
+      border-color: $color-danger;
+      box-shadow: 0 0 0 3px rgba($color-danger, 0.08);
+    }
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: $line-height-relaxed;
+  }
+
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23455A64' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right $space-4 center;
+    padding-right: $space-10;
+  }
+}
+
+// ─────────────────────────────────────────
+// AUTOCOMPLETE (entity reference fields)
+// ─────────────────────────────────────────
+.node-form .form-autocomplete {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23ADB5BD' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $space-4 center;
+  padding-right: $space-10;
+}
+
+// ─────────────────────────────────────────
+// CHECKBOXES & RADIOS
+// ─────────────────────────────────────────
+.node-form {
+  input[type="checkbox"],
+  input[type="radio"] {
+    width: 18px;
+    height: 18px;
+    accent-color: $color-primary;
+    cursor: pointer;
+    margin-right: $space-2;
+    vertical-align: middle;
+  }
+
+  .form-type-checkbox label,
+  .form-type-radio label {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    padding: $space-1 0;
+  }
+}
+
+// ─────────────────────────────────────────
+// BUTTONS (form actions)
+// ─────────────────────────────────────────
+.node-form .form-actions {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  padding-top: $space-6;
+  border-top: 1px solid $border-color-light;
+  margin-top: $space-6;
+  flex-wrap: wrap;
+
+  input[type="submit"],
+  button {
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    padding: $space-3 $space-6;
+    border-radius: $radius-md;
+    border: none;
+    cursor: pointer;
+    transition: $transition-base;
+    letter-spacing: $letter-spacing-wide;
+    text-transform: uppercase;
+
+    &:focus-visible {
+      outline: 2px solid $color-primary;
+      outline-offset: 2px;
+    }
+  }
+
+  // Primary save button
+  .button--primary,
+  #edit-submit,
+  input[name="op"][value="Save"] {
+    background: $gradient-primary;
+    color: $color-white;
+    box-shadow: 0 2px 8px rgba($color-primary, 0.2);
+
+    &:hover {
+      box-shadow: 0 4px 16px rgba($color-primary, 0.35);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  // Secondary buttons (Preview, Delete, etc.)
+  .button:not(.button--primary):not(#edit-submit),
+  input[name="op"]:not([value="Save"]) {
+    background: $color-white;
+    color: $color-secondary;
+    border: 1.5px solid $color-neutral-300;
+
+    &:hover {
+      background: $color-neutral-100;
+      border-color: $color-neutral-400;
+    }
+  }
+
+  // Delete button
+  .button--danger,
+  #edit-delete {
+    background: transparent !important;
+    color: $color-danger !important;
+    border-color: rgba($color-danger, 0.3) !important;
+
+    &:hover {
+      background: $color-danger-bg !important;
+      border-color: $color-danger !important;
+    }
+  }
+}
+
+// Gin sticky form actions bar
+.gin-sticky {
+  .form-actions {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
+
+// ─────────────────────────────────────────
+// FILE / IMAGE UPLOAD FIELDS
+// ─────────────────────────────────────────
+.node-form {
+  .form-managed-file,
+  .image-widget {
+    padding: $space-4;
+    background: $color-neutral-100;
+    border: 1.5px dashed $color-neutral-300;
+    border-radius: $radius-md;
+    transition: $transition-base;
+
+    &:hover {
+      border-color: $color-primary;
+      background: rgba($color-primary, 0.02);
+    }
+
+    .file {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+      padding: $space-2;
+      background: $color-white;
+      border-radius: $radius-sm;
+      border: 1px solid $border-color-light;
+      margin-bottom: $space-2;
+
+      a {
+        color: $color-primary;
+        font-weight: $font-weight-semibold;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    input[type="file"] {
+      font-size: $font-size-sm;
+      padding: $space-2;
+    }
+
+    .button {
+      font-size: $font-size-xs;
+      padding: $space-2 $space-4;
+    }
+  }
+
+  .image-preview {
+    border-radius: $radius-md;
+    overflow: hidden;
+    margin-bottom: $space-3;
+
+    img {
+      max-width: 200px;
+      height: auto;
+      border-radius: $radius-sm;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// DATE / DATETIME WIDGET
+// ─────────────────────────────────────────
+.node-form .container-inline {
+  display: flex;
+  align-items: center;
+  gap: $space-3;
+  flex-wrap: wrap;
+
+  .form-item {
+    margin-bottom: 0;
+  }
+}
+
+// ─────────────────────────────────────────
+// PARAGRAPHS (inline entity forms)
+// ─────────────────────────────────────────
+.node-form {
+  .paragraphs-subform {
+    padding: $space-5;
+    background: $color-neutral-100;
+    border-radius: $radius-md;
+    border: 1px solid $border-color-light;
+    margin-bottom: $space-3;
+
+    .form-item label {
+      font-size: $font-size-xs;
+    }
+  }
+
+  .paragraph-type-title {
+    font-family: $font-headline;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+    padding-bottom: $space-2;
+    border-bottom: 1px solid $border-color-light;
+    margin-bottom: $space-4;
+  }
+
+  // Paragraph items in table drag
+  .field-multiple-table {
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    background: $color-white;
+    margin-bottom: $space-4;
+
+    thead th {
+      background: $color-neutral;
+      font-family: $font-headline;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      color: $color-tertiary;
+      text-transform: uppercase;
+      letter-spacing: $letter-spacing-wide;
+      padding: $space-3 $space-4;
+      border-bottom: 2px solid $border-color;
+    }
+
+    tbody td {
+      padding: $space-4;
+      border-bottom: 1px solid $border-color-light;
+      vertical-align: top;
+    }
+
+    tbody tr {
+      transition: $transition-base;
+
+      &:hover td {
+        background: rgba($color-primary, 0.02);
+      }
+
+      &:last-child td {
+        border-bottom: none;
+      }
+    }
+
+    // Drag handle
+    .tabledrag-handle {
+      cursor: grab;
+
+      .handle {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  // Add more button for paragraphs
+  .paragraphs-add-dialog,
+  .field-add-more-submit {
+    margin-top: $space-3;
+  }
+
+  // Paragraphs dropdown add
+  .dropbutton-wrapper {
+    margin-top: $space-3;
+
+    .dropbutton {
+      border-radius: $radius-md;
+      overflow: hidden;
+      border: 1.5px solid $color-neutral-300;
+
+      li {
+        border-bottom: 1px solid $border-color-light;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+
+      .dropbutton-action {
+        input, button, a {
+          padding: $space-2 $space-4;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-semibold;
+          color: $color-secondary;
+          background: $color-white;
+          border: none;
+          width: 100%;
+          text-align: left;
+          cursor: pointer;
+          transition: $transition-base;
+
+          &:hover {
+            background: rgba($color-primary, 0.04);
+            color: $color-primary;
+          }
+        }
+      }
+    }
+
+    .dropbutton-toggle {
+      button {
+        background: $color-neutral-100;
+        border: none;
+        border-left: 1px solid $border-color-light;
+        cursor: pointer;
+
+        &:hover {
+          background: $color-neutral-200;
+        }
+      }
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// SIDEBAR (node status, revision, etc.)
+// ─────────────────────────────────────────
+.layout-region-node-secondary {
+  details {
+    background: $color-white;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+    margin-bottom: $space-4;
+    overflow: hidden;
+
+    summary {
+      font-family: $font-headline;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+      color: $color-secondary;
+      padding: $space-3 $space-5;
+      background: $color-neutral;
+      border-bottom: 1px solid $border-color-light;
+    }
+
+    .details-wrapper {
+      padding: $space-4 $space-5;
+    }
+  }
+
+  .form-item label {
+    font-size: $font-size-xs;
+    margin-bottom: $space-1;
+  }
+}
+
+// ─────────────────────────────────────────
+// MESSAGES / STATUS / ERRORS
+// ─────────────────────────────────────────
+.node-form {
+  .messages {
+    border-radius: $radius-md;
+    padding: $space-4 $space-5;
+    margin-bottom: $space-5;
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    border: none;
+
+    &--status {
+      background: $color-success-bg;
+      color: $color-success;
+    }
+
+    &--warning {
+      background: $color-warning-bg;
+      color: $color-warning;
+    }
+
+    &--error {
+      background: $color-danger-bg;
+      color: $color-danger;
+    }
+  }
+
+  .form-item--error-message {
+    font-size: $font-size-xs;
+    color: $color-danger;
+    font-weight: $font-weight-semibold;
+    margin-top: $space-1;
+  }
+}
+
+// ─────────────────────────────────────────
+// VERTICAL TABS (Gin-style)
+// ─────────────────────────────────────────
+.node-form .vertical-tabs {
+  border: 1px solid $border-color;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  background: $color-white;
+  box-shadow: $shadow-sm;
+
+  .vertical-tabs__menu {
+    background: $color-neutral;
+    border-right: 1px solid $border-color;
+
+    li {
+      border-bottom: 1px solid $border-color-light;
+
+      a {
+        padding: $space-3 $space-5;
+        font-family: $font-body;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: $color-tertiary;
+        text-decoration: none;
+        transition: $transition-base;
+
+        &:hover {
+          color: $color-primary;
+          background: rgba($color-primary, 0.04);
+        }
+
+        .vertical-tabs__menu-item-summary {
+          font-size: $font-size-xs;
+          color: $color-neutral-500;
+        }
+      }
+
+      &.is-selected a {
+        color: $color-primary;
+        background: $color-white;
+        border-left: 3px solid $color-primary;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+
+  .vertical-tabs__panes {
+    padding: $space-6;
+  }
+}
+
+// ─────────────────────────────────────────
+// CKEditor / TEXT FORMAT
+// ─────────────────────────────────────────
+.node-form {
+  .text-format-wrapper {
+    .form-textarea-wrapper {
+      textarea {
+        border-radius: $radius-md $radius-md 0 0;
+        border-bottom: none;
+      }
+    }
+
+    .filter-wrapper {
+      background: $color-neutral-100;
+      border: 1.5px solid $color-neutral-300;
+      border-top: none;
+      border-radius: 0 0 $radius-md $radius-md;
+      padding: $space-2 $space-4;
+
+      .form-item {
+        margin-bottom: 0;
+
+        label {
+          font-size: $font-size-xs;
+          text-transform: none;
+          letter-spacing: normal;
+          font-weight: $font-weight-medium;
+          color: $color-neutral-600;
+        }
+      }
+
+      select {
+        font-size: $font-size-xs;
+        padding: $space-1 $space-3;
+        border-radius: $radius-sm;
+      }
+    }
+  }
+
+  // CKEditor iframe
+  .ck-editor {
+    border-radius: $radius-md;
+    overflow: hidden;
+
+    .ck-editor__top {
+      border-bottom: 1px solid $border-color;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// AJAX THROBBER
+// ─────────────────────────────────────────
+.node-form {
+  .ajax-progress {
+    .throbber {
+      border-color: $color-primary rgba($color-primary, 0.2) rgba($color-primary, 0.2);
+    }
+
+    .message {
+      font-size: $font-size-xs;
+      color: $color-primary;
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// RESPONSIVE OVERRIDES
+// ─────────────────────────────────────────
+@include respond-to('md') {
+  .node-form {
+    details summary,
+    fieldset legend {
+      padding: $space-3 $space-4;
+      font-size: $font-size-sm;
+    }
+
+    details .details-wrapper,
+    fieldset .fieldset-wrapper {
+      padding: $space-4;
+    }
+
+    .form-actions {
+      flex-direction: column;
+
+      input[type="submit"],
+      button {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@include respond-to('sm') {
+  .node-form {
+    input[type="text"],
+    input[type="email"],
+    input[type="number"],
+    textarea,
+    select {
+      font-size: 16px; // Prevents iOS zoom on focus
+    }
+
+    .form-item label {
+      font-size: $font-size-xs;
+    }
+  }
+}

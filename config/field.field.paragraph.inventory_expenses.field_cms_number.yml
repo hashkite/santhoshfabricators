@@ -1,0 +1,19 @@
+uuid: 26a0410f-fff9-432c-96b7-2f1fb3b268bc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_cms_number
+    - paragraphs.paragraphs_type.inventory_expenses
+id: paragraph.inventory_expenses.field_cms_number
+field_name: field_cms_number
+entity_type: paragraph
+bundle: inventory_expenses
+label: 'CMS Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

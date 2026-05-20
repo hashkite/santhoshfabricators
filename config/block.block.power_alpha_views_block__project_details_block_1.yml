@@ -1,0 +1,33 @@
+uuid: b58a21a9-62d7-407a-bf67-fe558559aa59
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.project_details
+  module:
+    - node
+    - views
+  theme:
+    - power_alpha
+id: power_alpha_views_block__project_details_block_1
+theme: power_alpha
+region: content
+weight: -2
+provider: null
+plugin: 'views_block:project_details-block_1'
+settings:
+  id: 'views_block:project_details-block_1'
+  label: ''
+  label_display: visible
+  provider: views
+  context_mapping: {  }
+  views_label: ''
+  items_per_page: none
+visibility:
+  'entity_bundle:node':
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: '@node.node_route_context:node'
+    bundles:
+      project_sites: project_sites

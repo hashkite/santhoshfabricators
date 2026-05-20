@@ -1,0 +1,21 @@
+{
+  "name": "power-alpha-theme",
+  "version": "1.0.0",
+  "description": "Gulp + SCSS build pipeline for Power Alpha Drupal theme",
+  "scripts": {
+    "build": "gulp build",
+    "watch": "gulp watch",
+    "dev": "gulp watch"
+  },
+  "devDependencies": {
+    "gulp": "^5.0.0",
+    "gulp-sass": "^6.0.0",
+    "sass": "^1.77.0",
+    "gulp-autoprefixer": "^9.0.0",
+    "gulp-clean-css": "^4.3.0",
+    "gulp-rename": "^2.0.0",
+    "gulp-sourcemaps": "^3.0.0",
+    "gulp-postcss": "^10.0.0",
+    "autoprefixer": "^10.4.0"
+  }
+}

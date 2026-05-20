@@ -1,0 +1,19 @@
+uuid: fd2dd0f9-6d22-4da1-8ab3-f94b83472d36
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_account_number
+    - paragraphs.paragraphs_type.inventory_expenses
+id: paragraph.inventory_expenses.field_account_number
+field_name: field_account_number
+entity_type: paragraph
+bundle: inventory_expenses
+label: 'Account number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

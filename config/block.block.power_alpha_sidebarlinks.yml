@@ -1,0 +1,25 @@
+uuid: 24cc4ce0-6b62-468c-aef5-34eacb397e9b
+langcode: en
+status: true
+dependencies:
+  config:
+    - system.menu.side-bar-links
+  module:
+    - system
+  theme:
+    - power_alpha
+id: power_alpha_sidebarlinks
+theme: power_alpha
+region: sidebar_first
+weight: 0
+provider: null
+plugin: 'system_menu_block:side-bar-links'
+settings:
+  id: 'system_menu_block:side-bar-links'
+  label: 'Side-bar links'
+  label_display: '0'
+  provider: system
+  level: 1
+  depth: 0
+  expand_all_items: false
+visibility: {  }

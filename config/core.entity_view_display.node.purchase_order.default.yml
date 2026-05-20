@@ -1,0 +1,114 @@
+uuid: f9517ac3-162e-40be-bd65-af8f40b33ddc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.purchase_order.body
+    - field.field.node.purchase_order.field_abstract_sheet
+    - field.field.node.purchase_order.field_address
+    - field.field.node.purchase_order.field_amount_gst
+    - field.field.node.purchase_order.field_basic_amount
+    - field.field.node.purchase_order.field_company_name
+    - field.field.node.purchase_order.field_gst
+    - field.field.node.purchase_order.field_po_date
+    - field.field.node.purchase_order.field_po_number
+    - field.field.node.purchase_order.field_po_status
+    - field.field.node.purchase_order.field_project
+    - node.type.purchase_order
+  module:
+    - address
+    - datetime
+    - file
+    - options
+    - user
+id: node.purchase_order.default
+targetEntityType: node
+bundle: purchase_order
+mode: default
+content:
+  field_abstract_sheet:
+    type: file_default
+    label: above
+    settings:
+      use_description_as_link_text: true
+    third_party_settings: {  }
+    weight: 14
+    region: content
+  field_address:
+    type: address_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 11
+    region: content
+  field_amount_gst:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 17
+    region: content
+  field_basic_amount:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 18
+    region: content
+  field_company_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_gst:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_po_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_po_number:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_po_status:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 19
+    region: content
+  field_project:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden:
+  body: true

@@ -1,0 +1,38 @@
+uuid: c0088329-3783-4367-aeb8-1bb599ecbed8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.room_rent.field_amounts
+    - field.field.paragraph.room_rent.field_date
+    - field.field.paragraph.room_rent.field_type
+    - paragraphs.paragraphs_type.room_rent
+  module:
+    - datetime
+id: paragraph.room_rent.default
+targetEntityType: paragraph
+bundle: room_rent
+mode: default
+content:
+  field_amounts:
+    type: number
+    weight: 9
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_date:
+    type: datetime_default
+    weight: 0
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_type:
+    type: options_select
+    weight: 1
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

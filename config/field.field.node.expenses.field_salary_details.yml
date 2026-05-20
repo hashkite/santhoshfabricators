@@ -1,0 +1,40 @@
+uuid: 2173cb22-842e-4a71-9252-27878b29bc40
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_salary_details
+    - node.type.expenses
+    - paragraphs.paragraphs_type.salary
+  module:
+    - entity_reference_revisions
+id: node.expenses.field_salary_details
+field_name: field_salary_details
+entity_type: node
+bundle: expenses
+label: 'Salary Details'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      salary: salary
+    negate: 0
+    target_bundles_drag_drop:
+      expenses:
+        weight: 5
+        enabled: false
+      inventory_expenses:
+        weight: 6
+        enabled: false
+      room_rent:
+        weight: 7
+        enabled: false
+      salary:
+        weight: 8
+        enabled: true
+field_type: entity_reference_revisions

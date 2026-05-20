@@ -1,0 +1,70 @@
+// =========================
+// BASE STYLES & RESETS
+// =========================
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap');
+
+// -------------------------
+// CSS CUSTOM PROPERTIES
+// -------------------------
+:root {
+  // Map SCSS vars → CSS vars for runtime use
+  --pa-primary: #{$color-primary};
+  --pa-primary-light: #{$color-primary-light};
+  --pa-primary-dark: #{$color-primary-dark};
+  --pa-primary-gradient: #{$gradient-primary};
+  --pa-accent: #{$color-primary-light};
+
+  --pa-surface: #{$color-white};
+  --pa-surface-elevated: rgba(255, 255, 255, 0.85);
+  --pa-bg: #{$color-neutral};
+  --pa-bg-subtle: #{$color-neutral-200};
+
+  --pa-text: #{$color-secondary};
+  --pa-text-secondary: #{$color-primary};
+  --pa-text-muted: #{$color-tertiary};
+  --pa-text-faint: #{$color-neutral-500};
+
+  --pa-shadow-sm: #{$shadow-sm};
+  --pa-shadow-md: #{$shadow-md};
+  --pa-shadow-lg: #{$shadow-lg};
+  --pa-shadow-xl: #{$shadow-xl};
+  --pa-shadow-glow: #{$shadow-glow};
+
+  --pa-border: #{$border-color};
+  --pa-border-light: #{$border-color-light};
+
+  --pa-radius-sm: #{$radius-sm};
+  --pa-radius-md: #{$radius-md};
+  --pa-radius-lg: #{$radius-lg};
+  --pa-radius-xl: #{$radius-xl};
+  --pa-radius-full: #{$radius-full};
+
+  --pa-transition: #{$transition-base};
+  --pa-transition-bounce: #{$transition-bounce};
+}
+
+// -------------------------
+// BODY
+// -------------------------
+body.theme-power-alpha {
+  background: $color-neutral;
+  color: $color-secondary;
+  font-family: $font-body;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// Gin overrides
+.sticky-shadow {
+  display: none;
+}
+
+nav.tabs-wrapper .tabs--primary {
+  padding: 7px;
+}
+
+// -------------------------
+// GLOBAL SCROLLBAR
+// -------------------------
+@include custom-scrollbar;

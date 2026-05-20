@@ -1,0 +1,108 @@
+uuid: 7cf8db9b-9cc1-4df3-8638-21335ef9e13d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.project_sites.body
+    - field.field.node.project_sites.field_allocated_budget
+    - field.field.node.project_sites.field_end_date
+    - field.field.node.project_sites.field_image
+    - field.field.node.project_sites.field_location
+    - field.field.node.project_sites.field_project_code
+    - field.field.node.project_sites.field_project_manager
+    - field.field.node.project_sites.field_start_date
+    - field.field.node.project_sites.field_status
+    - image.style.wide
+    - node.type.project_sites
+  module:
+    - address
+    - datetime
+    - image
+    - options
+    - text
+    - user
+id: node.project_sites.default
+targetEntityType: node
+bundle: project_sites
+mode: default
+content:
+  body:
+    type: text_default
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_allocated_budget:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 10
+    region: content
+  field_end_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: olivero_medium
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: ''
+      image_style: wide
+      image_loading:
+        attribute: eager
+    third_party_settings: {  }
+    weight: -1
+    region: content
+  field_location:
+    type: address_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_project_code:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_project_manager:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_start_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: olivero_medium
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_status:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

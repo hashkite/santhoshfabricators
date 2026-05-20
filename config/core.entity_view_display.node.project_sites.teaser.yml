@@ -1,0 +1,58 @@
+uuid: 6483fb43-a429-4dce-a570-f85def2d1f86
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.project_sites.body
+    - field.field.node.project_sites.field_allocated_budget
+    - field.field.node.project_sites.field_end_date
+    - field.field.node.project_sites.field_image
+    - field.field.node.project_sites.field_location
+    - field.field.node.project_sites.field_project_code
+    - field.field.node.project_sites.field_project_manager
+    - field.field.node.project_sites.field_start_date
+    - field.field.node.project_sites.field_status
+    - image.style.medium
+    - node.type.project_sites
+  module:
+    - image
+    - text
+    - user
+id: node.project_sites.teaser
+targetEntityType: node
+bundle: project_sites
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  field_image:
+    type: image
+    label: hidden
+    settings:
+      image_link: content
+      image_style: medium
+      image_loading:
+        attribute: lazy
+    third_party_settings: {  }
+    weight: -1
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_allocated_budget: true
+  field_end_date: true
+  field_location: true
+  field_project_code: true
+  field_project_manager: true
+  field_start_date: true
+  field_status: true

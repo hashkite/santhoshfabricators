@@ -1,0 +1,201 @@
+// =========================
+// SHARED COMPONENTS
+// =========================
+
+// -------------------------
+// PAGE TITLE
+// -------------------------
+.page-title {
+  @include heading(2xl, extrabold);
+  @include gradient-text($gradient-primary);
+  margin-bottom: $space-6;
+  position: relative;
+  display: inline-block;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 48px;
+    height: 4px;
+    background: $gradient-primary;
+    border-radius: $radius-full;
+  }
+}
+
+// -------------------------
+// CARD (generic)
+// -------------------------
+.card {
+  @include card(md, false);
+  padding: $space-6;
+  margin-bottom: $space-6;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+  }
+}
+
+// -------------------------
+// STATUS BADGES
+// -------------------------
+.status-badge {
+  @include badge($color-success, $color-success-bg);
+  box-shadow: 0 1px 4px rgba($color-success, 0.12);
+
+  &--active {
+    @include badge($color-success, $color-success-bg);
+  }
+
+  &--completed {
+    @include badge(#4338ca, #e0e7ff);
+  }
+
+  &--pending {
+    @include badge($color-warning, $color-warning-bg);
+  }
+}
+
+.status-active {
+  background: $color-success-bg !important;
+  color: $color-success !important;
+}
+
+.status-completed {
+  background: #e0e7ff !important;
+  color: #4338ca !important;
+}
+
+.status-pending {
+  background: $color-warning-bg !important;
+  color: $color-warning !important;
+}
+
+// -------------------------
+// BUTTONS
+// -------------------------
+.button--primary {
+  @include button-primary;
+  margin-top: $space-4;
+
+  // Override Drupal defaults
+  background: $gradient-primary !important;
+  color: $color-white !important;
+}
+
+.button--secondary {
+  @include button-secondary;
+}
+
+.button--inverted {
+  @include button-inverted;
+}
+
+// -------------------------
+// TABS
+// -------------------------
+.tabs-container {
+  margin-bottom: 0;
+}
+
+.tabs {
+  @include flex-row($space-1);
+  background: $color-white;
+  padding: 6px;
+  border-radius: $radius-lg;
+  width: 100%;
+  margin-bottom: 0;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border-color;
+}
+
+.tab {
+  padding: $space-3 $space-6;
+  border: none;
+  background: transparent;
+  border-radius: $radius-md;
+  color: $color-tertiary;
+  font-family: $font-body;
+  font-weight: $font-weight-semibold;
+  font-size: $font-size-base;
+  cursor: pointer;
+  transition: $transition-base;
+  @include flex-row($space-2);
+  position: relative;
+
+  &:hover {
+    color: $color-secondary;
+    background: $color-neutral-200;
+  }
+
+  &.active {
+    background: $gradient-primary;
+    color: $color-white;
+    box-shadow: 0 2px 8px rgba($color-primary, 0.25);
+  }
+}
+
+// Tab content
+.tab-content {
+  display: none;
+  @include fade-in(0.35s, 8px);
+
+  &.active {
+    display: block;
+  }
+}
+
+// -------------------------
+// VIEW CONTAINER
+// -------------------------
+.view-container {
+  @include card(md);
+  padding: $space-6 + $space-1;
+  margin-top: $space-4;
+}
+
+// -------------------------
+// TABLE STYLES (Views)
+// -------------------------
+.view-container table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: $space-2;
+
+  thead th {
+    background: $color-neutral;
+    color: $color-tertiary;
+    @include label-text;
+    padding: $space-3 + $space-1 $space-4;
+    border-bottom: 2px solid $border-color;
+    text-align: left;
+
+    &:first-child {
+      border-radius: $radius-md 0 0 0;
+    }
+
+    &:last-child {
+      border-radius: 0 $radius-md 0 0;
+    }
+  }
+
+  tbody td {
+    padding: $space-3 + $space-1 $space-4;
+    border-bottom: 1px solid $border-color-light;
+    @include body-text(base);
+    color: $color-secondary;
+    transition: $transition-base;
+  }
+
+  tbody tr {
+    &:hover td {
+      background: rgba($color-primary, 0.03);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}

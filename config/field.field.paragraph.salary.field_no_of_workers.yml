@@ -1,0 +1,23 @@
+uuid: 78040bd0-1e05-469a-be3b-7c1ef14f58ad
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_no_of_workers
+    - paragraphs.paragraphs_type.salary
+id: paragraph.salary.field_no_of_workers
+field_name: field_no_of_workers
+entity_type: paragraph
+bundle: salary
+label: 'No of Workers'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

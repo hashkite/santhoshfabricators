@@ -1,0 +1,22 @@
+uuid: 4e439f98-58af-4897-a64a-9aef025da5fd
+langcode: en
+status: false
+dependencies:
+  module:
+    - system
+  theme:
+    - power_alpha
+_core:
+  default_config_hash: hBHXB7hC05XU7pDYzETt-GUcpFlogK1gkjyAsg0Ym58
+id: power_alpha_content
+theme: power_alpha
+region: content
+weight: -3
+provider: null
+plugin: system_main_block
+settings:
+  id: system_main_block
+  label: 'Main page content'
+  label_display: '0'
+  provider: system
+visibility: {  }

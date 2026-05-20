@@ -1,0 +1,19 @@
+uuid: 1cf77429-ebcd-4632-b14f-e1a7a5c2a365
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_vendor_name
+    - paragraphs.paragraphs_type.inventory_expenses
+id: paragraph.inventory_expenses.field_vendor_name
+field_name: field_vendor_name
+entity_type: paragraph
+bundle: inventory_expenses
+label: 'Vendor Name'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

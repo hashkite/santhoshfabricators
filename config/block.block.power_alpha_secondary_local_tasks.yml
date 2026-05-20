@@ -1,0 +1,22 @@
+uuid: 31bdc3bb-6a4f-4f3b-9030-53a09fe5a28e
+langcode: en
+status: true
+dependencies:
+  theme:
+    - power_alpha
+_core:
+  default_config_hash: BCWhood0xXFQYqxFgL1spXdb9KeIuXH1YvTdjIEedDg
+id: power_alpha_secondary_local_tasks
+theme: power_alpha
+region: header
+weight: -2
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Secondary tabs'
+  label_display: '0'
+  provider: core
+  primary: false
+  secondary: true
+visibility: {  }

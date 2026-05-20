@@ -1,5 +1,5 @@
-uuid: 26e3a76a-64df-4fe3-9f32-655c82510249
-langcode: en-gb
+uuid: 926b4d44-de79-4f04-b739-84ddf03bfc8b
+langcode: en
 status: true
 dependencies:
   config:
@@ -9,6 +9,7 @@ dependencies:
     - contact
     - file
     - filter
+    - media
     - search
     - shortcut
     - system
@@ -28,3 +29,4 @@ permissions:
   - 'search content'
   - 'skip comment approval'
   - 'use text format basic_html'
+  - 'view media'

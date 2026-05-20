@@ -1,0 +1,23 @@
+uuid: 391224a7-e5f9-45e2-be3b-759659056285
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_pf
+    - paragraphs.paragraphs_type.salary
+id: paragraph.salary.field_pf
+field_name: field_pf
+entity_type: paragraph
+bundle: salary
+label: PF
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

@@ -1,0 +1,19 @@
+uuid: be707103-8207-4654-a689-3e48b863f362
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_allocated_budget
+    - node.type.project_sites
+id: node.project_sites.field_allocated_budget
+field_name: field_allocated_budget
+entity_type: node
+bundle: project_sites
+label: 'Allocated Budget'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

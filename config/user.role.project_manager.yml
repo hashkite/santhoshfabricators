@@ -1,0 +1,9 @@
+uuid: cc185779-64af-4456-a93e-04068674dd09
+langcode: en
+status: true
+dependencies: {  }
+id: project_manager
+label: 'Project Manager'
+weight: 4
+is_admin: null
+permissions: {  }

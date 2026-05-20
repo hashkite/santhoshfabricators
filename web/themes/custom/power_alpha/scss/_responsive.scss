@@ -1,0 +1,707 @@
+// =========================
+// RESPONSIVE OVERRIDES
+// =========================
+// Professional mobile-first responsive design for all devices
+// Breakpoints: sm (480px), md (768px), lg (1024px), xl (1280px)
+
+// ─────────────────────────────────────────
+// TABLET LANDSCAPE / SMALL DESKTOP (≤1280px)
+// ─────────────────────────────────────────
+@include respond-to('xl') {
+  .fabritrack-sidebar {
+    width: 220px;
+    padding: $space-4 $space-3;
+
+    .brand-title {
+      font-size: 0.85rem;
+    }
+
+    .sidebar-nav .nav-item a,
+    .navigation .menu-item a {
+      font-size: 0.85rem;
+      padding: $space-2 $space-3;
+    }
+  }
+
+  .fabritrack-main {
+    padding: $space-6 $space-6;
+  }
+
+  .dashboard-page-title {
+    font-size: 1.6rem !important;
+  }
+
+  // Dashboard card grid
+  .view-project-dashboard .view-content .item-list ul {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: $space-5;
+  }
+}
+
+// ─────────────────────────────────────────
+// TABLET PORTRAIT (≤1024px)
+// ─────────────────────────────────────────
+@include respond-to('lg') {
+
+  // Collapse sidebar into a hidden state
+  .fabritrack-sidebar {
+    position: fixed;
+    left: -280px;
+    top: 0;
+    height: 100vh;
+    width: 260px;
+    z-index: $z-overlay;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+
+    &.sidebar-open {
+      left: 0;
+      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  // When sidebar is collapsed, main takes full width
+  .fabritrack-body {
+    flex-direction: column;
+  }
+
+  .fabritrack-main {
+    padding: $space-5 $space-5;
+    width: 100%;
+  }
+
+  // Header adjustments
+  .fabritrack-header {
+    padding: 0 $space-4;
+
+    .header-center {
+      max-width: 320px;
+      margin: 0 $space-4;
+    }
+  }
+
+  // Dashboard grid
+  .view-project-dashboard .view-content .item-list ul {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: $space-4;
+  }
+
+  // Project detail
+  .project-wrapper {
+    padding-left: $space-4;
+    padding-right: $space-4;
+  }
+
+  .project-header-card {
+    padding: $space-5 $space-5;
+  }
+
+  .project-meta-grid {
+    grid-template-columns: 1fr;
+  }
+
+  // Tabs in project detail
+  .tabs {
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  // Exposed filters
+  .view-filters-container {
+    flex-direction: column;
+    align-items: stretch;
+
+    .view-filters-form-wrapper .views-exposed-form {
+      flex-direction: row;
+      flex-wrap: wrap !important;
+    }
+
+    .btn-new-project {
+      align-self: flex-start;
+    }
+  }
+
+  // Purchase order table: make scrollable
+  .view-purchase-order {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+      min-width: 700px;
+    }
+  }
+
+  // Views table inside view-container
+  .view-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+      min-width: 600px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// MOBILE LANDSCAPE / LARGE PHONES (≤768px)
+// ─────────────────────────────────────────
+@include respond-to('md') {
+
+  // Header
+  .fabritrack-header {
+    height: 56px;
+    padding: 0 $space-3;
+
+    .logo-text {
+      font-size: 1.15rem;
+    }
+
+    .header-center {
+      display: none; // Hide search on mobile
+    }
+
+    .header-icon-btn {
+      width: 36px;
+      height: 36px;
+    }
+
+    .header-avatar {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  // Main content
+  .fabritrack-main {
+    padding: $space-4;
+  }
+
+  // Dashboard header
+  .dashboard-header-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-3;
+    margin-bottom: $space-5;
+  }
+
+  .dashboard-page-title {
+    font-size: 1.4rem !important;
+  }
+
+  .dashboard-page-subtitle {
+    font-size: 0.85rem !important;
+  }
+
+  // Dashboard card grid - 2 columns
+  .view-project-dashboard .view-content .item-list ul {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+  }
+
+  // Card adjustments
+  .project-card-wrapper {
+    .project-card-image-wrapper {
+      height: 150px;
+    }
+
+    .project-card-body {
+      padding: $space-4;
+    }
+
+    .project-card-title {
+      font-size: 1rem;
+    }
+
+    .project-card-footer {
+      padding: $space-3 $space-4;
+    }
+  }
+
+  // Create new site card
+  .create-new-site-card {
+    min-height: 350px;
+  }
+
+  // Exposed filters - stack vertically
+  .view-filters-container .view-filters-form-wrapper .views-exposed-form {
+    .form-item {
+      width: 100% !important;
+      max-width: none !important;
+    }
+  }
+
+  // Project detail page
+  .project-wrapper {
+    padding-top: $space-4;
+    padding-bottom: $space-8;
+    padding-left: 0px;
+    padding-right: 0px;
+  }
+
+  .project-header-card {
+    padding: $space-4;
+    margin-bottom: $space-4;
+
+    .project-title {
+      font-size: $font-size-xl;
+    }
+  }
+
+  // Project detail meta
+  .project-meta-item {
+    padding: $space-2 0;
+    font-size: $font-size-sm;
+
+    .meta-label {
+      font-size: $font-size-sm;
+    }
+
+    .meta-value {
+      font-size: $font-size-sm;
+    }
+  }
+
+  // Tabs
+  .tabs-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .tabs {
+    min-width: max-content;
+  }
+
+  .tab {
+    padding: $space-2 $space-4;
+    font-size: $font-size-sm;
+  }
+
+  // View containers
+  .view-container {
+    padding: $space-4;
+    border-radius: $radius-md;
+    margin-top: $space-3;
+  }
+
+  // Pagination
+  .view-purchase-order .pager {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    margin-top: $space-4 !important;
+
+    .pager__item a,
+    .pager__item span {
+      min-width: 32px !important;
+      height: 32px !important;
+      font-size: $font-size-sm !important;
+    }
+  }
+
+  // Expenses ledger filters
+  .view-filters-wrapper {
+    margin-bottom: $space-4;
+
+    .view-filters form {
+      flex-direction: column;
+      align-items: stretch;
+      gap: $space-2;
+    }
+  }
+
+  // Expense Type radio tabs
+  .view-filters-wrapper .view-filters form .form-item {
+    &[data-drupal-selector="edit-field-expense-type-value"] {
+      .form-radios {
+        gap: $space-3;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Page title
+  .page-title {
+    font-size: $font-size-xl;
+
+    &::after {
+      width: 36px;
+      height: 3px;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// MOBILE PORTRAIT (≤480px)
+// ─────────────────────────────────────────
+@include respond-to('sm') {
+
+  // Header minimized
+  .fabritrack-header {
+    height: 50px;
+    padding: 0 $space-2;
+
+    .logo-text {
+      font-size: 1rem;
+    }
+
+    .header-right {
+      gap: $space-1;
+    }
+
+    .header-icon-btn {
+      width: 32px;
+      height: 32px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .header-avatar {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  // Main content
+  .fabritrack-main {
+    padding: $space-3;
+  }
+
+  // Dashboard
+  .dashboard-header-bar {
+    margin-bottom: $space-4;
+  }
+
+  .dashboard-page-title {
+    font-size: 1.2rem !important;
+    line-height: 1.3;
+  }
+
+  .dashboard-page-subtitle {
+    font-size: 0.8rem !important;
+  }
+
+  // Single column cards
+  .view-project-dashboard .view-content .item-list ul {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+  }
+
+  // Card
+  .project-card-wrapper {
+    .project-card-image-wrapper {
+      height: 140px;
+    }
+
+    .project-card-body {
+      padding: $space-3;
+    }
+
+    .project-card-title {
+      font-size: 0.95rem;
+    }
+
+    .project-card-code {
+      font-size: 0.75rem;
+    }
+
+    .project-card-location {
+      font-size: 0.8rem;
+    }
+
+    .budget-meta-top {
+
+      .budget-label,
+      .budget-value {
+        font-size: 0.8rem;
+      }
+    }
+
+    .project-card-footer {
+      padding: $space-2 $space-3;
+      flex-direction: column;
+      gap: $space-2;
+      text-align: center;
+
+      .last-updated {
+        font-size: 0.7rem;
+      }
+    }
+  }
+
+  .create-new-site-card {
+    min-height: 200px;
+
+    .plus-icon-circle {
+      width: 40px;
+      height: 40px;
+    }
+
+    .create-title {
+      font-size: 0.95rem;
+    }
+
+    .create-subtitle {
+      font-size: 0.75rem;
+    }
+  }
+
+  // Filters
+  .view-filters-container {
+    margin-bottom: $space-4;
+    gap: $space-3;
+
+    .view-filters-form-wrapper .views-exposed-form {
+      gap: $space-2 !important;
+
+      .form-item {
+        height: 36px !important;
+        padding: 0 $space-3 !important;
+        font-size: $font-size-sm !important;
+
+        label {
+          font-size: 0.8rem !important;
+        }
+
+        select,
+        .form-select {
+          font-size: 0.8rem !important;
+        }
+
+        input[type="text"] {
+          width: 100px !important;
+          font-size: 0.8rem !important;
+        }
+      }
+
+      .form-actions {
+
+        input[type="submit"],
+        .button {
+          height: 36px !important;
+          font-size: 0.8rem !important;
+          padding: 0 $space-4 !important;
+        }
+      }
+    }
+
+    .btn-new-project {
+      font-size: 0.8rem;
+      padding: $space-2 $space-4;
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  // Project detail
+  .project-wrapper {
+    padding: $space-3 0px $space-6 0px;
+  }
+
+  .project-header-card {
+    padding: $space-3;
+    margin-bottom: $space-3;
+    border-radius: $radius-md;
+
+    .project-title {
+      font-size: $font-size-lg;
+      margin-bottom: $space-3;
+    }
+  }
+
+  .project-meta-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-1;
+
+    .meta-label {
+      font-size: $font-size-xs;
+    }
+
+    .meta-value {
+      font-size: $font-size-sm;
+    }
+  }
+
+  // Tabs
+  .tabs {
+    padding: 4px;
+    border-radius: $radius-md;
+  }
+
+  .tab {
+    padding: $space-2 $space-3;
+    font-size: $font-size-xs;
+  }
+
+  // View containers
+  .view-container {
+    padding: $space-3;
+    border-radius: $radius-sm;
+  }
+
+  // Tables
+  .view-container table,
+  .view-purchase-order table {
+    thead th {
+      padding: $space-2 $space-3 !important;
+      font-size: 0.7rem !important;
+    }
+
+    tbody td {
+      padding: $space-2 $space-3 !important;
+      font-size: 0.8rem !important;
+    }
+  }
+
+  // Pagination
+  .view-purchase-order .pager {
+
+    .pager__item a,
+    .pager__item span {
+      min-width: 28px !important;
+      height: 28px !important;
+      font-size: $font-size-xs !important;
+    }
+  }
+
+  // Buttons
+  .button--primary {
+    font-size: $font-size-sm;
+    padding: $space-2 $space-4;
+  }
+
+  // Page title
+  .page-title {
+    font-size: $font-size-lg;
+    margin-bottom: $space-4;
+
+    &::after {
+      width: 30px;
+      height: 3px;
+    }
+  }
+
+  // Expenses filters
+  .view-filters-wrapper .view-filters form {
+    .form-item[data-drupal-selector="edit-field-expense-type-value"] {
+      padding: 0;
+
+      .form-radios {
+        gap: $space-2;
+
+        .form-item label {
+          font-size: 0.8rem;
+          padding-bottom: $space-2;
+        }
+      }
+    }
+
+    select,
+    input[type="text"] {
+      font-size: $font-size-sm;
+      padding: $space-1 $space-3;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// TOUCH DEVICE IMPROVEMENTS
+// ─────────────────────────────────────────
+@media (hover: none) and (pointer: coarse) {
+
+  // Increase tap targets
+  .tab {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .nav-item a,
+  .menu-item a {
+    min-height: 44px;
+  }
+
+  .header-icon-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  // Disable hover effects on touch
+  .project-card-wrapper:hover {
+    transform: none;
+    box-shadow: $shadow-sm;
+  }
+
+  .project-card-wrapper:hover .project-card-image-wrapper img {
+    transform: none;
+  }
+
+  .btn-new-project:hover {
+    transform: none;
+  }
+}
+
+// ─────────────────────────────────────────
+// PRINT STYLES
+// ─────────────────────────────────────────
+@media print {
+
+  .fabritrack-header,
+  .fabritrack-sidebar,
+  .sidebar-footer,
+  .btn-new-project,
+  .form-actions,
+  .view-filters-container,
+  .view-filters-wrapper,
+  .pager,
+  .tabs-container,
+  .button--primary {
+    display: none !important;
+  }
+
+  .fabritrack-body {
+    display: block;
+  }
+
+  .fabritrack-main {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .project-wrapper {
+    padding: 0;
+  }
+
+  .view-container,
+  .project-header-card {
+    box-shadow: none;
+    border: 1px solid #ddd;
+    page-break-inside: avoid;
+  }
+
+  table {
+    page-break-inside: auto;
+
+    tr {
+      page-break-inside: avoid;
+    }
+  }
+}

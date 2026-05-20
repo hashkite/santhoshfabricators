@@ -1,0 +1,696 @@
+// =========================
+// ADMIN DASHBOARD OVERVIEW
+// =========================
+// Premium administrative dashboard matching the FabriTrack mockup
+
+// -------------------------
+// DASHBOARD CONTAINER
+// -------------------------
+.admin-dashboard {
+  @include fade-in(0.4s, 12px);
+}
+
+// -------------------------
+// HEADER
+// -------------------------
+.dashboard-overview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-6;
+  margin-bottom: $space-8;
+  flex-wrap: wrap;
+
+  &__left {
+    flex: 1;
+  }
+
+  &__right {
+    display: flex;
+    gap: $space-3;
+    flex-shrink: 0;
+  }
+}
+
+.dashboard-overview-title {
+  margin: 0 0 $space-1 0;
+  font-family: $font-headline;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-secondary;
+  letter-spacing: $letter-spacing-tight;
+  line-height: $line-height-tight;
+}
+
+.dashboard-overview-subtitle {
+  margin: 0;
+  font-family: $font-body;
+  font-size: $font-size-base;
+  color: $color-neutral-600;
+  font-weight: $font-weight-medium;
+}
+
+.dashboard-date-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-4;
+  background: $color-white;
+  border: 1px solid $color-neutral-300;
+  border-radius: $radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-secondary;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  svg {
+    color: $color-neutral-600;
+  }
+}
+
+// -------------------------
+// KPI STAT CARDS
+// -------------------------
+.kpi-cards-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-5;
+  margin-bottom: $space-8;
+}
+
+.kpi-card {
+  @include card(sm);
+  padding: $space-5 $space-6;
+  position: relative;
+  overflow: hidden;
+  transition: $transition-base;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: $gradient-primary;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  &__header {
+    @include flex-between;
+    margin-bottom: $space-4;
+  }
+
+  &__label {
+    font-family: $font-headline;
+    font-size: 0.7rem;
+    font-weight: $font-weight-bold;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-widest;
+  }
+
+  &__icon {
+    @include flex-center;
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-md;
+    flex-shrink: 0;
+
+    &--blue {
+      background: rgba($color-primary, 0.08);
+      color: $color-primary;
+    }
+
+    &--green {
+      background: rgba($color-success, 0.08);
+      color: $color-success;
+    }
+
+    &--amber {
+      background: rgba($color-warning, 0.08);
+      color: $color-warning;
+    }
+
+    &--purple {
+      background: rgba(#6366f1, 0.08);
+      color: #6366f1;
+    }
+  }
+
+  &__body {
+    display: flex;
+    align-items: baseline;
+    gap: $space-3;
+  }
+
+  &__value {
+    font-family: $font-headline;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-secondary;
+    letter-spacing: $letter-spacing-tight;
+    line-height: 1;
+  }
+}
+
+// -------------------------
+// MAIN CONTENT GRID
+// -------------------------
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-6;
+}
+
+.dashboard-grid__left {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+.dashboard-grid__right {
+  display: flex;
+  flex-direction: column;
+  gap: $space-6;
+}
+
+// -------------------------
+// DASHBOARD WIDGET (generic card)
+// -------------------------
+.dashboard-widget {
+  @include card(md);
+  overflow: hidden;
+
+  &__header {
+    @include flex-between;
+    padding: $space-5 $space-6;
+    border-bottom: 1px solid $border-color-light;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: $font-headline;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+  }
+
+  &__link {
+    font-family: $font-body;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-primary;
+    text-decoration: none;
+    transition: $transition-base;
+
+    &:hover {
+      color: $color-primary-dark;
+      text-decoration: underline;
+    }
+  }
+
+  &__body {
+    padding: $space-6;
+
+    &--table {
+      padding: 0;
+    }
+
+    &--centered {
+      @include flex-center;
+      padding: $space-8 $space-6;
+    }
+  }
+}
+
+// -------------------------
+// SITE STATUS ITEMS
+// -------------------------
+.site-status-item {
+  padding: $space-5 0;
+  border-bottom: 1px solid $border-color-light;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &__header {
+    @include flex-between;
+    margin-bottom: $space-2;
+  }
+
+  &__info {
+    @include flex-column($space-1);
+  }
+
+  &__title {
+    font-family: $font-headline;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+    text-decoration: none;
+    transition: $transition-base;
+
+    &:hover {
+      color: $color-primary;
+    }
+  }
+
+  &__code {
+    font-family: $font-body;
+    font-size: $font-size-xs;
+    color: $color-neutral-600;
+    font-weight: $font-weight-medium;
+  }
+
+  &__percent {
+    font-family: $font-headline;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    margin-top: $space-3;
+  }
+}
+
+// Site status progress bar
+.site-status-progress {
+  width: 100%;
+  height: 6px;
+  background: $color-neutral-200;
+  border-radius: $radius-full;
+  overflow: hidden;
+  margin-bottom: $space-1;
+
+  &__fill {
+    height: 100%;
+    background: $color-primary;
+    border-radius: $radius-full;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &--warning {
+      background: $color-warning;
+    }
+
+    &--critical {
+      background: $color-danger;
+    }
+  }
+}
+
+// Site status badge
+.site-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px $space-3;
+  border-radius: $radius-sm;
+  font-size: 0.65rem;
+  font-weight: $font-weight-bold;
+  letter-spacing: $letter-spacing-wide;
+
+  &--active {
+    background: $color-success-bg;
+    color: $color-success;
+  }
+
+  &--completed {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  &--pending {
+    background: $color-warning-bg;
+    color: $color-warning;
+  }
+
+  &--inactive,
+  &--closed {
+    background: $color-neutral-200;
+    color: $color-neutral-700;
+  }
+}
+
+// -------------------------
+// ACTIVITY TABLE
+// -------------------------
+.activity-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+
+  thead th {
+    background: #F8FAFC;
+    color: $color-tertiary;
+    font-family: $font-headline;
+    font-size: 0.7rem;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.75px;
+    padding: $space-4 $space-6;
+    border-bottom: 2px solid $border-color;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  tbody td {
+    padding: $space-4 + $space-1 $space-6;
+    border-bottom: 1px solid $border-color-light;
+    font-size: $font-size-sm;
+    color: $color-secondary;
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: $transition-base;
+
+    &:hover td {
+      background: rgba($color-primary, 0.02);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.activity-entity-link {
+  color: $color-secondary;
+  font-weight: $font-weight-bold;
+  text-decoration: none;
+  transition: $transition-base;
+
+  &:hover {
+    color: $color-primary;
+  }
+}
+
+.activity-date {
+  color: $color-neutral-700;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.activity-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px $space-3;
+  border-radius: $radius-sm;
+  font-size: 0.65rem;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  &--expense {
+    background: rgba($color-info, 0.08);
+    color: $color-info;
+  }
+
+  &--po {
+    background: rgba($color-warning, 0.08);
+    color: $color-warning;
+  }
+}
+
+.activity-amount {
+  font-family: $font-headline;
+  font-weight: $font-weight-bold;
+  color: $color-secondary;
+  white-space: nowrap;
+}
+
+// -------------------------
+// DONUT CHART
+// -------------------------
+.donut-chart-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-chart {
+  transform: rotate(0deg);
+
+  &__progress {
+    transition: stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+.donut-chart__label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  @include flex-column(2px);
+  align-items: center;
+}
+
+.donut-chart__value {
+  font-family: $font-headline;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-secondary;
+  line-height: 1;
+}
+
+.donut-chart__sublabel {
+  font-family: $font-body;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  color: $color-primary;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-widest;
+}
+
+// -------------------------
+// QUICK ACTIONS
+// -------------------------
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $space-3;
+}
+
+.quick-action-btn {
+  @include flex-center;
+  flex-direction: column;
+  gap: $space-2;
+  padding: $space-5 $space-4;
+  background: $color-neutral-100;
+  border: 1px solid $border-color-light;
+  border-radius: $radius-md;
+  color: $color-secondary;
+  font-family: $font-body;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+  transition: $transition-base;
+  cursor: pointer;
+
+  svg {
+    color: $color-primary;
+    transition: $transition-base;
+  }
+
+  &:hover {
+    background: rgba($color-primary, 0.04);
+    border-color: rgba($color-primary, 0.2);
+    color: $color-primary;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba($color-primary, 0.08);
+  }
+}
+
+// -------------------------
+// EMPTY STATE
+// -------------------------
+.empty-state {
+  text-align: center;
+  padding: $space-8;
+  color: $color-neutral-600;
+  @include body-text(base);
+}
+
+// ─────────────────────────────────────────
+// DASHBOARD RESPONSIVE OVERRIDES
+// ─────────────────────────────────────────
+
+@include respond-to('xl') {
+  .kpi-cards-row {
+    gap: $space-4;
+  }
+
+  .kpi-card__value {
+    font-size: $font-size-2xl;
+  }
+}
+
+@include respond-to('lg') {
+  .kpi-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-4;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-grid__right {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: $space-5;
+  }
+}
+
+@include respond-to('md') {
+  .dashboard-overview-header {
+    flex-direction: column;
+    gap: $space-3;
+    margin-bottom: $space-5;
+  }
+
+  .dashboard-overview-title {
+    font-size: $font-size-2xl;
+  }
+
+  .kpi-cards-row {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-3;
+  }
+
+  .kpi-card {
+    padding: $space-4;
+  }
+
+  .kpi-card__value {
+    font-size: $font-size-xl;
+  }
+
+  .kpi-card__label {
+    font-size: 0.6rem;
+  }
+
+  .dashboard-widget__header {
+    padding: $space-4 $space-5;
+  }
+
+  .dashboard-widget__body {
+    padding: $space-4 $space-5;
+  }
+
+  .dashboard-grid__right {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-table {
+    thead th {
+      padding: $space-3 $space-4;
+    }
+
+    tbody td {
+      padding: $space-3 $space-4;
+    }
+  }
+}
+
+@include respond-to('sm') {
+  .dashboard-overview-title {
+    font-size: $font-size-xl;
+  }
+
+  .dashboard-overview-subtitle {
+    font-size: $font-size-sm;
+  }
+
+  .kpi-cards-row {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-2;
+  }
+
+  .kpi-card {
+    padding: $space-3;
+
+    &__icon {
+      width: 32px;
+      height: 32px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    &__value {
+      font-size: $font-size-lg;
+    }
+
+    &__label {
+      font-size: 0.55rem;
+    }
+  }
+
+  .dashboard-widget__header {
+    padding: $space-3 $space-4;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $space-2;
+  }
+
+  .dashboard-widget__title {
+    font-size: $font-size-base;
+  }
+
+  .dashboard-widget__body {
+    padding: $space-3 $space-4;
+
+    &--centered {
+      padding: $space-5 $space-3;
+    }
+  }
+
+  .site-status-item__title {
+    font-size: $font-size-sm;
+  }
+
+  .donut-chart {
+    width: 140px;
+    height: 140px;
+  }
+
+  .donut-chart__value {
+    font-size: $font-size-xl;
+  }
+
+  .quick-actions-grid {
+    gap: $space-2;
+  }
+
+  .quick-action-btn {
+    padding: $space-3;
+    font-size: $font-size-xs;
+  }
+}

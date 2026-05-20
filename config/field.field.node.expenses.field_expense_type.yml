@@ -1,0 +1,21 @@
+uuid: 32997d87-ae2f-4013-8383-b8dc7f89f98f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_expense_type
+    - node.type.expenses
+  module:
+    - options
+id: node.expenses.field_expense_type
+field_name: field_expense_type
+entity_type: node
+bundle: expenses
+label: 'Expense Type'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

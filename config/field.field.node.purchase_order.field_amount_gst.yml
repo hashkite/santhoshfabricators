@@ -1,0 +1,19 @@
+uuid: 6e2f7a5c-54f9-49c5-850b-e03d714bd52a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_amount_gst
+    - node.type.purchase_order
+id: node.purchase_order.field_amount_gst
+field_name: field_amount_gst
+entity_type: node
+bundle: purchase_order
+label: 'Amount + GST'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

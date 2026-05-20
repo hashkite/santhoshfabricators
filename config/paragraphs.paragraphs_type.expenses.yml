@@ -1,0 +1,10 @@
+uuid: 122ebf58-d3ea-4c04-b87d-07de6ed3d702
+langcode: en
+status: true
+dependencies: {  }
+id: expenses
+label: Expenses
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

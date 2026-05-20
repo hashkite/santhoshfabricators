@@ -1,0 +1,159 @@
+// =========================
+// VARIABLES & DESIGN TOKENS
+// =========================
+// Based on Power Alpha Design System
+// Primary: #0091EA | Secondary: #263238 | Tertiary: #455A64 | Neutral: #F8F9FA
+
+// -------------------------
+// COLOR PALETTE
+// -------------------------
+
+// Primary
+$color-primary:        #0091EA;
+$color-primary-light:  #40C4FF;
+$color-primary-dark:   #0277BD;
+// Secondary
+$color-secondary:      #263238;
+$color-secondary-light:#37474F;
+$color-secondary-dark: #1C252B;
+
+// Tertiary
+$color-tertiary:       #455A64;
+$color-tertiary-light: #607D8B;
+$color-tertiary-dark:  #37474F;
+
+// Neutral
+$color-neutral:        #F8F9FA;
+$color-neutral-100:    #F8F9FA;
+$color-neutral-200:    #E9ECEF;
+$color-neutral-300:    #DEE2E6;
+$color-neutral-400:    #CED4DA;
+$color-neutral-500:    #ADB5BD;
+$color-neutral-600:    #6C757D;
+$color-neutral-700:    #495057;
+$color-neutral-800:    #343A40;
+$color-neutral-900:    #212529;
+
+// Status colors
+$color-success:        #15803d;
+$color-success-bg:     #dcfce7;
+$color-warning:        #a16207;
+$color-warning-bg:     #fef9c3;
+$color-info:           #0369a1;
+$color-info-bg:        #e0f2fe;
+$color-danger:         #dc2626;
+$color-danger-bg:      #fee2e2;
+
+// White / Black
+$color-white:          #ffffff;
+$color-black:          #000000;
+
+// -------------------------
+// GRADIENTS
+// -------------------------
+$gradient-primary:     linear-gradient(135deg, $color-primary 0%, #0277BD 50%, $color-primary-dark 100%);
+$gradient-accent:      linear-gradient(135deg, $color-primary-light 0%, $color-primary 100%);
+$gradient-dark:        linear-gradient(135deg, $color-secondary 0%, $color-tertiary 100%);
+
+// -------------------------
+// TYPOGRAPHY
+// -------------------------
+$font-headline:        'Manrope', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+$font-body:            'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+$font-label:           'Inter', system-ui, sans-serif;
+
+$font-size-xs:         0.75rem;   // 12px
+$font-size-sm:         0.8125rem; // 13px
+$font-size-base:       0.9rem;    // ~14px
+$font-size-md:         1rem;      // 16px
+$font-size-lg:         1.125rem;  // 18px
+$font-size-xl:         1.5rem;    // 24px
+$font-size-2xl:        1.75rem;   // 28px
+$font-size-3xl:        2rem;      // 32px
+$font-size-4xl:        2.5rem;    // 40px
+
+$font-weight-regular:  400;
+$font-weight-medium:   500;
+$font-weight-semibold: 600;
+$font-weight-bold:     700;
+$font-weight-extrabold:800;
+$font-weight-black:    900;
+
+$line-height-tight:    1.2;
+$line-height-base:     1.5;
+$line-height-relaxed:  1.75;
+
+$letter-spacing-tight: -0.03em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide:   0.02em;
+$letter-spacing-wider:  0.04em;
+$letter-spacing-widest: 0.05em;
+
+// -------------------------
+// SPACING
+// -------------------------
+$space-1:  0.25rem;  // 4px
+$space-2:  0.5rem;   // 8px
+$space-3:  0.75rem;  // 12px
+$space-4:  1rem;     // 16px
+$space-5:  1.25rem;  // 20px
+$space-6:  1.5rem;   // 24px
+$space-8:  2rem;     // 32px
+$space-10: 2.5rem;   // 40px
+$space-12: 3rem;     // 48px
+
+// -------------------------
+// BORDER RADIUS
+// -------------------------
+$radius-sm:   8px;
+$radius-md:   12px;
+$radius-lg:   16px;
+$radius-xl:   20px;
+$radius-full: 9999px;
+
+// -------------------------
+// SHADOWS (using hex colors directly for Dart Sass compatibility)
+// -------------------------
+$shadow-sm:   0 1px 3px rgba($color-primary, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+$shadow-md:   0 4px 12px rgba($color-primary, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+$shadow-lg:   0 12px 32px rgba($color-primary, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06);
+$shadow-xl:   0 20px 48px rgba($color-primary, 0.16), 0 8px 20px rgba(0, 0, 0, 0.08);
+$shadow-glow: 0 0 40px rgba($color-primary, 0.15);
+
+// -------------------------
+// BORDERS
+// -------------------------
+$border-color:       rgba($color-primary, 0.12);
+$border-color-light: rgba($color-primary, 0.06);
+
+// -------------------------
+// TRANSITIONS
+// -------------------------
+$transition-base:   0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$transition-bounce: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+$transition-fast:   0.15s ease;
+$transition-slow:   0.4s ease;
+
+// -------------------------
+// BREAKPOINTS
+// -------------------------
+$breakpoint-sm:  480px;
+$breakpoint-md:  768px;
+$breakpoint-lg:  1024px;
+$breakpoint-xl:  1280px;
+$breakpoint-2xl: 1440px;
+
+// -------------------------
+// Z-INDEX
+// -------------------------
+$z-dropdown:  100;
+$z-sticky:    200;
+$z-overlay:   300;
+$z-modal:     400;
+$z-tooltip:   500;
+
+// -------------------------
+// LAYOUT
+// -------------------------
+$container-max-width: 1280px;
+$sidebar-width:       280px;

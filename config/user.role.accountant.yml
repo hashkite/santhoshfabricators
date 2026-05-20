@@ -1,0 +1,9 @@
+uuid: 70b662a1-4fff-4257-9c39-57d169cdcfdb
+langcode: en
+status: true
+dependencies: {  }
+id: accountant
+label: Accountant
+weight: 5
+is_admin: null
+permissions: {  }

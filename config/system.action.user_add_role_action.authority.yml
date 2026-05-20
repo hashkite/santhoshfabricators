@@ -1,0 +1,14 @@
+uuid: 7fbccde1-d7ec-459a-9c33-6dc49c2dbc67
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.authority
+  module:
+    - user
+id: user_add_role_action.authority
+label: 'Add the Authority role to the selected user(s)'
+type: user
+plugin: user_add_role_action
+configuration:
+  rid: authority

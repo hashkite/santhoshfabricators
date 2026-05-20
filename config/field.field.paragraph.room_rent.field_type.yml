@@ -1,0 +1,21 @@
+uuid: a6db6e44-d1be-4ae8-b563-43834012f21d
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_type
+    - paragraphs.paragraphs_type.room_rent
+  module:
+    - options
+id: paragraph.room_rent.field_type
+field_name: field_type
+entity_type: paragraph
+bundle: room_rent
+label: Type
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

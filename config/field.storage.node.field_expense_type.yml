@@ -1,0 +1,33 @@
+uuid: 7bc12dcb-f439-482c-a9e5-c38be4365899
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_expense_type
+field_name: field_expense_type
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: salary
+      label: Salary
+    -
+      value: room_rent_utility
+      label: 'Room Rent & Utility'
+    -
+      value: vendor
+      label: Vendor
+    -
+      value: daily_expenses
+      label: 'Daily Expenses'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

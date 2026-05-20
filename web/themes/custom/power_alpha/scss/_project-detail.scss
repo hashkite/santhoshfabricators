@@ -1,0 +1,1002 @@
+// =========================
+// PROJECT DETAIL PAGE — PREMIUM REDESIGN
+// =========================
+// Matches the FabriTrack enterprise mockup aesthetic
+
+// -------------------------
+// PAGE CONTAINER
+// -------------------------
+.project-detail-page {
+  @include container;
+  padding-top: $space-6;
+  padding-bottom: $space-12;
+  @include fade-in(0.5s, 16px);
+}
+
+// -------------------------
+// BREADCRUMB NAVIGATION
+// -------------------------
+.project-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-6;
+  @include body-text(sm);
+
+  .breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    color: $color-tertiary;
+    text-decoration: none;
+    font-weight: $font-weight-medium;
+    transition: $transition-base;
+
+    &:hover {
+      color: $color-primary;
+    }
+
+    svg {
+      opacity: 0.7;
+    }
+  }
+
+  .breadcrumb-separator {
+    display: flex;
+    align-items: center;
+    color: $color-neutral-400;
+  }
+
+  .breadcrumb-current {
+    color: $color-secondary;
+    font-weight: $font-weight-bold;
+    @include truncate(1);
+    max-width: 300px;
+  }
+}
+
+// -------------------------
+// HEADER SECTION
+// -------------------------
+.project-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-6;
+  margin-bottom: $space-6;
+  flex-wrap: wrap;
+}
+
+.project-detail-header__title-row {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+.project-detail-title {
+  margin: 0;
+  font-family: $font-headline;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-secondary;
+  letter-spacing: $letter-spacing-tight;
+  line-height: $line-height-tight;
+}
+
+// Status Chip (in header next to title)
+.project-status-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px $space-4;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+
+  &.status-chip--active {
+    background: $color-success-bg;
+    color: $color-success;
+    border: 1px solid rgba($color-success, 0.2);
+  }
+
+  &.status-chip--completed {
+    background: #e0e7ff;
+    color: #4338ca;
+    border: 1px solid rgba(#4338ca, 0.2);
+  }
+
+  &.status-chip--pending {
+    background: $color-warning-bg;
+    color: $color-warning;
+    border: 1px solid rgba($color-warning, 0.2);
+  }
+
+  &.status-chip--inactive,
+  &.status-chip--closed {
+    background: $color-neutral-200;
+    color: $color-neutral-700;
+    border: 1px solid $color-neutral-300;
+  }
+}
+
+// Header Action Buttons
+.project-detail-header__actions {
+  display: flex;
+  gap: $space-3;
+  flex-shrink: 0;
+}
+
+.btn-detail {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-3 $space-5;
+  border-radius: $radius-sm;
+  font-family: $font-body;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  text-decoration: none;
+  cursor: pointer;
+  transition: $transition-base;
+  border: none;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  &--outline {
+    background: $color-white;
+    color: $color-secondary;
+    border: 1.5px solid $color-neutral-300;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+    &:hover {
+      border-color: $color-primary;
+      color: $color-primary;
+      background: rgba($color-primary, 0.02);
+      box-shadow: 0 2px 8px rgba($color-primary, 0.08);
+    }
+  }
+
+  &--primary {
+    background: $gradient-primary;
+    color: $color-white;
+    box-shadow: 0 2px 8px rgba($color-primary, 0.25);
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba($color-primary, 0.35);
+      filter: brightness(1.08);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+
+  &--dark {
+    background: $color-secondary;
+    color: $color-white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+    &:hover {
+      background: $color-secondary-light;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+  }
+}
+
+// -------------------------
+// PROJECT INFO CARD
+// -------------------------
+.project-info-card {
+  @include card(md);
+  position: relative;
+  overflow: hidden;
+  padding: $space-8;
+  margin-bottom: $space-6;
+
+  .project-info-card__accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $gradient-primary;
+  }
+}
+
+.project-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+}
+
+.project-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-4;
+
+  .info-item__icon {
+    @include flex-center;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    background: rgba($color-primary, 0.06);
+    color: $color-primary;
+    flex-shrink: 0;
+    transition: $transition-base;
+  }
+
+  &:hover .info-item__icon {
+    background: rgba($color-primary, 0.12);
+    transform: scale(1.05);
+  }
+
+  .info-item__content {
+    @include flex-column($space-1);
+  }
+
+  .info-item__label {
+    font-family: $font-body;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wider;
+  }
+
+  .info-item__value {
+    font-family: $font-headline;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+  }
+}
+
+// Inline status badge (inside info card)
+.status-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px $space-3;
+  border-radius: $radius-full;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: capitalize;
+
+  &.status-active {
+    background: $color-success-bg;
+    color: $color-success;
+  }
+
+  &.status-completed {
+    background: #e0e7ff;
+    color: #4338ca;
+  }
+
+  &.status-pending {
+    background: $color-warning-bg;
+    color: $color-warning;
+  }
+}
+
+// -------------------------
+// SUMMARY WIDGETS ROW
+// -------------------------
+.project-summary-row {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: $space-6;
+  margin-bottom: $space-8;
+}
+
+.summary-widget {
+  @include card(md);
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+
+  .summary-widget__header {
+    padding: $space-5 $space-6;
+    border-bottom: 1px solid $border-color-light;
+  }
+
+  .summary-widget__title {
+    margin: 0;
+    font-family: $font-headline;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+
+    svg {
+      color: $color-primary;
+      flex-shrink: 0;
+    }
+  }
+
+  .summary-widget__body {
+    padding: $space-6;
+    flex: 1;
+  }
+}
+
+// Budget Widget
+.summary-widget--budget {
+  .budget-hero {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    margin-bottom: $space-6;
+  }
+
+  .budget-hero__label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  .budget-hero__amount {
+    font-family: $font-headline;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-secondary;
+    letter-spacing: $letter-spacing-tight;
+  }
+}
+
+// Budget Progress Section
+.budget-progress-section {
+  .budget-progress__meta {
+    @include flex-between;
+    margin-bottom: $space-2;
+
+    span {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      color: $color-tertiary;
+    }
+
+    .budget-progress__remaining {
+      font-weight: $font-weight-bold;
+      color: $color-primary;
+    }
+  }
+
+  .budget-progress__bar {
+    width: 100%;
+    height: 10px;
+    background: $color-neutral-200;
+    border-radius: $radius-full;
+    overflow: hidden;
+
+    .budget-progress__fill {
+      height: 100%;
+      background: $color-primary;
+      border-radius: $radius-full;
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.3) 50%,
+          transparent 100%
+        );
+        animation: shimmer 2s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(100%);
+        }
+      }
+
+      &--critical {
+        background: $color-danger;
+      }
+    }
+  }
+}
+
+// Timeline Widget
+.summary-widget--timeline {
+  border-left: 4px solid $color-primary;
+
+  .timeline-dates {
+    @include flex-column($space-5);
+    margin-bottom: $space-5;
+  }
+
+  .timeline-date-item {
+    @include flex-column($space-1);
+
+    &__label {
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      color: $color-tertiary;
+      text-transform: uppercase;
+      letter-spacing: $letter-spacing-wide;
+    }
+
+    &__value {
+      font-family: $font-headline;
+      font-size: $font-size-md;
+      font-weight: $font-weight-bold;
+      color: $color-secondary;
+    }
+  }
+
+  .timeline-remaining {
+    display: flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-3 $space-4;
+    background: rgba($color-primary, 0.04);
+    border-radius: $radius-sm;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-tertiary;
+
+    svg {
+      color: $color-primary;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// -------------------------
+// TABBED SECTION
+// -------------------------
+.project-tabs-section {
+  margin-bottom: $space-8;
+}
+
+.project-tabs-nav {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 2px solid $border-color-light;
+  margin-bottom: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.project-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: $space-2;
+  padding: $space-4 $space-5;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  font-family: $font-body;
+  font-size: $font-size-base;
+  font-weight: $font-weight-semibold;
+  color: $color-tertiary;
+  cursor: pointer;
+  transition: $transition-base;
+  white-space: nowrap;
+  position: relative;
+
+  svg {
+    opacity: 0.6;
+    transition: $transition-base;
+  }
+
+  &:hover {
+    color: $color-secondary;
+    background: rgba($color-primary, 0.02);
+
+    svg {
+      opacity: 0.9;
+    }
+  }
+
+  &.active {
+    color: $color-primary;
+    border-bottom-color: $color-primary;
+    font-weight: $font-weight-bold;
+
+    svg {
+      opacity: 1;
+      color: $color-primary;
+    }
+  }
+}
+
+// Tab Panels
+.project-tab-panels {
+  margin-top: 0;
+}
+
+.project-tab-panel {
+  display: none;
+  @include fade-in(0.3s, 12px);
+
+  &.active {
+    display: block;
+  }
+}
+
+.tab-panel__card {
+  @include card(md);
+  padding: $space-6;
+  margin-top: $space-5;
+  border-radius: $radius-lg;
+}
+
+.tab-panel__footer {
+  padding-top: $space-6;
+  border-top: 1px solid $border-color-light;
+  margin-top: $space-5;
+}
+
+// -------------------------
+// PURCHASE ORDER TABLE (inside detail page)
+// -------------------------
+.view-purchase-order {
+  margin-top: $space-4;
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    border: 1px solid $border-color-light;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+
+    thead th {
+      background: #F8FAFC !important;
+      color: $color-tertiary !important;
+      font-family: $font-headline !important;
+      font-size: 0.775rem !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.75px !important;
+      padding: $space-4 $space-5 !important;
+      border-bottom: 2px solid $border-color !important;
+      text-align: left !important;
+      vertical-align: middle !important;
+    }
+
+    tbody td {
+      padding: $space-4 + $space-1 $space-5 !important;
+      border-bottom: 1px solid $border-color-light !important;
+      vertical-align: middle !important;
+      font-size: 0.875rem !important;
+      color: $color-secondary !important;
+      background: $color-white !important;
+      transition: $transition-base !important;
+    }
+
+    tbody tr:hover td {
+      background: rgba($color-primary, 0.02) !important;
+    }
+
+    tbody tr:last-child td {
+      border-bottom: none !important;
+    }
+
+    // PO Number column styling
+    .views-field-field-po-number {
+      a {
+        color: $color-primary !important;
+        font-weight: 700 !important;
+        text-decoration: none !important;
+        font-size: 0.9rem !important;
+        transition: color 0.2s ease !important;
+
+        &:hover {
+          color: darken($color-primary, 15%) !important;
+          text-decoration: underline !important;
+        }
+      }
+    }
+
+    // Date column styling
+    .views-field-field-po-date {
+      color: $color-neutral-700 !important;
+      font-weight: 500 !important;
+    }
+
+    // Vendor Name column styling
+    .views-field-field-company-name {
+      font-weight: 700 !important;
+      color: $color-secondary !important;
+    }
+
+    // Project Ref column styling
+    .views-field-field-project {
+      color: $color-neutral-700 !important;
+      font-size: 0.8rem !important;
+      font-family: monospace !important;
+    }
+
+    // Currency values styling
+    .views-field-field-basic-amount,
+    .views-field-field-amount-gst {
+      font-weight: 600 !important;
+      color: $color-secondary !important;
+
+      &::before {
+        content: "₹";
+        margin-right: 2px;
+        color: $color-neutral-600;
+        font-weight: 500;
+      }
+    }
+
+    .views-field-field-amount-gst {
+      font-weight: 700 !important;
+      color: $color-secondary !important;
+    }
+
+    // Status column styling
+    .views-field-nothing {
+      .po-status {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 4px 12px !important;
+        border-radius: $radius-full !important;
+        font-size: 0.725rem !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        min-width: 84px !important;
+        text-align: center !important;
+
+        &-issued {
+          background: rgba(90, 106, 133, 0.08) !important;
+          color: #5A6A85 !important;
+        }
+
+        &-approved {
+          background: rgba(2, 136, 209, 0.08) !important;
+          color: #0288D1 !important;
+        }
+
+        &-draft {
+          background: rgba(96, 125, 139, 0.08) !important;
+          color: #607D8B !important;
+        }
+
+        &-rejected {
+          background: rgba(211, 47, 47, 0.08) !important;
+          color: #D32F2F !important;
+        }
+      }
+    }
+
+    // Action column styling
+    .views-field-operations {
+      text-align: center !important;
+    }
+  }
+}
+
+// -------------------------
+// PAGINATION STYLES (Project Detail)
+// -------------------------
+.view-purchase-order .pager {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: $space-1 !important;
+  margin-top: $space-6 !important;
+  list-style: none !important;
+  padding: 0 !important;
+
+  .pager__item {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-flex !important;
+
+    a,
+    span {
+      display: inline-flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-width: 36px !important;
+      height: 36px !important;
+      padding: 0 $space-2 !important;
+      border: 1px solid $border-color !important;
+      border-radius: $radius-md !important;
+      background: $color-white !important;
+      color: $color-secondary !important;
+      font-family: $font-body !important;
+      font-size: 0.875rem !important;
+      font-weight: 600 !important;
+      text-decoration: none !important;
+      transition: $transition-base !important;
+      cursor: pointer !important;
+
+      &:hover {
+        background: rgba($color-primary, 0.04) !important;
+        border-color: $color-primary !important;
+        color: $color-primary !important;
+      }
+    }
+
+    &.is-active a,
+    &.pager__item--active a,
+    &.pager__item--active span {
+      background: $color-primary !important;
+      border-color: $color-primary !important;
+      color: $color-white !important;
+    }
+
+    &.pager__item--first a,
+    &.pager__item--previous a,
+    &.pager__item--next a,
+    &.pager__item--last a {
+      font-weight: bold !important;
+      background: #F8FAFC !important;
+    }
+  }
+}
+
+// -------------------------
+// ADD BUTTON INSIDE TAB
+// -------------------------
+.tab-panel__card {
+  .button.button--primary {
+    margin-top: $space-6 !important;
+    background: $gradient-primary !important;
+    border: none !important;
+    border-radius: $radius-md !important;
+    font-weight: 700 !important;
+    padding: $space-3 $space-5 !important;
+    box-shadow: 0 4px 12px rgba($color-primary, 0.15) !important;
+    transition: $transition-base !important;
+
+    &:hover {
+      transform: translateY(-1px) !important;
+      box-shadow: 0 6px 16px rgba($color-primary, 0.25) !important;
+    }
+  }
+}
+
+// ─────────────────────────────────────────
+// PROJECT DETAIL RESPONSIVE OVERRIDES
+// ─────────────────────────────────────────
+
+@include respond-to('xl') {
+  .project-info-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: $space-5;
+  }
+}
+
+@include respond-to('lg') {
+  .project-detail-page {
+    padding-left: $space-4;
+    padding-right: $space-4;
+  }
+
+  .project-detail-title {
+    font-size: $font-size-2xl;
+  }
+
+  .project-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $space-5;
+  }
+
+  .project-info-card {
+    padding: $space-6;
+  }
+
+  .project-summary-row {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-5;
+  }
+
+  .project-tabs-nav {
+    gap: 0;
+  }
+
+  .project-tab {
+    padding: $space-3 $space-4;
+    font-size: $font-size-sm;
+  }
+
+  // Tables scrollable
+  .tab-panel__card {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    table {
+      min-width: 600px;
+    }
+  }
+}
+
+@include respond-to('md') {
+  .project-detail-page {
+    padding: $space-4 $space-3 $space-8 $space-3;
+  }
+
+  .project-breadcrumb {
+    margin-bottom: $space-4;
+    font-size: $font-size-xs;
+
+    .breadcrumb-current {
+      max-width: 150px;
+    }
+  }
+
+  .project-detail-header {
+    flex-direction: column;
+    gap: $space-3;
+    margin-bottom: $space-4;
+  }
+
+  .project-detail-title {
+    font-size: $font-size-xl;
+  }
+
+  .project-detail-header__actions {
+    width: 100%;
+
+    .btn-detail {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  .project-info-card {
+    padding: $space-5;
+  }
+
+  .project-info-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-4;
+  }
+
+  .project-info-item {
+    gap: $space-3;
+
+    .info-item__icon {
+      width: 38px;
+      height: 38px;
+    }
+
+    .info-item__label {
+      font-size: 0.65rem;
+    }
+
+    .info-item__value {
+      font-size: $font-size-sm;
+    }
+  }
+
+  .project-summary-row {
+    grid-template-columns: 1fr;
+    gap: $space-4;
+  }
+
+  .summary-widget--budget {
+    .budget-hero__amount {
+      font-size: $font-size-2xl;
+    }
+  }
+
+  .project-tab {
+    padding: $space-3;
+    font-size: $font-size-xs;
+  }
+
+  .tab-panel__card {
+    padding: $space-4;
+    margin-top: $space-3;
+  }
+}
+
+@include respond-to('sm') {
+  .project-detail-page {
+    padding: $space-3 $space-2 $space-6 $space-2;
+  }
+
+  .project-breadcrumb {
+    display: none;
+  }
+
+  .project-detail-title {
+    font-size: $font-size-lg;
+  }
+
+  .project-status-chip {
+    font-size: 0.65rem;
+    padding: 3px $space-2;
+  }
+
+  .project-info-card {
+    padding: $space-4;
+    border-radius: $radius-md;
+  }
+
+  .project-info-grid {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+  }
+
+  .project-info-item {
+    padding-bottom: $space-3;
+    border-bottom: 1px solid $border-color-light;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  .summary-widget {
+    .summary-widget__header {
+      padding: $space-3 $space-4;
+    }
+
+    .summary-widget__body {
+      padding: $space-4;
+    }
+
+    .summary-widget__title {
+      font-size: $font-size-base;
+    }
+  }
+
+  .summary-widget--budget {
+    .budget-hero__amount {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .project-tabs-nav {
+    gap: 0;
+  }
+
+  .project-tab {
+    padding: $space-2 $space-3;
+    font-size: 0.7rem;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  .tab-panel__card {
+    padding: $space-3;
+    border-radius: $radius-sm;
+  }
+
+  .btn-detail {
+    padding: $space-2 $space-4;
+    font-size: $font-size-sm;
+  }
+}

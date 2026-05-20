@@ -1,0 +1,10 @@
+uuid: f0395d38-602d-4ad4-a502-60848dd05839
+langcode: en
+status: true
+dependencies: {  }
+id: room_rent
+label: 'Room Rent'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

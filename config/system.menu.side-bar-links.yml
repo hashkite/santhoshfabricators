@@ -1,0 +1,8 @@
+uuid: a8b43409-dfd4-4127-84a0-2b41b082a95e
+langcode: en
+status: true
+dependencies: {  }
+id: side-bar-links
+label: 'Side-bar links'
+description: ''
+locked: false

@@ -1,0 +1,575 @@
+// =========================
+// ENTITY DETAIL PAGES (Expense & Purchase Order)
+// =========================
+// Shared premium styles for node detail pages
+
+// -------------------------
+// PAGE CONTAINER
+// -------------------------
+.entity-detail-page {
+  @include container;
+  padding-top: $space-6;
+  padding-bottom: $space-12;
+  @include fade-in(0.5s, 16px);
+}
+
+// -------------------------
+// BREADCRUMB
+// -------------------------
+.entity-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: $space-2;
+  margin-bottom: $space-6;
+  @include body-text(sm);
+
+  .breadcrumb-link {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1;
+    color: $color-tertiary;
+    text-decoration: none;
+    font-weight: $font-weight-medium;
+    transition: $transition-base;
+
+    &:hover {
+      color: $color-primary;
+    }
+
+    svg { opacity: 0.7; }
+  }
+
+  .breadcrumb-sep {
+    display: flex;
+    align-items: center;
+    color: $color-neutral-400;
+  }
+
+  .breadcrumb-current {
+    color: $color-secondary;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// -------------------------
+// HEADER
+// -------------------------
+.entity-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: $space-6;
+  margin-bottom: $space-6;
+  flex-wrap: wrap;
+}
+
+.entity-detail-header__left {
+  display: flex;
+  align-items: center;
+  gap: $space-4;
+  flex-wrap: wrap;
+}
+
+.entity-detail-title {
+  margin: 0;
+  font-family: $font-headline;
+  font-size: $font-size-3xl;
+  font-weight: $font-weight-extrabold;
+  color: $color-secondary;
+  letter-spacing: $letter-spacing-tight;
+  line-height: $line-height-tight;
+}
+
+// Type Chip
+.entity-type-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px $space-4;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: $letter-spacing-wide;
+
+  &--expense {
+    background: rgba($color-info, 0.08);
+    color: $color-info;
+    border: 1px solid rgba($color-info, 0.2);
+  }
+
+  &--po {
+    background: rgba(#6366f1, 0.08);
+    color: #6366f1;
+    border: 1px solid rgba(#6366f1, 0.2);
+  }
+}
+
+.entity-detail-header__actions {
+  display: flex;
+  gap: $space-3;
+  flex-shrink: 0;
+}
+
+// -------------------------
+// HERO CARD (Amount Display)
+// -------------------------
+.entity-hero-card {
+  @include card(md);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: $space-6;
+
+  &__accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+  }
+
+  &--expense .entity-hero-card__accent {
+    background: linear-gradient(90deg, $color-primary, $color-info);
+  }
+
+  &--po .entity-hero-card__accent {
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  }
+
+  &__body {
+    padding: $space-8;
+  }
+}
+
+// Single amount hero (expense)
+.hero-amount-section {
+  @include flex-column($space-1);
+  margin-bottom: $space-6;
+
+  .hero-amount-label {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  .hero-amount-value {
+    font-family: $font-headline;
+    font-size: 2.5rem;
+    font-weight: $font-weight-extrabold;
+    color: $color-secondary;
+    letter-spacing: $letter-spacing-tight;
+    line-height: 1;
+  }
+}
+
+// Triple amount grid (PO)
+.hero-amounts-grid {
+  display: flex;
+  align-items: stretch;
+  gap: $space-6;
+}
+
+.hero-amount-block {
+  flex: 1;
+  @include flex-column($space-1);
+  padding: $space-4;
+  border-radius: $radius-md;
+  transition: $transition-base;
+
+  &--highlight {
+    background: rgba($color-primary, 0.04);
+    border: 1px solid rgba($color-primary, 0.1);
+  }
+
+  .hero-amount-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  .hero-amount-value {
+    font-family: $font-headline;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-secondary;
+    letter-spacing: $letter-spacing-tight;
+    line-height: 1.2;
+
+    &--secondary {
+      color: $color-neutral-700;
+    }
+
+    &--muted {
+      color: $color-neutral-600;
+      font-size: $font-size-xl;
+    }
+  }
+}
+
+.hero-amount-divider {
+  width: 1px;
+  background: $border-color-light;
+  flex-shrink: 0;
+}
+
+// Meta group (inside hero card)
+.hero-meta-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $space-5;
+  padding-top: $space-6;
+  border-top: 1px solid $border-color-light;
+}
+
+.hero-meta-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-3;
+
+  svg {
+    color: $color-primary;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  div {
+    @include flex-column(2px);
+  }
+
+  .meta-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wider;
+  }
+
+  .meta-value {
+    font-family: $font-headline;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+
+    a {
+      color: $color-primary;
+      text-decoration: none;
+      &:hover { text-decoration: underline; }
+    }
+  }
+}
+
+// -------------------------
+// INFO CARD (4-col grid — used by PO)
+// -------------------------
+.entity-info-card {
+  @include card(md);
+  position: relative;
+  overflow: hidden;
+  padding: $space-8;
+  margin-bottom: $space-6;
+
+  .entity-info-card__accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  }
+}
+
+.entity-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $space-6;
+}
+
+.entity-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: $space-4;
+
+  .info-item__icon {
+    @include flex-center;
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-md;
+    background: rgba(#6366f1, 0.06);
+    color: #6366f1;
+    flex-shrink: 0;
+    transition: $transition-base;
+  }
+
+  &:hover .info-item__icon {
+    background: rgba(#6366f1, 0.12);
+    transform: scale(1.05);
+  }
+
+  .info-item__content {
+    @include flex-column($space-1);
+  }
+
+  .info-item__label {
+    font-family: $font-body;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wider;
+  }
+
+  .info-item__value {
+    font-family: $font-headline;
+    font-size: $font-size-base;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+
+    a {
+      color: $color-primary;
+      text-decoration: none;
+      &:hover { text-decoration: underline; }
+    }
+  }
+}
+
+// -------------------------
+// SECTION CARD (Description, Paragraphs, Notes)
+// -------------------------
+.entity-section-card {
+  @include card(md);
+  overflow: hidden;
+  margin-bottom: $space-6;
+
+  &__header {
+    padding: $space-5 $space-6;
+    border-bottom: 1px solid $border-color-light;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: $font-headline;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+
+    svg {
+      color: $color-primary;
+      flex-shrink: 0;
+    }
+  }
+
+  &__body {
+    padding: $space-6;
+  }
+}
+
+.entity-description-text {
+  @include body-text(base);
+  color: $color-secondary;
+  line-height: $line-height-relaxed;
+
+  p { margin: 0 0 $space-4 0; }
+  p:last-child { margin-bottom: 0; }
+}
+
+// File Download Area
+.file-download-area {
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    padding: $space-3 $space-5;
+    background: $color-neutral-100;
+    border: 1px solid $border-color;
+    border-radius: $radius-md;
+    color: $color-primary;
+    font-weight: $font-weight-semibold;
+    text-decoration: none;
+    transition: $transition-base;
+
+    &:hover {
+      background: rgba($color-primary, 0.04);
+      border-color: rgba($color-primary, 0.2);
+      box-shadow: 0 2px 8px rgba($color-primary, 0.08);
+    }
+  }
+}
+
+// Paragraph field rendering inside section cards
+.entity-section-card__body {
+  .field--type-entity-reference-revisions {
+    > .field__items > .field__item {
+      padding: $space-4;
+      background: $color-neutral-100;
+      border-radius: $radius-md;
+      margin-bottom: $space-3;
+
+      &:last-child { margin-bottom: 0; }
+    }
+  }
+
+  .paragraph {
+    .field {
+      margin-bottom: $space-3;
+
+      &:last-child { margin-bottom: 0; }
+
+      .field__label {
+        font-size: $font-size-xs;
+        font-weight: $font-weight-bold;
+        color: $color-tertiary;
+        text-transform: uppercase;
+        letter-spacing: $letter-spacing-wide;
+        margin-bottom: 2px;
+      }
+
+      .field__item {
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        color: $color-secondary;
+      }
+    }
+  }
+}
+
+// -------------------------
+// BACK LINK
+// -------------------------
+.entity-back-link {
+  margin-top: $space-4;
+}
+
+// ─────────────────────────────────────────
+// ENTITY DETAIL RESPONSIVE
+// ─────────────────────────────────────────
+
+@include respond-to('lg') {
+  .entity-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .hero-meta-group {
+    grid-template-columns: repeat(3, 1fr);
+    gap: $space-4;
+  }
+
+  .hero-amounts-grid {
+    gap: $space-4;
+  }
+}
+
+@include respond-to('md') {
+  .entity-detail-page {
+    padding: $space-4 $space-3 $space-8 $space-3;
+  }
+
+  .entity-detail-header {
+    flex-direction: column;
+    gap: $space-3;
+    margin-bottom: $space-4;
+  }
+
+  .entity-detail-title {
+    font-size: $font-size-xl;
+  }
+
+  .entity-detail-header__actions {
+    width: 100%;
+    .btn-detail { flex: 1; justify-content: center; }
+  }
+
+  .entity-hero-card__body {
+    padding: $space-5;
+  }
+
+  .hero-amount-section .hero-amount-value {
+    font-size: $font-size-2xl;
+  }
+
+  .hero-meta-group {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-4;
+  }
+
+  .hero-amounts-grid {
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  .hero-amount-divider {
+    width: 100%;
+    height: 1px;
+  }
+
+  .entity-info-card {
+    padding: $space-5;
+  }
+
+  .entity-info-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: $space-4;
+  }
+
+  .entity-section-card__header {
+    padding: $space-4 $space-5;
+  }
+
+  .entity-section-card__body {
+    padding: $space-4 $space-5;
+  }
+}
+
+@include respond-to('sm') {
+  .entity-breadcrumb {
+    display: none;
+  }
+
+  .entity-detail-title {
+    font-size: $font-size-lg;
+  }
+
+  .entity-type-chip {
+    font-size: 0.65rem;
+    padding: 3px $space-2;
+  }
+
+  .hero-amount-section .hero-amount-value {
+    font-size: $font-size-xl;
+  }
+
+  .hero-meta-group {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+  }
+
+  .hero-amount-block .hero-amount-value {
+    font-size: $font-size-lg;
+  }
+
+  .entity-info-grid {
+    grid-template-columns: 1fr;
+    gap: $space-3;
+  }
+
+  .entity-info-item {
+    padding-bottom: $space-3;
+    border-bottom: 1px solid $border-color-light;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  .entity-section-card {
+    &__header { padding: $space-3 $space-4; }
+    &__body { padding: $space-3 $space-4; }
+    &__title { font-size: $font-size-base; }
+  }
+}

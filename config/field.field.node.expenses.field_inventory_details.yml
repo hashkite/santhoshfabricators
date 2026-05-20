@@ -1,0 +1,40 @@
+uuid: d89d1160-bec9-4dab-866b-d365cd58985f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_inventory_details
+    - node.type.expenses
+    - paragraphs.paragraphs_type.inventory_expenses
+  module:
+    - entity_reference_revisions
+id: node.expenses.field_inventory_details
+field_name: field_inventory_details
+entity_type: node
+bundle: expenses
+label: 'Inventory Details'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      inventory_expenses: inventory_expenses
+    negate: 0
+    target_bundles_drag_drop:
+      expenses:
+        weight: 5
+        enabled: false
+      inventory_expenses:
+        weight: 6
+        enabled: true
+      room_rent:
+        weight: 7
+        enabled: false
+      salary:
+        weight: 8
+        enabled: false
+field_type: entity_reference_revisions

@@ -1,0 +1,20 @@
+uuid: febe4fcb-3265-45d2-a643-50eb2e43bff6
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_amounts
+field_name: field_amounts
+entity_type: paragraph
+type: decimal
+settings:
+  precision: 15
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

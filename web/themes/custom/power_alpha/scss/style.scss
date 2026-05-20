@@ -1,0 +1,33 @@
+/**
+ * @file
+ * Main SCSS entry point for Power Alpha theme.
+ *
+ * Architecture:
+ *   _variables      → Design tokens, colors, spacing, breakpoints
+ *   _mixins         → Reusable mixins & utilities
+ *   _base           → Root styles, CSS vars, body, resets
+ *   _components     → Shared components (buttons, tabs, tables, badges)
+ *   _dashboard      → Project dashboard listing page
+ *   _project-detail → Project detail / single page
+ *   _responsive     → Responsive breakpoint overrides
+ */
+
+// 1. Settings
+@import 'variables';
+@import 'mixins';
+
+// 2. Foundation
+@import 'base';
+
+// 3. Components
+@import 'components';
+
+// 4. Pages
+@import 'dashboard';
+@import 'project-detail';
+@import 'admin-dashboard';
+@import 'entity-detail';
+@import 'node-form';
+
+// 5. Responsive
+@import 'responsive';

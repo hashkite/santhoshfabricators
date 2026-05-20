@@ -1,0 +1,24 @@
+uuid: 18c98601-a832-4ec7-ab9d-9748ae12ebd0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_materials_description
+    - filter.format.full_html
+    - paragraphs.paragraphs_type.inventory_expenses
+  module:
+    - text
+id: paragraph.inventory_expenses.field_materials_description
+field_name: field_materials_description
+entity_type: paragraph
+bundle: inventory_expenses
+label: 'Materials Description'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - full_html
+field_type: text

@@ -1,0 +1,23 @@
+uuid: b0aad534-e4c4-4b47-b8a5-b6de1df796bc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_esi
+    - paragraphs.paragraphs_type.salary
+id: paragraph.salary.field_esi
+field_name: field_esi
+entity_type: paragraph
+bundle: salary
+label: ESI
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

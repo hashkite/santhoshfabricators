@@ -1,5 +1,5 @@
-uuid: 5c8ecd1f-989a-42c1-ac95-493aed3f696e
-langcode: en-gb
+uuid: bc0dbfed-4280-49a0-95df-da8fe4400cd7
+langcode: en
 status: true
 dependencies: {  }
 _core:
@@ -7,7 +7,7 @@ _core:
 id: daily_schedule
 label: 'Daily Schedule'
 enabled: false
-keep: null
+keep: ''
 period: null
 cron: null
 source_id: default_db

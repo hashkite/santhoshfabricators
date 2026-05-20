@@ -1,0 +1,1147 @@
+// ==========================================
+// FABRITRACK PRO LAYOUT & DASHBOARD STYLING
+// ==========================================
+
+// 1. GLOBAL LAYOUT FRAMEWORK
+.fabritrack-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background: #f8fafc; // Soft slate white canvas matching mock
+
+  // Hide default Drupal top toolbars / breadcrumbs on frontend dashboard
+  ~.gin-secondary-toolbar,
+  ~header.region-sticky,
+  ~.sticky-shadow,
+  ~.content-header {
+    display: none !important;
+  }
+}
+
+// 2. TOP HEADER BAR
+// HAMBURGER TOGGLE BUTTON (mobile/tablet only)
+.sidebar-toggle-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  border-radius: $radius-sm;
+  color: $color-secondary;
+  cursor: pointer;
+  padding: 0;
+  margin-right: $space-3;
+  transition: $transition-base;
+  flex-shrink: 0;
+
+  &:hover {
+    background: $color-neutral-200;
+    color: $color-primary;
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    display: inline-flex;
+  }
+}
+
+// SIDEBAR OVERLAY BACKDROP (mobile/tablet only)
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: $z-overlay - 1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+
+  &.active {
+    display: block;
+    opacity: 1;
+  }
+}
+
+// Prevent body scroll when sidebar is open on mobile
+body.sidebar-is-open {
+  overflow: hidden;
+}
+
+// HEADER BAR
+.fabritrack-header {
+  height: 70px;
+  background: $color-white;
+  border-bottom: 1px solid rgba($color-primary, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $space-6;
+  z-index: 10;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.01);
+
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-text {
+    font-family: $font-headline;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: $color-primary; // Bold FabriTrack primary blue
+    letter-spacing: -0.02em;
+  }
+
+  .header-center {
+    flex: 1;
+    max-width: 480px;
+    margin: 0 $space-8;
+  }
+
+  .header-search-wrapper {
+    position: relative;
+    width: 100%;
+
+    .search-icon {
+      position: absolute;
+      left: $space-4;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $color-neutral-600;
+      pointer-events: none;
+    }
+
+    .header-search-input {
+      width: 100%;
+      height: 42px;
+      padding: 0 $space-4 0 42px;
+      border-radius: $radius-full;
+      border: 1px solid rgba($color-primary, 0.12);
+      background: $color-neutral-100;
+      font-family: $font-body;
+      font-size: 0.875rem;
+      color: $color-secondary;
+      transition: $transition-base;
+
+      &:focus {
+        border-color: $color-primary;
+        background: $color-white;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+      }
+
+      ::placeholder {
+        color: $color-neutral-500;
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  .header-icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-full;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: $color-neutral-700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition-base;
+
+    &:hover {
+      background: $color-neutral-200;
+      color: $color-primary;
+    }
+  }
+
+  .header-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: $radius-full;
+    overflow: hidden;
+    margin-left: $space-2;
+    border: 1px solid rgba($color-primary, 0.15);
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
+
+// 3. MAIN SHELL BODY
+.fabritrack-body {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+// 4. SIDEBAR PANEL
+.fabritrack-sidebar {
+  width: 260px;
+  background: $color-white;
+  border-right: 1px solid rgba($color-primary, 0.08);
+  display: flex;
+  flex-direction: column;
+  padding: $space-5 $space-4;
+  height: 100%;
+
+  // Brand card
+  .sidebar-brand-card {
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+    padding: $space-4 $space-3;
+    background: rgba($color-primary, 0.04);
+    border-radius: $radius-md;
+    border: 1px solid rgba($color-primary, 0.06);
+    margin-bottom: $space-6;
+  }
+
+  .brand-icon-wrapper {
+    background: $color-primary;
+    color: $color-white;
+    width: 38px;
+    height: 38px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba($color-primary, 0.2);
+  }
+
+  .brand-text-wrapper {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .brand-title {
+    font-family: $font-headline;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: $color-secondary;
+    line-height: 1.2;
+  }
+
+  .brand-subtitle {
+    font-size: 0.75rem;
+    color: $color-neutral-600;
+    font-weight: 500;
+  }
+
+  // Navigation Items
+  .sidebar-nav,
+  .navigation {
+    flex: 1;
+
+    .nav-list,
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: $space-1;
+    }
+
+    .nav-item,
+    .menu-item {
+      margin: 0;
+      padding: 0;
+
+      .nav-link,
+      a {
+        display: flex;
+        align-items: center;
+        gap: $space-4;
+        padding: $space-3 $space-4;
+        border-radius: $radius-sm;
+        color: $color-neutral-700;
+        text-decoration: none;
+        font-family: $font-body;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: $transition-base;
+
+        .nav-icon {
+          color: $color-neutral-600;
+          transition: $transition-base;
+        }
+
+        &:hover {
+          background: rgba($color-primary, 0.04);
+          color: $color-primary;
+
+          .nav-icon {
+            color: $color-primary;
+          }
+        }
+      }
+
+      &.active .nav-link,
+      & .is-active {
+        background: rgba($color-primary, 0.08); // trans blue highlight matching mock
+        color: $color-primary;
+        font-weight: 700;
+
+        .nav-icon {
+          color: $color-primary;
+        }
+      }
+    }
+  }
+
+  // Sidebar Footer / Logout
+  .sidebar-footer {
+    border-top: 1px solid rgba($color-primary, 0.08);
+    padding-top: $space-4;
+
+    .logout-link {
+      display: flex;
+      align-items: center;
+      gap: $space-4;
+      padding: $space-3 $space-4;
+      border-radius: $radius-sm;
+      color: $color-neutral-700;
+      text-decoration: none;
+      font-family: $font-body;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: $transition-base;
+
+      &:hover {
+        background: rgba($color-danger, 0.05);
+        color: $color-danger;
+      }
+    }
+  }
+}
+
+// 5. MAIN CONTENT PANEL AREA
+.fabritrack-main {
+  flex: 1;
+  overflow-y: auto;
+  padding: $space-8 $space-10;
+  @include custom-scrollbar;
+
+  .main-content-inner {
+    max-width: $container-max-width;
+    margin: 0 auto;
+  }
+}
+
+// Dashboard Header section (Title + Subtitle)
+.dashboard-header-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: $space-6;
+
+  .header-titles {
+    flex: 1;
+  }
+
+  .dashboard-page-title {
+    font-family: $font-headline;
+    font-size: 1.85rem;
+    font-weight: 800;
+    color: $color-secondary;
+    margin: 0 0 $space-1 0;
+    letter-spacing: -0.02em;
+  }
+
+  .dashboard-page-subtitle {
+    font-family: $font-body;
+    font-size: 0.95rem;
+    color: $color-neutral-600;
+    margin: 0;
+    font-weight: 500;
+  }
+}
+
+// 6. DRUPAL VIEWS EXPOSED FILTERS & ACTIONS CONTAINER
+.view-filters-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $space-4;
+  margin-bottom: $space-8;
+  flex-wrap: wrap;
+  width: 100%;
+
+  .view-filters-form-wrapper {
+    flex: 1;
+
+    // Override Gin's exposed form card wrapper defaults
+    .views-exposed-form {
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      display: flex !important;
+      align-items: center !important;
+      gap: $space-3 !important;
+      flex-wrap: wrap !important;
+
+      // Outer pill structure containing label + select/input
+      .form-item {
+        display: inline-flex !important;
+        align-items: center !important;
+        background: $color-white !important;
+        border: 1px solid rgba($color-primary, 0.15) !important;
+        border-radius: $radius-full !important;
+        padding: 0 $space-4 !important;
+        height: 40px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+        transition: $transition-base !important;
+        margin: 0 !important;
+
+        &:hover {
+          border-color: $color-primary !important;
+          box-shadow: 0 2px 6px rgba($color-primary, 0.08) !important;
+        }
+
+        label {
+          display: inline-block !important;
+          font-family: $font-body !important;
+          font-size: 0.85rem !important;
+          font-weight: 600 !important;
+          color: $color-neutral-600 !important;
+          margin: 0 0 0 $space-2 !important;
+          padding: 0 !important;
+          white-space: nowrap !important;
+          text-transform: none !important;
+
+          &::after {
+            content: ":";
+            margin-right: $space-1;
+          }
+        }
+
+        // Clean all inner borders/outlines of form inputs inside the pill
+        select,
+        input[type="text"],
+        .form-element,
+        .form-select {
+          border: none !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          margin: 0 !important;
+          font-family: $font-body !important;
+          font-size: 0.85rem !important;
+          font-weight: 700 !important;
+          color: $color-secondary !important;
+          outline: none !important;
+          height: 100% !important;
+          max-height: 100% !important;
+
+          &:focus {
+            outline: none !important;
+            border: none !important;
+            box-shadow: none !important;
+          }
+        }
+
+        // Inner selector dropdown style details
+        select,
+        .form-select {
+          padding: 0 28px 0 $space-2 !important;
+          cursor: pointer !important;
+          -webkit-appearance: none !important;
+          -moz-appearance: none !important;
+          appearance: none !important;
+
+          // Custom caret arrow matching the mockup exactly
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23455A64'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E") !important;
+          background-repeat: no-repeat !important;
+          background-position: right center !important;
+          background-size: 14px !important;
+        }
+
+        // Spacing for inner text input field details to prevent wrapping
+        input[type="text"],
+        .form-element--type-text {
+          padding: 0 $space-2 0 $space-2 !important;
+          width: 140px !important;
+        }
+      }
+
+      // Overrides for the Expense Type radios fieldset to design in segmented control tab format
+      fieldset.form-composite[data-drupal-selector="edit-field-expense-type-value"],
+      fieldset[id*="edit-field-expense-type-value"] {
+        display: block !important;
+        background: transparent !important;
+        border: none !important;
+        border-radius: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        width: auto !important;
+        max-width: 100% !important;
+
+        legend.fieldset__legend {
+          display: block !important;
+          margin-bottom: $space-2 !important;
+          padding: 0 !important;
+          border: none !important;
+
+          .fieldset__label {
+            font-family: $font-headline !important;
+            font-size: 0.8rem !important;
+            font-weight: 700 !important;
+            color: $color-neutral-600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.75px !important;
+          }
+        }
+
+        .fieldset__wrapper {
+          display: block !important;
+          padding: 0 !important;
+          margin: 0 !important;
+        }
+
+        // The inner form-radios container that contains all elements
+        .form-radios {
+          display: inline-flex !important;
+          align-items: center !important;
+          background: #F1F5F9 !important; // Sleek modern light-gray track background
+          border: 1px solid rgba($color-primary, 0.08) !important;
+          padding: 4px !important;
+          border-radius: $radius-md !important; // Fully-rounded premium segmented control track
+          box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03) !important;
+          gap: 2px !important;
+          flex-wrap: wrap !important;
+
+          // Target individual radio wrapper divs
+          .form-type--radio {
+            display: inline-flex !important;
+            align-items: center !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: $radius-sm - 2px !important;
+            padding: 0 !important;
+            height: 32px !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            transition: all 0.2s ease !important;
+
+            &:hover {
+              box-shadow: none !important;
+              border-color: transparent !important;
+            }
+
+            // Hide the actual circular radio dot input!
+            input[type="radio"].form-radio {
+              position: absolute !important;
+              opacity: 0 !important;
+              width: 0 !important;
+              height: 0 !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              border: none !important;
+              pointer-events: none !important;
+            }
+
+            // The clickable label which behaves like a button
+            label.form-item__label.option {
+              display: inline-flex !important;
+              align-items: center !important;
+              justify-content: center !important;
+              height: 100% !important;
+              padding: 0 $space-4 !important;
+              font-family: $font-body !important;
+              font-size: 0.785rem !important;
+              font-weight: 700 !important;
+              color: $color-neutral-700 !important;
+              cursor: pointer !important;
+              border-radius: $radius-sm !important;
+              margin: 0 !important;
+              text-transform: none !important;
+              transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+              user-select: none !important;
+
+              &::after {
+                content: "" !important; // Remove the trailing colon from standard label style
+                display: none !important;
+              }
+
+              &:hover {
+                color: $color-primary !important;
+                background: rgba(0, 0, 0, 0.02) !important;
+              }
+            }
+
+            // Active/Checked Segmented style!
+            // When radio input is checked, color the adjacent label
+            input[type="radio"]:checked+label.form-item__label.option {
+              background: $color-white !important; // Sleek premium white pill
+              color: $color-primary !important;
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08), 0 2px 4px rgba($color-primary, 0.04) !important;
+              font-weight: 800 !important;
+            }
+          }
+        }
+      }
+
+      // Sleek outline action button for Apply (Drupal form actions submit)
+      .form-actions {
+        margin: 0 !important;
+        padding: 0 !important;
+        display: inline-flex !important;
+
+        input[type="submit"],
+        .button {
+          height: 40px !important;
+          border-radius: $radius-full !important;
+          padding: 0 $space-5 !important;
+          background: transparent !important;
+          border: 1px solid $color-primary !important;
+          color: $color-primary !important;
+          font-family: $font-body !important;
+          font-size: 0.85rem !important;
+          font-weight: 700 !important;
+          transition: $transition-base !important;
+          box-shadow: none !important;
+          cursor: pointer !important;
+          margin: 0 !important;
+
+          &:hover {
+            background: $color-primary !important;
+            color: $color-white !important;
+            box-shadow: 0 4px 10px rgba($color-primary, 0.15) !important;
+          }
+        }
+      }
+    }
+  }
+
+  // "+ New Project" Action button
+  .btn-new-project {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    background: $gradient-primary;
+    color: $color-white;
+    font-family: $font-body;
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: $space-3 $space-5;
+    border-radius: $radius-md;
+    text-decoration: none;
+    transition: $transition-bounce;
+    box-shadow: 0 4px 14px rgba($color-primary, 0.25);
+
+    svg {
+      transition: transform 0.3s ease;
+    }
+
+    &:hover {
+      box-shadow: 0 6px 20px rgba($color-primary, 0.35);
+      transform: translateY(-2px);
+
+      svg {
+        transform: rotate(90deg);
+      }
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// 7. DASHBOARD LISTING GRID
+.view-project-dashboard {
+  .view-content .item-list ul {
+    @include auto-grid(330px, $space-6);
+    padding: 0;
+    margin: 0;
+  }
+
+  // Clear default Gin cards list
+  .view-content .item-list ul li {
+    list-style: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+
+    &::before {
+      display: none;
+    }
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+
+  .view-empty {
+    text-align: center;
+    padding: $space-12;
+    color: $color-neutral-600;
+    @include body-text(base);
+  }
+}
+
+// 8. PREMIUM PROJECT CARD COMPONENT
+.project-card-wrapper {
+  @include card(sm, true);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: $color-white;
+  overflow: hidden;
+  border: 1px solid rgba($color-primary, 0.08);
+
+  // Card Image
+  .project-card-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 190px;
+    overflow: hidden;
+    background: $color-neutral-200;
+
+    img,
+    .field--name-field-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  &:hover {
+    .project-card-image-wrapper img {
+      transform: scale(1.05);
+    }
+  }
+
+  // Overlaid status badge
+  .project-card-badge {
+    position: absolute;
+    top: $space-4;
+    right: $space-4;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    padding: $space-1 $space-4;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: $radius-full;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: $transition-base;
+
+    // Default pending/translucent
+    background: rgba(243, 244, 246, 0.9);
+    color: #374151;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    &.status-active {
+      background: rgba(220, 252, 231, 0.9);
+      color: #15803d;
+      border: 1px solid rgba(220, 252, 231, 0.5);
+    }
+
+    &.status-completed {
+      background: rgba(224, 231, 255, 0.9);
+      color: #4338ca;
+      border: 1px solid rgba(224, 231, 255, 0.5);
+    }
+  }
+
+  // Content Area
+  .project-card-body {
+    padding: $space-5 $space-6;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  // Header Title + menu icon
+  .project-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: $space-3;
+    margin-bottom: 2px;
+  }
+
+  .project-card-title {
+    margin: 0;
+    font-family: $font-headline;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.3;
+
+    a {
+      color: $color-secondary;
+      text-decoration: none;
+      transition: $transition-base;
+
+      &:hover {
+        color: $color-primary;
+      }
+    }
+  }
+
+  // PID Code
+  .project-card-code {
+    font-family: $font-body;
+    font-size: 0.8125rem;
+    color: $color-neutral-600;
+    margin-bottom: $space-3;
+    font-weight: 500;
+  }
+
+  // Location Indicator
+  .project-card-location {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-2;
+    font-family: $font-body;
+    font-size: 0.875rem;
+    color: $color-tertiary;
+    font-weight: 500;
+    margin-bottom: $space-5;
+
+    .location-icon {
+      display: flex;
+      align-items: center;
+      color: $color-neutral-500;
+    }
+  }
+
+  // Budget Utilization bar
+  .project-card-budget-section {
+    margin-top: auto;
+    border-top: 1px dashed rgba($color-primary, 0.08);
+    padding-top: $space-4;
+  }
+
+  .budget-meta-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $space-2;
+
+    .budget-label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: $color-tertiary;
+    }
+
+    .budget-value {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: $color-secondary;
+    }
+  }
+
+  .budget-progress-bar {
+    width: 100%;
+    height: 8px;
+    background: $color-neutral-200;
+    border-radius: $radius-full;
+    overflow: hidden;
+    margin-bottom: $space-3;
+
+    .progress-fill {
+      height: 100%;
+      background: $color-primary;
+      border-radius: $radius-full;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+      // Critical state (red progress bar)
+      &.critical {
+        background: $color-danger !important;
+      }
+    }
+  }
+
+  .budget-meta-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: $color-tertiary-light;
+
+    // Critical label state (red bold text)
+    .critical-text {
+      color: $color-danger !important;
+      font-weight: 700;
+    }
+  }
+
+  // Card Footer
+  .project-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $space-4 $space-6;
+    background: $color-neutral-100;
+    border-top: 1px solid rgba($color-primary, 0.06);
+
+    .last-updated {
+      font-size: 0.775rem;
+      color: $color-neutral-600;
+      font-weight: 500;
+    }
+
+    .view-details-link {
+      font-size: 0.8125rem;
+      font-weight: 700;
+      color: $color-primary;
+      text-decoration: none;
+      transition: $transition-base;
+
+      &:hover {
+        color: $color-primary-dark;
+        text-decoration: underline;
+      }
+    }
+  }
+}
+
+// 9. DYNAMIC "CREATE NEW SITE" GRID CARD
+.create-new-site-card-li {
+  list-style: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  box-shadow: none;
+}
+
+.create-new-site-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 480px; // matches standard height of other cards perfectly
+  border: 2px dashed rgba($color-primary, 0.2);
+  border-radius: $radius-md;
+  background: rgba($color-white, 0.4);
+  text-decoration: none;
+  transition: $transition-base;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $color-primary;
+    background: rgba($color-primary-light, 0.04);
+    transform: translateY(-4px);
+    box-shadow: $shadow-md;
+
+    .plus-icon-circle {
+      background: $color-primary;
+      color: $color-white;
+      border-color: $color-primary;
+      box-shadow: 0 4px 14px rgba($color-primary, 0.2);
+    }
+  }
+
+  .create-new-site-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: $space-6;
+  }
+
+  .plus-icon-circle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-full;
+    background: $color-white;
+    color: $color-secondary;
+    border: 1px solid rgba($color-primary, 0.15);
+    margin-bottom: $space-4;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+    transition: $transition-bounce;
+  }
+
+  .create-title {
+    font-family: $font-headline;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: $color-secondary;
+    margin-bottom: $space-1;
+  }
+
+  .create-subtitle {
+    font-size: 0.825rem;
+    font-weight: 500;
+    color: $color-neutral-600;
+  }
+}
+
+// Sleek Exposed Filters styling for Views Page (Expenses Ledger)
+.view-filters-wrapper {
+  margin-bottom: $space-6;
+
+  .view-filters {
+    background: transparent;
+    padding: 0;
+    box-shadow: none;
+    border: none;
+
+    form {
+      display: flex;
+      align-items: center;
+      gap: $space-3;
+      flex-wrap: wrap;
+      margin: 0;
+      padding: 0px;
+      box-shadow: none;
+      border: none;
+
+      .form-item {
+        margin: 0;
+        display: flex;
+        align-items: center;
+
+        &[data-drupal-selector="edit-field-expense-type-value"] {
+          flex-direction: column;
+          align-items: flex-start;
+          background: transparent;
+          border: none;
+          padding: 0;
+          width: 100%;
+          margin-bottom: $space-4;
+
+          legend.fieldset__legend {
+            display: none !important;
+          }
+
+          .fieldset__wrapper {
+            width: 100%;
+            border-bottom: 1px solid $border-color-light;
+          }
+        }
+
+        .form-radios {
+          display: flex;
+          gap: $space-6;
+          flex-wrap: nowrap;
+          margin-bottom: -1px; // Pull down to overlap wrapper border
+          overflow-x: auto;
+          scrollbar-width: none;
+
+          &::-webkit-scrollbar {
+            display: none;
+          }
+
+          .form-item {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            padding: 0;
+            border: none;
+            background: transparent;
+
+            input[type="radio"] {
+              position: absolute;
+              opacity: 0;
+              width: 0;
+              height: 0;
+              pointer-events: none;
+              margin: 0;
+            }
+
+            label {
+              margin: 0;
+              font-family: $font-headline;
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: $color-tertiary; // Grey text for inactive tabs
+              cursor: pointer;
+              padding: 0 0 $space-3 0; // Bottom padding space
+              border-bottom: 2px solid transparent;
+              transition: all 0.2s ease;
+              white-space: nowrap;
+
+              &:hover {
+                color: $color-primary;
+              }
+            }
+
+            // Checked (Active Tab) state
+            input[type="radio"]:checked+label {
+              color: $color-primary; // Blue active text
+              font-weight: 700;
+              border-bottom-color: $color-primary; // Blue bottom border
+            }
+
+            // Focus state for accessibility
+            input[type="radio"]:focus-visible+label {
+              outline: 2px solid rgba($color-primary, 0.3);
+              outline-offset: 4px;
+            }
+          }
+        }
+      }
+
+      label {
+        font-family: $font-body;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: $color-secondary;
+        margin-right: $space-2;
+      }
+
+      select,
+      input[type="text"] {
+        border-radius: $radius-full;
+        padding: $space-2 $space-5;
+        background: $color-white;
+        border: 1px solid rgba($color-primary, 0.15);
+        font-family: $font-body;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: $color-secondary;
+        cursor: pointer;
+        transition: $transition-base;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+
+        &:hover {
+          border-color: $color-primary;
+          background: rgba($color-primary, 0.02);
+        }
+
+        &:focus {
+          border-color: $color-primary;
+          outline: none;
+          box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+        }
+      }
+
+      .form-actions {
+        display: none !important;
+      }
+    }
+  }
+}

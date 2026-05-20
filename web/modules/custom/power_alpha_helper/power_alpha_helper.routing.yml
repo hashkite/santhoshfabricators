@@ -1,0 +1,7 @@
+power_alpha_helper.dashboard:
+  path: '/dashboard'
+  defaults:
+    _controller: '\Drupal\power_alpha_helper\Controller\DashboardController::overview'
+    _title: 'Administrative Overview'
+  requirements:
+    _permission: 'access content'

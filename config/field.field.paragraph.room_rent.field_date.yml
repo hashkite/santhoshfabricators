@@ -1,0 +1,21 @@
+uuid: 7f08851e-fe01-4e89-93f1-d9bb78ed9a03
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_date
+    - paragraphs.paragraphs_type.room_rent
+  module:
+    - datetime
+id: paragraph.room_rent.field_date
+field_name: field_date
+entity_type: paragraph
+bundle: room_rent
+label: Date
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

@@ -1,0 +1,22 @@
+uuid: d42e76aa-4ce6-404f-bbfd-b51c1cf6494b
+langcode: en
+status: true
+dependencies:
+  module:
+    - help
+  theme:
+    - power_alpha
+_core:
+  default_config_hash: 8nOAry2oKqJOr0zbrlJ3sZHDFJLIO6j-0vT0K_TYca4
+id: power_alpha_help
+theme: power_alpha
+region: header
+weight: -4
+provider: null
+plugin: help_block
+settings:
+  id: help_block
+  label: Help
+  label_display: '0'
+  provider: help
+visibility: {  }

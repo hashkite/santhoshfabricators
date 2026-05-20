@@ -1,0 +1,29 @@
+uuid: f8772d72-e517-4c02-81c3-131b7ce8f2ce
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project
+    - node.type.project_sites
+    - node.type.purchase_order
+id: node.purchase_order.field_project
+field_name: field_project
+entity_type: node
+bundle: purchase_order
+label: Project
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      project_sites: project_sites
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

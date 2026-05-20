@@ -1,0 +1,10 @@
+uuid: 050c94cf-581f-40d1-ac33-4eb9965b7f58
+langcode: en
+status: true
+dependencies: {  }
+id: inventory_expenses
+label: 'Inventory Expenses'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

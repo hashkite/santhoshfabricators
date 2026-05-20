@@ -1,0 +1,21 @@
+uuid: f2f5f1de-57b1-425b-ab6f-ef24bb5d67c0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_po_date
+    - node.type.purchase_order
+  module:
+    - datetime
+id: node.purchase_order.field_po_date
+field_name: field_po_date
+entity_type: node
+bundle: purchase_order
+label: 'PO Date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

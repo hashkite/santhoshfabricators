@@ -1,0 +1,22 @@
+uuid: ac0c9b50-94e6-4e17-95c6-d9509e36ab32
+langcode: en
+status: true
+dependencies:
+  theme:
+    - power_alpha
+_core:
+  default_config_hash: Hh01DLj9k7UnNdPpOQXHZHW7GHf2OPNDQyCJF7_R9ac
+id: power_alpha_primary_local_tasks
+theme: power_alpha
+region: header
+weight: -3
+provider: null
+plugin: local_tasks_block
+settings:
+  id: local_tasks_block
+  label: 'Primary tabs'
+  label_display: '0'
+  provider: core
+  primary: true
+  secondary: false
+visibility: {  }

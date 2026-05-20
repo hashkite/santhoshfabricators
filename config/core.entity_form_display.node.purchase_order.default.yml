@@ -1,0 +1,156 @@
+uuid: d1df0b31-00c1-4a8e-9ae7-3c43f5389caf
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.purchase_order.body
+    - field.field.node.purchase_order.field_abstract_sheet
+    - field.field.node.purchase_order.field_address
+    - field.field.node.purchase_order.field_amount_gst
+    - field.field.node.purchase_order.field_basic_amount
+    - field.field.node.purchase_order.field_company_name
+    - field.field.node.purchase_order.field_gst
+    - field.field.node.purchase_order.field_po_date
+    - field.field.node.purchase_order.field_po_number
+    - field.field.node.purchase_order.field_po_status
+    - field.field.node.purchase_order.field_project
+    - node.type.purchase_order
+  module:
+    - address
+    - datetime
+    - file
+    - path
+id: node.purchase_order.default
+targetEntityType: node
+bundle: purchase_order
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 9
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_abstract_sheet:
+    type: file_generic
+    weight: 16
+    region: content
+    settings:
+      progress_indicator: throbber
+    third_party_settings: {  }
+  field_address:
+    type: address_default
+    weight: 7
+    region: content
+    settings:
+      wrapper_type: fieldset
+    third_party_settings: {  }
+  field_amount_gst:
+    type: string_textfield
+    weight: 15
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_basic_amount:
+    type: string_textfield
+    weight: 14
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_company_name:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_gst:
+    type: string_textfield
+    weight: 6
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_po_date:
+    type: datetime_default
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_po_number:
+    type: string_textfield
+    weight: 3
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_po_status:
+    type: options_select
+    weight: 5
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_project:
+    type: entity_reference_autocomplete
+    weight: 1
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  path:
+    type: path
+    weight: 12
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 10
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 13
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 11
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 8
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  body: true

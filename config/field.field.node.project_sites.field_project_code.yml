@@ -1,0 +1,19 @@
+uuid: e9eb8f4b-f4ba-4c0a-aa24-091e7b74a152
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project_code
+    - node.type.project_sites
+id: node.project_sites.field_project_code
+field_name: field_project_code
+entity_type: node
+bundle: project_sites
+label: 'Project Code'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

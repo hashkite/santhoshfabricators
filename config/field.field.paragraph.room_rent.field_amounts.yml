@@ -1,0 +1,23 @@
+uuid: dadb138a-ba87-4d7b-82ca-c936d8eb51ce
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_amounts
+    - paragraphs.paragraphs_type.room_rent
+id: paragraph.room_rent.field_amounts
+field_name: field_amounts
+entity_type: paragraph
+bundle: room_rent
+label: Amount
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

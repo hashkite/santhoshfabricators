@@ -1,0 +1,30 @@
+uuid: e8fda6c9-c8ed-4f06-a4d6-22104bc51dc6
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_po_status
+field_name: field_po_status
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: pending
+      label: Pending
+    -
+      value: completed
+      label: Completed
+    -
+      value: rejected
+      label: Rejected
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

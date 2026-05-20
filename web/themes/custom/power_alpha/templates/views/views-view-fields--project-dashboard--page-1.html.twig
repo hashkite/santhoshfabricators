@@ -1,0 +1,74 @@
+{#
+/**
+ * @file
+ * Custom theme implementation to display all the fields in a row for project dashboard.
+ * Designed to look exactly like the premium target design with high-quality structure.
+ */
+#}
+<div
+	class="project-card-wrapper">
+	{# Image Container with Overlaid Status Badge #}
+	<div class="project-card-image-wrapper">
+		{% if fields.field_image.content %}
+			{{ fields.field_image.content }}
+		{% else %}
+			<img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80" alt="{{ project_title }}"/>
+		{% endif %}
+
+		<div class="project-card-badge status-{{ project_status|lower }}">
+			{{ project_status|capitalize }}
+		</div>
+	</div>
+
+	{# Card Content #}
+	<div class="project-card-body">
+		<div class="project-card-header">
+			<h3 class="project-card-title">
+				<a href="{{ path('entity.node.canonical', {'node': row._entity.id}) }}">{{ project_title }}</a>
+			</h3>
+		</div>
+
+		<div class="project-card-code">
+			PID:
+			{{ project_code }}
+		</div>
+
+		<div class="project-card-location">
+			<span class="location-icon">
+				<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+					<circle cx="12" cy="10" r="3"></circle>
+				</svg>
+			</span>
+			{{ project_location }}
+		</div>
+
+		{# Budget section #}
+		{% if budget_allocated and budget_remaining %}
+			<div class="project-card-budget-section">
+				<div class="budget-meta-top">
+					<span class="budget-label">Budget Utilization</span>
+					<span class="budget-value">{{ budget_percent }}%</span>
+				</div>
+				<div class="budget-progress-bar">
+					<div class="progress-fill {% if budget_percent >= 90 %}critical{% endif %}" style="width: {{ budget_percent }}%"></div>
+				</div>
+				<div class="budget-meta-bottom">
+					{% if budget_percent >= 90 %}
+						<span class="allocated-value critical-text">CRITICAL: {{ budget_allocated }}</span>
+					{% else %}
+						<span class="allocated-value">Allocated: {{ budget_allocated }}</span>
+					{% endif %}
+					<span class="remaining-value">Remaining: {{ budget_remaining }}</span>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+	{# Card Footer #}
+	<div class="project-card-footer">
+		<span class="last-updated">Last updated:
+			{{ last_updated }}</span>
+		<a class="view-details-link" href="{{ path('entity.node.canonical', {'node': row._entity.id}) }}">View Details</a>
+	</div>
+</div>

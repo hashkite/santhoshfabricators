@@ -1,5 +1,5 @@
-uuid: cabec234-2d24-4959-bb69-bc93c158f81e
-langcode: en-gb
+uuid: 05de5971-d2f0-4d38-b4fd-ad503fed2930
+langcode: en
 status: true
 dependencies:
   config:

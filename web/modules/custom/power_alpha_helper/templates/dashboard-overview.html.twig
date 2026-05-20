@@ -1,0 +1,229 @@
+{#
+/**
+ * @file
+ * Administrative Overview Dashboard template.
+ * Renders KPI cards, project status, resource utilization,
+ * recent financial activity — all from dynamic Drupal data.
+ *
+ * Available variables:
+ *   - data.active_projects
+ *   - data.monthly_spend / data.monthly_spend_formatted
+ *   - data.pending_pos
+ *   - data.total_expenses
+ *   - data.projects (array of project data)
+ *   - data.total_utilization
+ *   - data.recent_activity (array)
+ *   - data.current_month
+ */
+#}
+<div
+	class="admin-dashboard">
+
+	{# ── DASHBOARD HEADER ── #}
+	<div class="dashboard-overview-header">
+		<div class="dashboard-overview-header__left">
+			<h1 class="dashboard-overview-title">Administrative Overview</h1>
+			<p class="dashboard-overview-subtitle">Central management portal for operational health.</p>
+		</div>
+		<div class="dashboard-overview-header__right">
+			<span class="dashboard-date-badge">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+				{{ data.current_month }}
+			</span>
+		</div>
+	</div>
+
+	{# ── KPI STAT CARDS ROW ── #}
+	<div class="kpi-cards-row">
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">ACTIVE PROJECTS</span>
+				<div class="kpi-card__icon kpi-card__icon--blue">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value">{{ data.active_projects }}</span>
+			</div>
+		</div>
+
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">MONTHLY SPEND</span>
+				<div class="kpi-card__icon kpi-card__icon--green">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value">{{ data.monthly_spend_formatted }}</span>
+			</div>
+		</div>
+
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">PURCHASE ORDERS</span>
+				<div class="kpi-card__icon kpi-card__icon--amber">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value">{{ data.pending_pos }}</span>
+			</div>
+		</div>
+
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">TOTAL EXPENSES</span>
+				<div class="kpi-card__icon kpi-card__icon--purple">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value">{{ data.total_expenses }}</span>
+			</div>
+		</div>
+	</div>
+
+	{# ── MAIN CONTENT GRID (2-column layout) ── #}
+	<div
+		class="dashboard-grid">
+
+		{# LEFT COLUMN #}
+		<div
+			class="dashboard-grid__left">
+
+			{# ── MAJOR SITE STATUS ── #}
+			<div class="dashboard-widget">
+				<div class="dashboard-widget__header">
+					<h2 class="dashboard-widget__title">Major Site Status</h2>
+					<a href="/projects" class="dashboard-widget__link">View All Projects →</a>
+				</div>
+				<div class="dashboard-widget__body">
+					{% if data.projects %}
+						{% for project in data.projects %}
+							<div class="site-status-item">
+								<div class="site-status-item__header">
+									<div class="site-status-item__info">
+										<a href="{{ project.url }}" class="site-status-item__title">{{ project.title }}</a>
+										{% if project.code %}
+											<span class="site-status-item__code">ID:
+												{{ project.code }}</span>
+										{% endif %}
+									</div>
+									<span class="site-status-item__percent">{{ project.percent }}%</span>
+								</div>
+								<div class="site-status-progress">
+									<div class="site-status-progress__fill {% if project.percent >= 90 %}site-status-progress__fill--critical{% elseif project.percent >= 70 %}site-status-progress__fill--warning{% endif %}" style="width: {{ project.percent }}%"></div>
+								</div>
+								<div class="site-status-item__footer">
+									<span class="site-status-badge site-status-badge--{{ project.status|lower }}">{{ project.status|upper }}</span>
+								</div>
+							</div>
+						{% endfor %}
+					{% else %}
+						<div class="empty-state">
+							<p>No active projects found.</p>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+			{# ── RECENT FINANCIAL ACTIVITY ── #}
+			<div class="dashboard-widget">
+				<div class="dashboard-widget__header">
+					<h2 class="dashboard-widget__title">Recent Financial Activity</h2>
+				</div>
+				<div class="dashboard-widget__body dashboard-widget__body--table">
+					{% if data.recent_activity %}
+						<table class="activity-table">
+							<thead>
+								<tr>
+									<th>ENTITY</th>
+									<th>DATE</th>
+									<th>CATEGORY</th>
+									<th>AMOUNT</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in data.recent_activity %}
+									<tr>
+										<td>
+											<a href="{{ item.url }}" class="activity-entity-link">{{ item.title }}</a>
+										</td>
+										<td class="activity-date">{{ item.date }}</td>
+										<td>
+											<span class="activity-badge activity-badge--{{ item.type_class }}">{{ item.type }}</span>
+										</td>
+										<td class="activity-amount">{{ item.amount }}</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					{% else %}
+						<div class="empty-state">
+							<p>No recent financial activity.</p>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+
+		{# RIGHT COLUMN #}
+		<div
+			class="dashboard-grid__right">
+
+			{# ── RESOURCE ALLOCATION (Donut Chart) ── #}
+			<div class="dashboard-widget">
+				<div class="dashboard-widget__header">
+					<h2 class="dashboard-widget__title">Resource Allocation</h2>
+				</div>
+				<div class="dashboard-widget__body dashboard-widget__body--centered">
+					<div class="donut-chart-container">
+						<svg
+							class="donut-chart" width="180" height="180" viewbox="0 0 180 180">
+							{# Background circle #}
+							<circle
+							cx="90" cy="90" r="70" fill="none" stroke="#E9ECEF" stroke-width="16"/>
+							{# Progress arc — animated via CSS/JS #}
+							<circle class="donut-chart__progress" cx="90" cy="90" r="70" fill="none" stroke="#0091EA" stroke-width="16" stroke-dasharray="{{ (data.total_utilization / 100) * 440 }} 440" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 90 90)"/>
+						</svg>
+						<div class="donut-chart__label">
+							<span class="donut-chart__value">{{ data.total_utilization }}%</span>
+							<span class="donut-chart__sublabel">UTILIZED</span>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			{# ── QUICK ACTIONS (only for authenticated users) ── #}
+			{% if data.logged_in %}
+				<div class="dashboard-widget">
+					<div class="dashboard-widget__header">
+						<h2 class="dashboard-widget__title">Quick Actions</h2>
+					</div>
+					<div class="dashboard-widget__body">
+						<div class="quick-actions-grid">
+							<a href="/node/add/project_sites" class="quick-action-btn">
+								<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+								New Project
+							</a>
+							<a href="/node/add/expenses" class="quick-action-btn">
+								<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+								Add Expense
+							</a>
+							<a href="/node/add/purchase_order" class="quick-action-btn">
+								<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+								New PO
+							</a>
+							<a href="/projects" class="quick-action-btn">
+								<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+								All Projects
+							</a>
+						</div>
+					</div>
+				</div>
+			{% endif %}
+
+		</div>
+	</div>
+</div>

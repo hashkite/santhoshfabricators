@@ -1,0 +1,50 @@
+uuid: 301e3bca-80d6-4065-b551-e73841ec2559
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.purchase_order.body
+    - field.field.node.purchase_order.field_abstract_sheet
+    - field.field.node.purchase_order.field_address
+    - field.field.node.purchase_order.field_amount_gst
+    - field.field.node.purchase_order.field_basic_amount
+    - field.field.node.purchase_order.field_company_name
+    - field.field.node.purchase_order.field_gst
+    - field.field.node.purchase_order.field_po_date
+    - field.field.node.purchase_order.field_po_number
+    - field.field.node.purchase_order.field_po_status
+    - field.field.node.purchase_order.field_project
+    - node.type.purchase_order
+  module:
+    - text
+    - user
+id: node.purchase_order.teaser
+targetEntityType: node
+bundle: purchase_order
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_abstract_sheet: true
+  field_address: true
+  field_amount_gst: true
+  field_basic_amount: true
+  field_company_name: true
+  field_gst: true
+  field_po_date: true
+  field_po_number: true
+  field_po_status: true
+  field_project: true

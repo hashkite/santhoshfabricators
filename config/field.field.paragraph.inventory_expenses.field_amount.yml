@@ -1,0 +1,19 @@
+uuid: e80ee3c1-be29-497c-9760-37a5bd49fed3
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_amount
+    - paragraphs.paragraphs_type.inventory_expenses
+id: paragraph.inventory_expenses.field_amount
+field_name: field_amount
+entity_type: paragraph
+bundle: inventory_expenses
+label: Amount
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

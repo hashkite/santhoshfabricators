@@ -1,0 +1,27 @@
+uuid: afb9459d-02ea-4093-859a-29c6e47e6598
+langcode: en
+status: true
+dependencies:
+  module:
+    - options
+    - paragraphs
+id: paragraph.field_type
+field_name: field_type
+entity_type: paragraph
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: lpg
+      label: LPG
+    -
+      value: room_rent
+      label: 'Room Rent(Water Bill+Electricity)'
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

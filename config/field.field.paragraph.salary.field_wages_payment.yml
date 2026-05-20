@@ -1,0 +1,19 @@
+uuid: 4d76d97d-1572-444f-aa03-a3379097fc81
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_wages_payment
+    - paragraphs.paragraphs_type.salary
+id: paragraph.salary.field_wages_payment
+field_name: field_wages_payment
+entity_type: paragraph
+bundle: salary
+label: 'Wages payment'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,226 @@
+uuid: 82ccb9fa-2ea5-4698-9502-61a1797fd1f8
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.expenses.body
+    - field.field.node.expenses.field_amount
+    - field.field.node.expenses.field_date
+    - field.field.node.expenses.field_description
+    - field.field.node.expenses.field_expense_type
+    - field.field.node.expenses.field_inventory_details
+    - field.field.node.expenses.field_project
+    - field.field.node.expenses.field_room_rent_details
+    - field.field.node.expenses.field_salary_details
+    - node.type.expenses
+  module:
+    - conditional_fields
+    - datetime
+    - paragraphs
+    - path
+id: node.expenses.default
+targetEntityType: node
+bundle: expenses
+mode: default
+content:
+  created:
+    type: datetime_timestamp
+    weight: 3
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_amount:
+    type: number
+    weight: 14
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_date:
+    type: datetime_default
+    weight: 8
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_description:
+    type: string_textarea
+    weight: 9
+    region: content
+    settings:
+      rows: 5
+      placeholder: ''
+    third_party_settings: {  }
+  field_expense_type:
+    type: options_select
+    weight: 10
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_inventory_details:
+    type: paragraphs
+    weight: 12
+    region: content
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings:
+      conditional_fields:
+        b82c48b9-5d75-4d1a-8e51-10a9271dd333:
+          entity_type: node
+          bundle: expenses
+          dependee: field_expense_type
+          settings:
+            state: visible
+            reset: false
+            condition: value
+            grouping: OR
+            values_set: 3
+            value: ''
+            values: "vendor\r\ndaily_expenses"
+            value_form:
+              -
+                value: daily_expenses
+            effect: show
+            effect_options: {  }
+            selector: ''
+  field_project:
+    type: entity_reference_autocomplete
+    weight: 1
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_room_rent_details:
+    type: paragraphs
+    weight: 13
+    region: content
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings:
+      conditional_fields:
+        7220caa8-dca4-48b1-bcc7-49d80a1f352f:
+          entity_type: node
+          bundle: expenses
+          dependee: field_expense_type
+          settings:
+            state: visible
+            reset: false
+            condition: value
+            grouping: AND
+            values_set: 1
+            value: ''
+            values: {  }
+            value_form:
+              -
+                value: room_rent_utility
+            effect: show
+            effect_options: {  }
+            selector: ''
+  field_salary_details:
+    type: paragraphs
+    weight: 11
+    region: content
+    settings:
+      title: Paragraph
+      title_plural: Paragraphs
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+      features:
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings:
+      conditional_fields:
+        a91481c9-b79e-46fe-b47f-8e3e848d3e95:
+          entity_type: node
+          bundle: expenses
+          dependee: field_expense_type
+          settings:
+            state: visible
+            reset: false
+            condition: value
+            grouping: AND
+            values_set: 1
+            value: ''
+            values: {  }
+            value_form:
+              -
+                value: salary
+            effect: show
+            effect_options: {  }
+            selector: ''
+  path:
+    type: path
+    weight: 6
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  promote:
+    type: boolean_checkbox
+    weight: 4
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 7
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  sticky:
+    type: boolean_checkbox
+    weight: 5
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  uid:
+    type: entity_reference_autocomplete
+    weight: 2
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  body: true

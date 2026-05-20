@@ -2,11 +2,167 @@
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\ReplaceCommand;
+
+/**
+ * Implements hook_theme().
+ */
+function power_alpha_helper_theme($existing, $type, $theme, $path) {
+  return [
+    'dashboard_overview' => [
+      'variables' => ['data' => NULL],
+      'template' => 'dashboard-overview',
+    ],
+  ];
+}
 
 /**
  * Implements hook_form_alter().
  */
-function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $form_id)
+{
+
+  // Purchase Order dynamic calculations using AJAX
+  if (in_array($form_id, ['node_purchase_order_form', 'node_purchase_order_edit_form'])) {
+    if (isset($form['field_basic_amount']['widget'][0]['value'])) {
+      // 1. Wrap the target fields in wrappers for AJAX replacement
+      $form['field_amount_gst']['#prefix'] = '<div id="po-amount-gst-wrapper">';
+      $form['field_amount_gst']['#suffix'] = '</div>';
+      
+      if (isset($form['field_gst'])) {
+        $form['field_gst']['#prefix'] = '<div id="po-gst-wrapper">';
+        $form['field_gst']['#suffix'] = '</div>';
+      }
+
+      // 2. Attach #ajax settings to the basic amount input
+      $form['field_basic_amount']['widget'][0]['value']['#ajax'] = [
+        'callback' => 'power_alpha_helper_purchase_order_ajax_callback',
+        'event' => 'change',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Calculating GST...'),
+        ],
+      ];
+
+      // 3. Perform server-side calculation on AJAX trigger or form reload
+      $basic_amount = 0;
+      $user_input = $form_state->getUserInput();
+
+      if (isset($user_input['field_basic_amount'][0]['value'])) {
+        $basic_amount = $user_input['field_basic_amount'][0]['value'];
+      } elseif (isset($form['field_basic_amount']['widget'][0]['value']['#default_value'])) {
+        $basic_amount = $form['field_basic_amount']['widget'][0]['value']['#default_value'];
+      }
+
+      $basic_amount = (float) $basic_amount;
+
+      if ($basic_amount > 0 || isset($user_input['field_basic_amount'])) {
+        // Calculate GST (18%) and Total (Basic Amount * 1.18)
+        $gst = $basic_amount * 0.18;
+        $total = $basic_amount * 1.18;
+
+        // Format to clean decimals
+        $formatted_gst = number_format($gst, 2, '.', '');
+        if (substr($formatted_gst, -3) === '.00') {
+          $formatted_gst = number_format($gst, 0, '.', '');
+        }
+
+        $formatted_total = number_format($total, 2, '.', '');
+        if (substr($formatted_total, -3) === '.00') {
+          $formatted_total = number_format($total, 0, '.', '');
+        }
+
+        $form['field_amount_gst']['widget'][0]['value']['#value'] = $formatted_total;
+        if (isset($form['field_gst'])) {
+          $form['field_gst']['widget'][0]['value']['#value'] = $formatted_gst;
+        }
+      }
+    }
+  }
+
+  // PF Calculation for node_expenses_form and node_expenses_edit_form
+  if (in_array($form_id, ['node_expenses_form', 'node_expenses_edit_form'])) {
+    if (isset($form['field_salary_details']['widget'])) {
+      $elements = \Drupal\Core\Render\Element::children($form['field_salary_details']['widget']);
+      foreach ($elements as $delta) {
+        if (is_numeric($delta)) {
+          $subform = &$form['field_salary_details']['widget'][$delta]['subform'];
+          if (isset($subform['field_wages_payment'])) {
+            $wrapper_pf_id = 'salary-pf-wrapper-' . $delta;
+            $wrapper_total_id = 'salary-total-wrapper-' . $delta;
+            $wrapper_esi_id = 'salary-esi-wrapper-' . $delta;
+
+            if (isset($subform['field_pf'])) {
+              $subform['field_pf']['#prefix'] = '<div id="' . $wrapper_pf_id . '">';
+              $subform['field_pf']['#suffix'] = '</div>';
+            }
+            if (isset($subform['field_total_amount'])) {
+              $subform['field_total_amount']['#prefix'] = '<div id="' . $wrapper_total_id . '">';
+              $subform['field_total_amount']['#suffix'] = '</div>';
+            }
+            if (isset($subform['field_esi'])) {
+              $subform['field_esi']['#prefix'] = '<div id="' . $wrapper_esi_id . '">';
+              $subform['field_esi']['#suffix'] = '</div>';
+            }
+
+            $ajax_settings = [
+              'callback' => 'power_alpha_helper_salary_pf_ajax_callback',
+              'event' => 'change',
+              'progress' => [
+                'type' => 'throbber',
+                'message' => t('Calculating...'),
+              ],
+            ];
+
+            $subform['field_wages_payment']['widget'][0]['value']['#ajax'] = $ajax_settings;
+            if (isset($subform['field_other_payment'])) {
+              $subform['field_other_payment']['widget'][0]['value']['#ajax'] = $ajax_settings;
+            }
+
+            // Calculations
+            $wages = 0;
+            $other = 0;
+            
+            $user_input = $form_state->getUserInput();
+            
+            if (isset($user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'])) {
+               $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
+            } elseif (isset($subform['field_wages_payment']['widget'][0]['value']['#default_value'])) {
+               $wages = $subform['field_wages_payment']['widget'][0]['value']['#default_value'];
+            }
+            
+            if (isset($user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'])) {
+               $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
+            } elseif (isset($subform['field_other_payment']['widget'][0]['value']['#default_value'])) {
+               $other = $subform['field_other_payment']['widget'][0]['value']['#default_value'];
+            }
+
+            $wages = (float) $wages;
+            $other = (float) $other;
+
+            if ($wages > 0 || $other > 0 || isset($user_input['field_salary_details'])) {
+              if (isset($subform['field_pf'])) {
+                $pf = $wages * 0.24;
+                $subform['field_pf']['widget'][0]['value']['#value'] = number_format($pf, 2, '.', '');
+              }
+              
+              if (isset($subform['field_esi'])) {
+                // ESI 4% (0.75% + 3.25%)
+                $esi = $wages * 0.04;
+                $subform['field_esi']['widget'][0]['value']['#value'] = number_format($esi, 2, '.', '');
+              }
+              
+              if (isset($subform['field_total_amount'])) {
+                $total = $wages + $other;
+                $subform['field_total_amount']['widget'][0]['value']['#value'] = number_format($total, 2, '.', '');
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 
   // Step 3.1: Define target forms
   $target_forms = [
@@ -16,6 +172,10 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
     'node_purchase_order_form',
     'node_attendance_form',
   ];
+
+  if ($form_id == 'node_expenses_edit_form') {
+
+  }
 
   // Step 3.2: Skip if not matching form
   if (!in_array($form_id, $target_forms)) {
@@ -44,4 +204,57 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
     // Step 3.6: Hide field (optional but recommended)
     $form['field_project']['#access'] = FALSE;
   }
+}
+
+/**
+ * AJAX callback to return the updated fields in salary details.
+ */
+function power_alpha_helper_salary_pf_ajax_callback(array &$form, FormStateInterface $form_state)
+{
+  $triggering_element = $form_state->getTriggeringElement();
+  $parents = $triggering_element['#array_parents'];
+  
+  $subform_parents = array_slice($parents, 0, -4);
+  $delta = $subform_parents[2]; // 'field_salary_details', 'widget', $delta, 'subform'
+  
+  $response = new AjaxResponse();
+  
+  $pf_parents = array_merge($subform_parents, ['field_pf']);
+  $total_parents = array_merge($subform_parents, ['field_total']);
+  $esi_parents = array_merge($subform_parents, ['field_esi']);
+  
+  $pf_element = \Drupal\Component\Utility\NestedArray::getValue($form, $pf_parents);
+  if ($pf_element) {
+    $response->addCommand(new ReplaceCommand('#salary-pf-wrapper-' . $delta, $pf_element));
+  }
+  
+  $total_element = \Drupal\Component\Utility\NestedArray::getValue($form, $total_parents);
+  if ($total_element) {
+    $response->addCommand(new ReplaceCommand('#salary-total-wrapper-' . $delta, $total_element));
+  }
+  
+  $esi_element = \Drupal\Component\Utility\NestedArray::getValue($form, $esi_parents);
+  if ($esi_element) {
+    $response->addCommand(new ReplaceCommand('#salary-esi-wrapper-' . $delta, $esi_element));
+  }
+  
+  return $response;
+}
+
+/**
+ * AJAX callback to return updated GST and Amount + GST fields.
+ */
+function power_alpha_helper_purchase_order_ajax_callback(array &$form, FormStateInterface $form_state)
+{
+  $response = new AjaxResponse();
+  
+  if (isset($form['field_amount_gst'])) {
+    $response->addCommand(new ReplaceCommand('#po-amount-gst-wrapper', $form['field_amount_gst']));
+  }
+  
+  if (isset($form['field_gst'])) {
+    $response->addCommand(new ReplaceCommand('#po-gst-wrapper', $form['field_gst']));
+  }
+  
+  return $response;
 }

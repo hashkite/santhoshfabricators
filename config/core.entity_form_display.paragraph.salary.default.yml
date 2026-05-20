@@ -1,0 +1,65 @@
+uuid: 9712ede0-890b-4f02-a921-033d2091d13c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.salary.field_esi
+    - field.field.paragraph.salary.field_no_of_workers
+    - field.field.paragraph.salary.field_other_payment
+    - field.field.paragraph.salary.field_pf
+    - field.field.paragraph.salary.field_total_amount
+    - field.field.paragraph.salary.field_wages_payment
+    - paragraphs.paragraphs_type.salary
+id: paragraph.salary.default
+targetEntityType: paragraph
+bundle: salary
+mode: default
+content:
+  field_esi:
+    type: number
+    weight: 3
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_no_of_workers:
+    type: number
+    weight: 0
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_other_payment:
+    type: string_textfield
+    weight: 2
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_pf:
+    type: number
+    weight: 4
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_total_amount:
+    type: string_textfield
+    weight: 5
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_wages_payment:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

@@ -1,0 +1,34 @@
+uuid: 992c8c02-371c-45ce-a566-ed83b7fb8006
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_add_expences
+    - paragraphs.paragraphs_type.expenses
+    - paragraphs.paragraphs_type.salary
+  module:
+    - entity_reference_revisions
+id: paragraph.expenses.field_add_expences
+field_name: field_add_expences
+entity_type: paragraph
+bundle: expenses
+label: 'Add Expences'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      salary: salary
+    negate: 0
+    target_bundles_drag_drop:
+      expenses:
+        weight: 3
+        enabled: false
+      salary:
+        weight: 4
+        enabled: true
+field_type: entity_reference_revisions

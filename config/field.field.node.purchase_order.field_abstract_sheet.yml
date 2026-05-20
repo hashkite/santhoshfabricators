@@ -1,0 +1,27 @@
+uuid: b9a64a96-4d61-4da5-846e-99dfa3c52b3f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_abstract_sheet
+    - node.type.purchase_order
+  module:
+    - file
+id: node.purchase_order.field_abstract_sheet
+field_name: field_abstract_sheet
+entity_type: node
+bundle: purchase_order
+label: 'Abstract Sheet'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'txt pdf.xls xlsx'
+  max_filesize: ''
+  description_field: false
+field_type: file

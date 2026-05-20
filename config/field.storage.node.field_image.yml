@@ -1,4 +1,4 @@
-uuid: cb46f2e9-4f5c-4a94-9ea7-344e334d05aa
+uuid: 7b8e57b3-4940-48d0-987c-88465575c999
 langcode: en
 status: true
 dependencies:
@@ -15,10 +15,10 @@ type: image
 settings:
   target_type: file
   display_field: false
-  display_default: false
+  display_default: true
   uri_scheme: public
   default_image:
-    uuid: null
+    uuid: ''
     alt: ''
     title: ''
     width: null

@@ -1,0 +1,14 @@
+uuid: 57007a0b-1172-4891-b810-de3a0b578aef
+langcode: en
+status: true
+dependencies:
+  config:
+    - user.role.authority
+  module:
+    - user
+id: user_remove_role_action.authority
+label: 'Remove the Authority role from the selected user(s)'
+type: user
+plugin: user_remove_role_action
+configuration:
+  rid: authority

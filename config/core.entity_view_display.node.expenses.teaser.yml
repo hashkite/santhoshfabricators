@@ -1,0 +1,46 @@
+uuid: d8e616f3-4e35-4568-a2e7-105814e552a6
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.expenses.body
+    - field.field.node.expenses.field_amount
+    - field.field.node.expenses.field_date
+    - field.field.node.expenses.field_description
+    - field.field.node.expenses.field_expense_type
+    - field.field.node.expenses.field_inventory_details
+    - field.field.node.expenses.field_project
+    - field.field.node.expenses.field_room_rent_details
+    - field.field.node.expenses.field_salary_details
+    - node.type.expenses
+  module:
+    - text
+    - user
+id: node.expenses.teaser
+targetEntityType: node
+bundle: expenses
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_amount: true
+  field_date: true
+  field_description: true
+  field_expense_type: true
+  field_inventory_details: true
+  field_project: true
+  field_room_rent_details: true
+  field_salary_details: true

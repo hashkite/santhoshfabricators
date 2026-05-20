@@ -1,0 +1,9 @@
+uuid: 700ce707-47fe-46fb-8000-78ead71f6a93
+langcode: en
+status: true
+dependencies: {  }
+id: authority
+label: Authority
+weight: 6
+is_admin: null
+permissions: {  }

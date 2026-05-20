@@ -1,0 +1,21 @@
+features:
+  node_user_picture: 1
+  comment_user_picture: 1
+  comment_user_verification: 1
+  favicon: 1
+logo:
+  use_default: 1
+favicon:
+  use_default: 1
+enable_darkmode: '0'
+preset_accent_color: null
+accent_color: ''
+preset_focus_color: gin
+focus_color: ''
+high_contrast_mode: 0
+classic_toolbar: horizontal
+sticky_action_buttons: 0
+secondary_toolbar_frontend: 0
+layout_density: ''
+show_description_toggle: 0
+show_user_theme_settings: 0

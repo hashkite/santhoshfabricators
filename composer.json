@@ -28,7 +28,12 @@
         "drupal/gin": "^4.1",
         "drupal/twig_tweak": "^3.4",
         "drupal/gin_login": "^2.1",
-        "drupal/devel": "^5.4"
+        "drupal/devel": "^5.4",
+        "drupal/paragraphs": "^1.20",
+        "drupal/conditional_fields": "^4.0@alpha",
+        "drupal/better_exposed_filters": "^7.1",
+        "drupal/computed_field": "^4.0",
+        "drupal/address": "^2.0"
     },
     "require-dev": {
         "drupal/core-dev": "^10"

@@ -1,0 +1,86 @@
+uuid: c5772dcc-30f0-4db7-9ead-4968e98db1f2
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.inventory_expenses.field_account_number
+    - field.field.paragraph.inventory_expenses.field_amount
+    - field.field.paragraph.inventory_expenses.field_cms_number
+    - field.field.paragraph.inventory_expenses.field_gst
+    - field.field.paragraph.inventory_expenses.field_materials_description
+    - field.field.paragraph.inventory_expenses.field_payment_status
+    - field.field.paragraph.inventory_expenses.field_quantity
+    - field.field.paragraph.inventory_expenses.field_vendor_name
+    - paragraphs.paragraphs_type.inventory_expenses
+  module:
+    - options
+    - text
+id: paragraph.inventory_expenses.default
+targetEntityType: paragraph
+bundle: inventory_expenses
+mode: default
+content:
+  field_account_number:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  field_amount:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_cms_number:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_gst:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_materials_description:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_payment_status:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_quantity:
+    type: number_integer
+    label: above
+    settings:
+      thousand_separator: ''
+      prefix_suffix: true
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_vendor_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+hidden: {  }

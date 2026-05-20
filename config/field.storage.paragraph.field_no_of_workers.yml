@@ -1,0 +1,20 @@
+uuid: 07dd840e-2808-49a2-ba5f-e9b979dfe87c
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_no_of_workers
+field_name: field_no_of_workers
+entity_type: paragraph
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

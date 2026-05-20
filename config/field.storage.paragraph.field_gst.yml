@@ -1,0 +1,21 @@
+uuid: b5570ff6-606a-4f2a-a344-5502161489df
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_gst
+field_name: field_gst
+entity_type: paragraph
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

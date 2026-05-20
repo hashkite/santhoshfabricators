@@ -6,48 +6,113 @@ use Drupal\Core\Form\FormStateInterface;
  * @file
  * Functions to support theming in the Power Alpha theme.
  */
-
 /**
  * Implements hook_preprocess_HOOK() for node templates.
  */
-function power_alpha_preprocess_node(&$variables) {
+function power_alpha_preprocess_node(&$variables)
+{
   $node = $variables['node'];
   if ($node->getType() == 'project_sites' && $variables['view_mode'] == 'full') {
-    // Load Views blocks manually since twig_tweak is not present.
+    // Load Views blocks — only include views that exist in the system.
     $variables['expenses_block'] = [
       '#type' => 'view',
       '#name' => 'expenses_report',
       '#display_id' => 'block_1',
     ];
-    
-    $variables['documents_block'] = [
-      '#type' => 'view',
-      '#name' => 'documents',
-      '#display_id' => 'block_1',
-    ];
-    
-    $variables['esi_block'] = [
-      '#type' => 'view',
-      '#name' => 'esi_compliance',
-      '#display_id' => 'block_1',
-    ];
+
     $variables['purchase_order_block'] = [
       '#type' => 'view',
       '#name' => 'purchase_order',
       '#display_id' => 'block_1',
     ];
-    $variables['attendance_block'] = [
-      '#type' => 'view',
-      '#name' => 'attendance_report',
-      '#display_id' => 'block_1',
+
+    // Safely load optional views only if they exist.
+    $optional_views = [
+      'documents_block' => ['name' => 'documents', 'display' => 'block_1'],
+      'esi_block' => ['name' => 'esi_compliance', 'display' => 'block_1'],
+      'attendance_block' => ['name' => 'attendance_report', 'display' => 'block_1'],
     ];
+    foreach ($optional_views as $var_name => $view_info) {
+      $view = \Drupal\views\Views::getView($view_info['name']);
+      if ($view) {
+        $variables[$var_name] = [
+          '#type' => 'view',
+          '#name' => $view_info['name'],
+          '#display_id' => $view_info['display'],
+        ];
+      } else {
+        $variables[$var_name] = NULL;
+      }
+    }
+
+    // Budget Calculation for project detail page.
+    $allocated_raw = $node->get('field_allocated_budget')->value;
+    if (!empty($allocated_raw)) {
+      $query = \Drupal::entityQuery('node')
+        ->condition('type', 'expenses')
+        ->condition('field_project', $node->id())
+        ->condition('status', 1)
+        ->accessCheck(FALSE);
+      $nids = $query->execute();
+      $spent = 0;
+      if (!empty($nids)) {
+        foreach (\Drupal\node\Entity\Node::loadMultiple($nids) as $expense) {
+          $spent += (float) $expense->get('field_amount')->value;
+        }
+      }
+      $allocated = (float) $allocated_raw;
+      $remaining = max(0.0, $allocated - $spent);
+      $percent = $allocated > 0 ? round(($spent / $allocated) * 100) : 0;
+
+      if ($allocated >= 10000000) {
+        $variables['budget_allocated'] = '₹' . number_format($allocated / 10000000, 2) . ' Cr';
+      } else {
+        $variables['budget_allocated'] = '₹' . number_format($allocated / 100000, 2) . ' L';
+      }
+
+      if ($remaining >= 10000000) {
+        $variables['budget_remaining'] = '₹' . number_format($remaining / 10000000, 2) . ' Cr';
+      } else {
+        $variables['budget_remaining'] = '₹' . number_format($remaining / 100000, 2) . ' L';
+      }
+      $variables['budget_percent'] = $percent;
+    } else {
+      $variables['budget_allocated'] = NULL;
+      $variables['budget_remaining'] = NULL;
+      $variables['budget_percent'] = NULL;
+    }
+
+    // Days Remaining Calculation.
+    $start_date = $node->get('field_start_date')->value;
+    $end_date = $node->get('field_end_date')->value;
+    if ($start_date && $end_date) {
+      $now = new \DateTime();
+      $end = new \DateTime($end_date);
+      if ($end > $now) {
+        $interval = $now->diff($end);
+        $variables['days_left'] = $interval->days;
+      } else {
+        $variables['days_left'] = 0;
+      }
+    } else {
+      $variables['days_left'] = '-';
+    }
   }
+}
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function power_alpha_preprocess_page(array &$variables)
+{
+  $variables['is_logged_in'] = \Drupal::currentUser()->isAuthenticated();
 }
 
 /**
  * Implements hook_form_alter().
  */
-function power_alpha_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function power_alpha_form_alter(&$form, FormStateInterface $form_state, $form_id)
+{
   // Target document node form
   if ($form_id == 'node_documents_form' || $form_id == 'node_expenses_form' || $form_id == 'node_esi_compliance_data_form' || $form_id == 'node_purchase_order_form' || $form_id == 'node_attendance_form') {
 
@@ -60,3 +125,132 @@ function power_alpha_form_alter(&$form, FormStateInterface $form_state, $form_id
     }
   }
 }
+
+/**
+ * Implements hook_theme_suggestions_views_view_alter().
+ */
+function power_alpha_theme_suggestions_views_view_alter(array &$suggestions, array $variables)
+{
+  if (isset($variables['view'])) {
+    $view = $variables['view'];
+    $id = $view->id();
+    $display_id = $view->current_display;
+    $suggestions[] = 'views_view__' . $id;
+    $suggestions[] = 'views_view__' . $id . '__' . $display_id;
+  }
+}
+
+/**
+ * Implements hook_preprocess_views_view_fields().
+ */
+function power_alpha_preprocess_views_view_fields(&$variables)
+{
+  $view = $variables['view'];
+  if ($view->id() == 'project_dashboard') {
+    $row = $variables['row'];
+    $node = $row->_entity;
+    if ($node) {
+      // 1. Project Title
+      $variables['project_title'] = $node->label();
+
+      // 2. Project Code (with fallback)
+      $code = $node->get('field_project_code')->value;
+      $variables['project_code'] = !empty($code) ? $code : '#FT-2024-095';
+
+      // 3. Location (with fallback)
+      $location = $node->get('field_location')->value;
+      $variables['project_location'] = !empty($location) ? $location : 'Jamnagar, Gujarat';
+
+      // 4. Status (with fallback)
+      $status = $node->get('field_status')->value;
+      $variables['project_status'] = !empty($status) ? $status : 'pending';
+
+      // 5. Budget Calculation (with fallback)
+      $allocated_raw = $node->get('field_allocated_budget')->value;
+      if (!empty($allocated_raw)) {
+        // Calculate spent budget
+        $query = \Drupal::entityQuery('node')
+          ->condition('type', 'expenses')
+          ->condition('field_project', $node->id())
+          ->condition('status', 1)
+          ->accessCheck(FALSE);
+        $nids = $query->execute();
+        $spent = 0;
+        if (!empty($nids)) {
+          foreach (\Drupal\node\Entity\Node::loadMultiple($nids) as $expense) {
+            $spent += (float) $expense->get('field_amount')->value;
+          }
+        }
+        $allocated = (float) $allocated_raw;
+        $remaining = max(0.0, $allocated - $spent);
+        $percent = $allocated > 0 ? round(($spent / $allocated) * 100) : 0;
+
+        // Allocated budget format.
+        if ($allocated >= 10000000) {
+          $variables['budget_allocated'] = '₹' . number_format($allocated / 10000000, 2) . ' Cr';
+        } else {
+          $variables['budget_allocated'] = '₹' . number_format($allocated / 100000, 2) . ' L';
+        }
+
+        // Remaining budget format.
+        if ($remaining >= 10000000) {
+          $variables['budget_remaining'] = '₹' . number_format($remaining / 10000000, 2) . ' Cr';
+        } else {
+          $variables['budget_remaining'] = '₹' . number_format($remaining / 100000, 2) . ' L';
+        }
+        $variables['budget_percent'] = $percent;
+      } else {
+        // Fallback mock data matching the visual mock
+        $variables['budget_allocated'] = null;
+        $variables['budget_remaining'] = null;
+        $variables['budget_percent'] = null;
+      }
+
+      // 6. Days Calculation
+      $start_date = $node->get('field_start_date')->value;
+      $end_date = $node->get('field_end_date')->value;
+
+      if ($start_date && $end_date) {
+        $start = new \DateTime($start_date);
+        $end = new \DateTime($end_date);
+        $interval = $start->diff($end);
+        $variables['days_left'] = $interval->days;
+      } else {
+        $variables['days_left'] = '-';
+      }
+      // get last updated time in readable format
+      $last_updated = \Drupal::service('date.formatter')->format($node->get('changed')->value, 'custom', 'd M Y');
+      $variables['last_updated'] = $last_updated;
+    }
+  }
+}
+
+/**
+ * Implements hook_theme_suggestions_page_alter().
+ */
+function power_alpha_theme_suggestions_page_alter(array &$suggestions, array $variables)
+{
+  // 1. Suggestion based on node type
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+    if ($node instanceof \Drupal\node\NodeInterface) {
+      $suggestions[] = 'page__node__' . $node->getType();
+    }
+  }
+
+  // 2. Suggestion based on views ID
+  if ($view_id = \Drupal::routeMatch()->getParameter('view_id')) {
+    $suggestions[] = 'page__view__' . $view_id;
+    $display_id = \Drupal::routeMatch()->getParameter('display_id');
+    if ($display_id) {
+      $suggestions[] = 'page__view__' . $view_id . '__' . $display_id;
+    }
+  }
+
+  // 3. Dashboard page uses the same layout as project sites
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  if ($route_name === 'power_alpha_helper.dashboard') {
+    $suggestions[] = 'page__dashboard';
+  }
+}
+
+
