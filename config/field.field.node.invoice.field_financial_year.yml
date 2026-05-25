@@ -1,0 +1,23 @@
+uuid: 0e1c0615-c372-4540-a9ef-47512f27dc39
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_financial_year
+    - node.type.invoice
+  module:
+    - options
+id: node.invoice.field_financial_year
+field_name: field_financial_year
+entity_type: node
+bundle: invoice
+label: 'Financial Year'
+description: 'Select the financial year for this invoice.'
+required: true
+translatable: false
+default_value:
+  -
+    value: 2025-26
+default_value_callback: ''
+settings: {  }
+field_type: list_string

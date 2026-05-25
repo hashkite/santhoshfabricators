@@ -1,0 +1,48 @@
+uuid: a380be6f-3671-4f7c-bd3e-3ae2aba5b0e6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.invoice_item.field_description
+    - field.field.paragraph.invoice_item.field_uom
+    - field.field.paragraph.invoice_item.field_quantity
+    - field.field.paragraph.invoice_item.field_rate
+    - paragraphs.paragraphs_type.invoice_item
+id: paragraph.invoice_item.default
+targetEntityType: paragraph
+bundle: invoice_item
+mode: default
+content:
+  field_description:
+    type: string_textfield
+    weight: 0
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_quantity:
+    type: number
+    weight: 2
+    region: content
+    settings:
+      placeholder: '1'
+    third_party_settings: {  }
+  field_rate:
+    type: number
+    weight: 3
+    region: content
+    settings:
+      placeholder: '0.00'
+    third_party_settings: {  }
+  field_uom:
+    type: string_textfield
+    weight: 1
+    region: content
+    settings:
+      size: 15
+      placeholder: PU
+    third_party_settings: {  }
+hidden:
+  created: true
+  status: true

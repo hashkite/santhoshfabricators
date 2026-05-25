@@ -1,17 +1,15 @@
-uuid: 3edb7813-ae63-4057-a6d0-baa3289501df
+uuid: d14daec0-aa7d-48d6-abf2-3f510cb7607f
 langcode: en
 status: true
 dependencies:
   module:
     - node
-id: node.field_po_number
-field_name: field_po_number
+id: node.field_purchase_order
+field_name: field_purchase_order
 entity_type: node
-type: string
+type: entity_reference
 settings:
-  max_length: 25
-  case_sensitive: false
-  is_ascii: false
+  target_type: node
 module: core
 locked: false
 cardinality: 1

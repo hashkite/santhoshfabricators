@@ -5,3 +5,11 @@ power_alpha_helper.dashboard:
     _title: 'Administrative Overview'
   requirements:
     _permission: 'access content'
+
+power_alpha_helper.invoice_settings:
+  path: '/admin/config/system/invoice-settings'
+  defaults:
+    _form: '\Drupal\power_alpha_helper\Form\InvoiceSettingsForm'
+    _title: 'Invoice Settings'
+  requirements:
+    _permission: 'administer site configuration'

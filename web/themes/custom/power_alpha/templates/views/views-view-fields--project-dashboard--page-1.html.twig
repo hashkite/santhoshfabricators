@@ -2,11 +2,11 @@
 /**
  * @file
  * Custom theme implementation to display all the fields in a row for project dashboard.
+ *
  * Designed to look exactly like the premium target design with high-quality structure.
  */
 #}
-<div
-	class="project-card-wrapper">
+<div class="project-card-wrapper">
 	{# Image Container with Overlaid Status Badge #}
 	<div class="project-card-image-wrapper">
 		{% if fields.field_image.content %}
@@ -29,15 +29,14 @@
 		</div>
 
 		<div class="project-card-code">
-			PID:
-			{{ project_code }}
+			PID: {{ project_code }}
 		</div>
 
 		<div class="project-card-location">
 			<span class="location-icon">
-				<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-					<circle cx="12" cy="10" r="3"></circle>
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+					<circle cx="12" cy="10" r="3"/>
 				</svg>
 			</span>
 			{{ project_location }}
@@ -59,6 +58,7 @@
 					{% else %}
 						<span class="allocated-value">Allocated: {{ budget_allocated }}</span>
 					{% endif %}
+					<span class="utilized-value">Utilized: {{ budget_utilized }}</span>
 					<span class="remaining-value">Remaining: {{ budget_remaining }}</span>
 				</div>
 			</div>
@@ -67,8 +67,7 @@
 
 	{# Card Footer #}
 	<div class="project-card-footer">
-		<span class="last-updated">Last updated:
-			{{ last_updated }}</span>
+		<span class="last-updated">Last updated: {{ last_updated }}</span>
 		<a class="view-details-link" href="{{ path('entity.node.canonical', {'node': row._entity.id}) }}">View Details</a>
 	</div>
 </div>

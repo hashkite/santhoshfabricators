@@ -1,0 +1,27 @@
+uuid: 99d89411-096d-43e6-b062-6952469c8177
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_purchase_order
+    - node.type.invoice
+id: node.invoice.field_purchase_order
+field_name: field_purchase_order
+entity_type: node
+bundle: invoice
+label: 'Purchase Order'
+description: 'Select the Purchase Order this invoice belongs to.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      purchase_order: purchase_order
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

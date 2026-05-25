@@ -1,15 +1,15 @@
-uuid: 3edb7813-ae63-4057-a6d0-baa3289501df
+uuid: 281892df-29b2-4c1d-9342-31024d884004
 langcode: en
 status: true
 dependencies:
   module:
     - node
-id: node.field_po_number
-field_name: field_po_number
+id: node.field_invoice_no
+field_name: field_invoice_no
 entity_type: node
 type: string
 settings:
-  max_length: 25
+  max_length: 50
   case_sensitive: false
   is_ascii: false
 module: core

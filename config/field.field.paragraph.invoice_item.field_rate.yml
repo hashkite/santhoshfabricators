@@ -1,0 +1,23 @@
+uuid: 2a2c84ad-aaf0-4ec2-b430-f059af872efb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_rate
+    - paragraphs.paragraphs_type.invoice_item
+id: paragraph.invoice_item.field_rate
+field_name: field_rate
+entity_type: paragraph
+bundle: invoice_item
+label: Rate
+description: 'Rate or unit price.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

@@ -1,0 +1,19 @@
+uuid: 964961ee-a01a-4621-b5cd-b0fba377596a
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_description
+    - paragraphs.paragraphs_type.invoice_item
+id: paragraph.invoice_item.field_description
+field_name: field_description
+entity_type: paragraph
+bundle: invoice_item
+label: Description
+description: 'Item description/details.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,10 @@
+uuid: 249d4fd4-18b7-4022-9001-7e4e2ff50b90
+langcode: en
+status: true
+dependencies: {  }
+id: invoice_item
+label: 'Invoice Item'
+icon_uuid: null
+icon_default: null
+description: 'Itemized row details for invoices.'
+behavior_plugins: {  }

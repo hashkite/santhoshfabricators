@@ -74,17 +74,21 @@ class DashboardController extends ControllerBase {
         $allocated_raw = $project->get('field_allocated_budget')->value;
         $allocated = (float) $allocated_raw;
 
-        // Calculate spent
-        $proj_expense_query = \Drupal::entityQuery('node')
-          ->condition('type', 'expenses')
+        // Calculate spent based on Purchase Orders
+        $proj_po_query = \Drupal::entityQuery('node')
+          ->condition('type', 'purchase_order')
           ->condition('field_project', $project->id())
           ->condition('status', 1)
           ->accessCheck(FALSE);
-        $proj_expense_nids = $proj_expense_query->execute();
+        $proj_po_nids = $proj_po_query->execute();
         $spent = 0;
-        if (!empty($proj_expense_nids)) {
-          foreach (Node::loadMultiple($proj_expense_nids) as $exp) {
-            $spent += (float) $exp->get('field_amount')->value;
+        if (!empty($proj_po_nids)) {
+          foreach (Node::loadMultiple($proj_po_nids) as $po) {
+            $po_val = $po->get('field_amount_gst')->value;
+            if (empty($po_val)) {
+              $po_val = $po->get('field_basic_amount')->value;
+            }
+            $spent += (float) $po_val;
           }
         }
 
@@ -120,10 +124,19 @@ class DashboardController extends ControllerBase {
         $total_allocated += (float) $project->get('field_allocated_budget')->value;
       }
     }
-    // Sum all expenses
-    if (!empty($total_exp_nids)) {
-      foreach (Node::loadMultiple($total_exp_nids) as $expense) {
-        $total_spent += (float) $expense->get('field_amount')->value;
+    // Sum all purchase orders
+    $total_po_query = \Drupal::entityQuery('node')
+      ->condition('type', 'purchase_order')
+      ->condition('status', 1)
+      ->accessCheck(FALSE);
+    $total_po_nids = $total_po_query->execute();
+    if (!empty($total_po_nids)) {
+      foreach (Node::loadMultiple($total_po_nids) as $po) {
+        $po_val = $po->get('field_amount_gst')->value;
+        if (empty($po_val)) {
+          $po_val = $po->get('field_basic_amount')->value;
+        }
+        $total_spent += (float) $po_val;
       }
     }
     $data['total_allocated'] = $total_allocated;

@@ -1,0 +1,104 @@
+uuid: 6f756b19-ea8b-47bf-9d41-268c36ba9173
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.invoice.body
+    - field.field.node.invoice.field_basic_value
+    - field.field.node.invoice.field_basic_value_gst
+    - field.field.node.invoice.field_financial_year
+    - field.field.node.invoice.field_invoice_date
+    - field.field.node.invoice.field_invoice_no
+    - field.field.node.invoice.field_invoice_items
+    - field.field.node.invoice.field_project
+    - field.field.node.invoice.field_purchase_order
+    - node.type.invoice
+  module:
+    - datetime
+    - options
+    - text
+    - user
+    - entity_reference_revisions
+id: node.invoice.default
+targetEntityType: node
+bundle: invoice
+mode: default
+content:
+  body:
+    type: text_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_basic_value:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_basic_value_gst:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+  field_financial_year:
+    type: list_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 4
+    region: content
+  field_invoice_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: medium
+    third_party_settings: {  }
+    weight: 5
+    region: content
+  field_invoice_items:
+    type: entity_reference_revisions_entity_view
+    label: above
+    settings:
+      view_mode: default
+      link: ''
+    third_party_settings: {  }
+    weight: 9
+    region: content
+  field_invoice_no:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 6
+    region: content
+  field_project:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 7
+    region: content
+  field_purchase_order:
+    type: entity_reference_label
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    weight: 8
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 0
+    region: content
+hidden: {  }

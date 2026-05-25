@@ -1,11 +1,11 @@
-uuid: 3edb7813-ae63-4057-a6d0-baa3289501df
+uuid: 13051613-efa3-401f-8c0a-6af2e96bdc27
 langcode: en
 status: true
 dependencies:
   module:
     - node
-id: node.field_po_number
-field_name: field_po_number
+id: node.field_basic_value_gst
+field_name: field_basic_value_gst
 entity_type: node
 type: string
 settings:

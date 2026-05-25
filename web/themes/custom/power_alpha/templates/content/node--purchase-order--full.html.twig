@@ -2,8 +2,6 @@
 /**
  * @file
  * Premium purchase order detail page template.
- * Displays PO number, vendor info, amounts (basic + GST),
- * project reference, and abstract sheet download.
  */
 #}
 <div class="entity-detail-page entity-detail--po">
@@ -11,10 +9,17 @@
 	{# ── BREADCRUMB ── #}
 	<div class="entity-breadcrumb">
 		<a href="/dashboard" class="breadcrumb-link">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+				<polyline points="9 22 9 12 15 12 15 22"/>
+			</svg>
 			Dashboard
 		</a>
-		<span class="breadcrumb-sep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+		<span class="breadcrumb-sep">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+				<polyline points="9 18 15 12 9 6"/>
+			</svg>
+		</span>
 		<span class="breadcrumb-current">Purchase Order</span>
 	</div>
 
@@ -22,160 +27,242 @@
 	<div class="entity-detail-header">
 		<div class="entity-detail-header__left">
 			<h1 class="entity-detail-title">{{ label }}</h1>
-			{% if content.field_po_number.0 %}
-			<span class="entity-type-chip entity-type-chip--po">PO #{{ content.field_po_number.0|render|striptags|trim }}</span>
-			{% endif %}
+			<div class="entity-meta-tags" style="display: flex; gap: 0.75rem; align-items: center; margin-top: 0.5rem;">
+				{% if content.field_po_number.0 %}
+					<span class="entity-type-chip entity-type-chip--po">PO #{{ content.field_po_number.0|render|striptags|trim }}</span>
+				{% endif %}
+				{% if node.field_po_status.value %}
+					<span class="po-status-badge po-status-badge--{{ node.field_po_status.value|clean_class }}">
+						{{ node.field_po_status.value }}
+					</span>
+				{% endif %}
+			</div>
 		</div>
 		{% if logged_in %}
-		<div class="entity-detail-header__actions">
-			<a href="{{ path('entity.node.edit_form', {'node': node.id}) }}" class="btn-detail btn-detail--outline">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-				Edit
-			</a>
-		</div>
+			<div class="entity-detail-header__actions">
+				<a href="{{ path('entity.node.edit_form', {'node': node.id}) }}" class="btn-detail btn-detail--outline">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+					</svg>
+					Edit PO
+				</a>
+			</div>
 		{% endif %}
 	</div>
 
-	{# ── AMOUNT HERO CARD ── #}
-	<div class="entity-hero-card entity-hero-card--po">
-		<div class="entity-hero-card__accent"></div>
-		<div class="entity-hero-card__body">
-			<div class="hero-amounts-grid">
-				<div class="hero-amount-block">
-					<span class="hero-amount-label">Basic Amount</span>
-					<span class="hero-amount-value hero-amount-value--secondary">{{ content.field_basic_amount.0 }}</span>
+	{# ── TWO-COLUMN GRID ── #}
+	<div class="po-grid-container">
+		
+		{# ── LEFT/MAIN COLUMN ── #}
+		<div class="po-grid-main">
+			
+			{# Vendor & Project Card #}
+			<div class="entity-section-card">
+				<div class="entity-section-card__header">
+					<h2 class="entity-section-card__title">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+							<circle cx="12" cy="7" r="4"/>
+						</svg>
+						Vendor & Project Details
+					</h2>
 				</div>
-				<div class="hero-amount-divider"></div>
-				<div class="hero-amount-block">
-					<span class="hero-amount-label">GST (18%)</span>
-					<span class="hero-amount-value hero-amount-value--muted">{{ content.field_gst.0 }}</span>
-				</div>
-				<div class="hero-amount-divider"></div>
-				<div class="hero-amount-block hero-amount-block--highlight">
-					<span class="hero-amount-label">Total (incl. GST)</span>
-					<span class="hero-amount-value">{{ content.field_amount_gst.0 }}</span>
-				</div>
-			</div>
-		</div>
-	</div>
+				<div class="entity-section-card__body">
+					<div class="po-details-overview">
+						<div class="po-overview-grid">
+							{% if content.field_company_name.0 %}
+								<div class="po-overview-item">
+									<span class="po-overview-label">Vendor Name</span>
+									<span class="po-overview-value font-bold" style="font-weight: 700; color: #111827;">{{ content.field_company_name.0 }}</span>
+								</div>
+							{% endif %}
+							{% if content.field_project.0 %}
+								<div class="po-overview-item">
+									<span class="po-overview-label">Project Site</span>
+									<span class="po-overview-value">{{ content.field_project.0 }}</span>
+								</div>
+							{% endif %}
+							{% if content.field_po_date.0 %}
+								<div class="po-overview-item">
+									<span class="po-overview-label">Order Date</span>
+									<span class="po-overview-value">{{ content.field_po_date.0 }}</span>
+								</div>
+							{% endif %}
+							{% if content.field_po_number.0 %}
+								<div class="po-overview-item">
+									<span class="po-overview-label">Reference Number</span>
+									<span class="po-overview-value font-mono">{{ content.field_po_number.0 }}</span>
+								</div>
+							{% endif %}
+						</div>
 
-	{# ── PO DETAILS GRID ── #}
-	<div class="entity-info-card">
-		<div class="entity-info-card__accent"></div>
-		<div class="entity-info-grid">
-			{% if content.field_po_number.0 %}
-			<div class="entity-info-item">
-				<div class="info-item__icon">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-				</div>
-				<div class="info-item__content">
-					<span class="info-item__label">PO Number</span>
-					<span class="info-item__value">{{ content.field_po_number.0 }}</span>
+						{% if content.field_address.0 %}
+							<div class="po-vendor-address-box">
+								<span class="po-overview-label">Billing Address</span>
+								<div class="address-content">{{ content.field_address }}</div>
+							</div>
+						{% endif %}
+					</div>
 				</div>
 			</div>
+
+			{# Invoices List Section #}
+			<div class="entity-section-card">
+				<div class="entity-section-card__header">
+					<h2 class="entity-section-card__title">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+							<line x1="16" y1="2" x2="16" y2="6"/>
+							<line x1="8" y1="2" x2="8" y2="6"/>
+							<line x1="3" y1="10" x2="21" y2="10"/>
+						</svg>
+						Linked Invoices
+					</h2>
+				</div>
+				<div class="entity-section-card__body">
+					{{ invoice_block }}
+					{% if logged_in %}
+						<div class="tab-panel__footer" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+							<a href="/node/add/invoice?field_purchase_order={{ node.id }}&field_project={{ node.field_project.target_id }}" class="btn-detail btn-detail--primary">
+								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<line x1="12" y1="5" x2="12" y2="19"/>
+									<line x1="5" y1="12" x2="19" y2="12"/>
+								</svg>
+								Create New Invoice
+							</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+		</div>
+
+		{# ── RIGHT/SIDEBAR COLUMN ── #}
+		<div class="po-grid-sidebar">
+
+			{# Financial tracking dashboard #}
+			{% if po_dashboard %}
+				<div class="po-sidebar-card financial-summary-card">
+					<div class="po-sidebar-card__header">
+						<h3 class="po-sidebar-card__title">Financial Summary</h3>
+					</div>
+					<div class="po-sidebar-card__body">
+						
+						<div class="po-financial-flow">
+							<div class="po-flow-item">
+								<span class="po-flow-label">Basic Value</span>
+								<span class="po-flow-value">{{ content.field_basic_amount.0 }}</span>
+							</div>
+							<div class="po-flow-item">
+								<span class="po-flow-label">GST Amount (18%)</span>
+								<span class="po-flow-value po-flow-value--gst">{{ content.field_gst.0 }}</span>
+							</div>
+							<div class="po-flow-item po-flow-item--total">
+								<span class="po-flow-label font-bold" style="font-weight: 700; color: #111827;">Total Budget</span>
+								<span class="po-flow-value font-bold text-primary" style="font-weight: 800; color: #3b82f6;">{{ po_dashboard.po_total }}</span>
+							</div>
+						</div>
+
+						<div class="po-utilization-metrics">
+							<div class="metric-title-row">
+								<span class="metric-title">Budget Utilized</span>
+								<span class="metric-percentage {% if po_dashboard.percent >= 100 %}percentage--danger{% elseif po_dashboard.percent >= 75 %}percentage--warning{% else %}percentage--ok{% endif %}">
+									{{ po_dashboard.percent }}%
+								</span>
+							</div>
+
+							{# Progress Bar #}
+							<div class="po-progress-bar-container">
+								<div class="po-progress-bar-fill {% if po_dashboard.is_exceeded %}bar-fill--exceeded{% elseif po_dashboard.percent >= 90 %}bar-fill--danger{% elseif po_dashboard.percent >= 75 %}bar-fill--warning{% endif %}" style="width: {{ po_dashboard.percent }}%"></div>
+							</div>
+
+							<div class="po-summary-sub-stats">
+								<div class="sub-stat-item">
+									<span class="sub-stat-label">Invoiced Total</span>
+									<span class="sub-stat-val font-semibold">{{ po_dashboard.total_invoiced }}</span>
+								</div>
+								<div class="sub-stat-item">
+									<span class="sub-stat-label">Remaining Balance</span>
+									<span class="sub-stat-val font-semibold {% if po_dashboard.is_exceeded %}val--exceeded{% endif %}">{{ po_dashboard.remaining }}</span>
+								</div>
+							</div>
+							
+							{% if po_dashboard.is_exceeded %}
+								<div class="po-limit-alert">
+									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
+										<line x1="12" y1="9" x2="12" y2="13"/>
+										<line x1="12" y1="17" x2="12.01" y2="17"/>
+									</svg>
+									PO budget limit exceeded!
+								</div>
+							{% endif %}
+						</div>
+
+					</div>
+				</div>
 			{% endif %}
 
-			{% if content.field_po_date.0 %}
-			<div class="entity-info-item">
-				<div class="info-item__icon">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+			{# Abstract sheet card #}
+			{% if content.field_abstract_sheet.0 %}
+				<div class="po-sidebar-card download-card">
+					<div class="po-sidebar-card__header">
+						<h3 class="po-sidebar-card__title">Attachments</h3>
+					</div>
+					<div class="po-sidebar-card__body">
+						<div class="file-download-wrapper">
+							<div class="file-icon-box">
+								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
+									<polyline points="14 2 14 8 20 8"/>
+								</svg>
+							</div>
+							<div class="file-link-content">
+								<span class="file-link-title">Abstract Sheet</span>
+								{{ content.field_abstract_sheet }}
+							</div>
+						</div>
+					</div>
 				</div>
-				<div class="info-item__content">
-					<span class="info-item__label">PO Date</span>
-					<span class="info-item__value">{{ content.field_po_date.0 }}</span>
-				</div>
-			</div>
 			{% endif %}
 
-			{% if content.field_company_name.0 %}
-			<div class="entity-info-item">
-				<div class="info-item__icon">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+			{# Notes card #}
+			{% if content.body.0 %}
+				<div class="po-sidebar-card notes-card">
+					<div class="po-sidebar-card__header">
+						<h3 class="po-sidebar-card__title">Notes & Remarks</h3>
+					</div>
+					<div class="po-sidebar-card__body">
+						<div class="notes-text-content">
+							{{ content.body }}
+						</div>
+					</div>
 				</div>
-				<div class="info-item__content">
-					<span class="info-item__label">Vendor / Company</span>
-					<span class="info-item__value">{{ content.field_company_name.0 }}</span>
-				</div>
-			</div>
 			{% endif %}
 
-			{% if content.field_project.0 %}
-			<div class="entity-info-item">
-				<div class="info-item__icon">
-					<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-				</div>
-				<div class="info-item__content">
-					<span class="info-item__label">Project</span>
-					<span class="info-item__value">{{ content.field_project.0 }}</span>
-				</div>
-			</div>
-			{% endif %}
 		</div>
-	</div>
 
-	{# ── VENDOR ADDRESS ── #}
-	{% if content.field_address.0 %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-				Vendor Address
-			</h2>
-		</div>
-		<div class="entity-section-card__body">
-			<div class="entity-description-text">
-				{{ content.field_address }}
-			</div>
-		</div>
 	</div>
-	{% endif %}
-
-	{# ── ABSTRACT SHEET (File Download) ── #}
-	{% if content.field_abstract_sheet.0 %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-				Abstract Sheet
-			</h2>
-		</div>
-		<div class="entity-section-card__body">
-			<div class="file-download-area">
-				{{ content.field_abstract_sheet }}
-			</div>
-		</div>
-	</div>
-	{% endif %}
-
-	{# ── BODY / NOTES ── #}
-	{% if content.body.0 %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-				Notes
-			</h2>
-		</div>
-		<div class="entity-section-card__body">
-			<div class="entity-description-text">
-				{{ content.body }}
-			</div>
-		</div>
-	</div>
-	{% endif %}
 
 	{# ── BACK LINK ── #}
 	<div class="entity-back-link">
 		{% if node.field_project.entity %}
-		<a href="{{ path('entity.node.canonical', {'node': node.field_project.target_id}) }}" class="btn-detail btn-detail--outline">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-			Back to {{ node.field_project.entity.label }}
-		</a>
+			<a href="{{ path('entity.node.canonical', {'node': node.field_project.target_id}) }}" class="btn-detail btn-detail--outline">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="19" y1="12" x2="5" y2="12"/>
+					<polyline points="12 19 5 12 12 5"/>
+				</svg>
+				Back to {{ node.field_project.entity.label }}
+			</a>
 		{% else %}
-		<a href="/projects" class="btn-detail btn-detail--outline">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-			Back to Projects
-		</a>
+			<a href="/projects" class="btn-detail btn-detail--outline">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="19" y1="12" x2="5" y2="12"/>
+					<polyline points="12 19 5 12 12 5"/>
+				</svg>
+				Back to Projects
+			</a>
 		{% endif %}
 	</div>
 

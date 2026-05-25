@@ -287,9 +287,17 @@
 // -------------------------
 .project-summary-row {
   display: grid;
-  grid-template-columns: 2fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: $space-6;
   margin-bottom: $space-8;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .summary-widget {
@@ -458,6 +466,114 @@
     svg {
       color: $color-primary;
       flex-shrink: 0;
+    }
+  }
+}
+
+// Expenses Widget
+.summary-widget--expenses {
+  border-left: 4px solid #f97316;
+
+  .expenses-hero {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    margin-bottom: $space-5;
+  }
+
+  .expenses-hero__label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $color-tertiary;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+  }
+
+  .expenses-hero__amount {
+    font-family: $font-headline;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-extrabold;
+    color: $color-secondary;
+    letter-spacing: $letter-spacing-tight;
+  }
+
+  .expenses-breakdown-section {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+  }
+
+  .expenses-breakdown__bar {
+    width: 100%;
+    height: 8px;
+    background: $color-neutral-200;
+    border-radius: $radius-full;
+    display: flex;
+    overflow: hidden;
+
+    .expenses-bar-segment {
+      height: 100%;
+      transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &.segment--salary {
+        background: #2563eb;
+      }
+      &.segment--inventory {
+        background: #f97316;
+      }
+      &.segment--rent {
+        background: #06b6d4;
+      }
+      &.segment--other {
+        background: #9ca3af;
+      }
+      &.segment--empty {
+        background: $color-neutral-300;
+      }
+    }
+  }
+
+  .expenses-breakdown__list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: $space-2;
+  }
+
+  .breakdown-item {
+    display: flex;
+    align-items: center;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    color: $color-tertiary;
+
+    .breakdown-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: $space-2;
+      flex-shrink: 0;
+    }
+
+    &.item--salary .breakdown-dot {
+      background: #2563eb;
+    }
+    &.item--inventory .breakdown-dot {
+      background: #f97316;
+    }
+    &.item--rent .breakdown-dot {
+      background: #06b6d4;
+    }
+
+    .breakdown-label {
+      flex: 1;
+    }
+
+    .breakdown-value {
+      font-weight: $font-weight-bold;
+      color: $color-secondary;
     }
   }
 }

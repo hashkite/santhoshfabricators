@@ -1,0 +1,251 @@
+{#
+/**
+ * @file
+ * Premium tax invoice detail template matching standard Indian Tax Invoice format.
+ */
+#}
+<div class="entity-detail-page entity-detail--invoice printable-invoice">
+
+	{# ── BREADCRUMB ── #}
+	<div class="entity-breadcrumb no-print">
+		<a href="/dashboard" class="breadcrumb-link">
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+				<polyline points="9 22 9 12 15 12 15 22"/>
+			</svg>
+			Dashboard
+		</a>
+		<span class="breadcrumb-sep">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+				<polyline points="9 18 15 12 9 6"/>
+			</svg>
+		</span>
+		{% if content.field_purchase_order.0 %}
+			<a href="{{ path('entity.node.canonical', {'node': node.field_purchase_order.target_id}) }}" class="breadcrumb-link">{{ node.field_purchase_order.entity.label }}</a>
+			<span class="breadcrumb-sep">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+					<polyline points="9 18 15 12 9 6"/>
+				</svg>
+			</span>
+		{% endif %}
+		<span class="breadcrumb-current">Tax Invoice</span>
+	</div>
+
+	{# ── ACTIONS ── #}
+	<div class="entity-detail-header no-print">
+		<div class="entity-detail-header__left">
+			<h1 class="entity-detail-title">{{ label }}</h1>
+			<span class="entity-type-chip entity-type-chip--invoice">INV #{{ invoice_no }}</span>
+		</div>
+		<div class="entity-detail-header__actions">
+			<button onclick="window.print();" class="btn-detail btn-detail--primary btn-print-invoice">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<polyline points="6 9 6 2 18 2 18 9"/>
+					<path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+					<rect x="6" y="14" width="12" height="8"/>
+				</svg>
+				Print / Save PDF
+			</button>
+			{% if logged_in %}
+				<a href="{{ path('entity.node.edit_form', {'node': node.id}) }}" class="btn-detail btn-detail--outline">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+					</svg>
+					Edit
+				</a>
+			{% endif %}
+		</div>
+	</div>
+
+	{# ── TAX INVOICE EXACT FORMAT ── #}
+	<div class="indian-tax-invoice">
+		
+		{# Top line GST No and TAX INVOICE #}
+		<div class="invoice-top-bar">
+			<span class="invoice-top-gst">Gst No-{{ company_gstin }}</span>
+			<span class="invoice-top-title">TAX INVOICE</span>
+			<span class="invoice-top-spacer"></span>
+		</div>
+
+		{# Banner header box #}
+		<div class="invoice-banner-header">
+			<div class="banner-logo-box">
+				{% if company_logo_url %}
+					<img src="{{ company_logo_url }}" class="vendor-logo-image" alt="{{ company_name }} Logo" />
+				{% else %}
+					{# Styled SVG Logo resembling Santhosh Fabricators #}
+					<svg viewBox="0 0 120 100" class="vendor-logo-svg">
+						<path d="M20,40 C20,25 35,15 50,15 C65,15 80,25 80,40 L65,40 C65,33 58,28 50,28 C42,28 35,33 35,40 C35,47 42,52 50,52 L50,65 C35,65 20,55 20,40 Z" fill="#C2272D" />
+						<path d="M45,45 L75,45 C85,45 90,52 90,62 C90,72 82,78 72,78 L45,78 Z M60,57 L60,67 L70,67 C73,67 75,65 75,62 C75,59 73,57 70,57 Z" fill="#243E8F" />
+						<text x="5" y="93" font-size="10" font-weight="bold" fill="#C2272D" font-family="sans-serif">SANTHOSH</text>
+						<text x="5" y="101" font-size="8" fill="#243E8F" font-family="sans-serif">FABRICATORS</text>
+					</svg>
+				{% endif %}
+			</div>
+			
+			<div class="banner-text-box">
+				<div class="company-name-strip">
+					<h1>{{ company_name }}</h1>
+					<div class="diagonal-stripes"></div>
+				</div>
+				<p class="company-tagline">{{ company_tagline }}</p>
+				<p class="company-address">Office address: {{ company_address }}</p>
+			</div>
+		</div>
+
+		{# Grid Table (To & Bill Details) #}
+		<div class="invoice-details-grid-table">
+			<div class="details-grid-col details-buyer-col">
+				<div class="col-heading-label">To,</div>
+				<div class="buyer-company-name">{{ buyer_name }}</div>
+				<div class="buyer-address-text">{{ buyer_address|nl2br }}</div>
+				<div class="buyer-gstin-row">GSTIN NO : {{ buyer_gstin }}</div>
+			</div>
+			
+			<div class="details-grid-col details-meta-col">
+				<table class="meta-inner-table">
+					<tr>
+						<th>BILL No.</th>
+						<td>: {{ invoice_no }}</td>
+					</tr>
+					<tr>
+						<th>BILL DATE</th>
+						<td>: {{ invoice_date }}</td>
+					</tr>
+					<tr>
+						<th>Work Order No.</th>
+						<td>: {{ work_order_no }}</td>
+					</tr>
+					<tr>
+						<th>Work Order Date</th>
+						<td>: {{ work_order_date }}</td>
+					</tr>
+					<tr>
+						<th>GSTN NO.</th>
+						<td>: {{ company_gstin }}</td>
+					</tr>
+					<tr>
+						<th>SAC NO.</th>
+						<td>: {{ company_sac }}</td>
+					</tr>
+					<tr>
+						<th>PAN NO.</th>
+						<td>: {{ company_pan }}</td>
+					</tr>
+					<tr>
+						<th>RA</th>
+						<td>: {{ company_ra }}</td>
+					</tr>
+				</table>
+			</div>
+		</div>
+
+		{# Main Items Table #}
+		<table class="invoice-items-formatted-table">
+			<thead>
+				<tr>
+					<th class="col-sr">SR.NO</th>
+					<th class="col-desc">DESCRIPTION</th>
+					<th class="col-uom">UOM</th>
+					<th class="col-qty">QTY</th>
+					<th class="col-rate">RATE</th>
+					<th class="col-amt">AMOUNT</th>
+				</tr>
+			</thead>
+			<tbody>
+				{% for item in invoice_items %}
+					<tr class="item-data-row">
+						<td class="text-center font-bold">{{ item.sr_no }}</td>
+						<td>
+							<div class="item-desc-content" style="white-space: pre-line;">{{ item.description }}</div>
+						</td>
+						<td class="text-center font-medium">{{ item.uom }}</td>
+						<td class="text-center font-medium">{{ item.qty }}</td>
+						<td class="text-right font-medium">{{ item.rate }}</td>
+						<td class="text-right font-bold">{{ item.amount }}</td>
+					</tr>
+				{% endfor %}
+				
+				{# Padding rows to ensure spacing matches standard paper format #}
+				<tr class="spacer-row"><td colspan="6"></td></tr>
+
+				{# Financial calculations block #}
+				<tr class="calc-row">
+					<td colspan="4" class="noborder-left noborder-bottom"></td>
+					<td class="calc-label">TOTAL AMOUNT</td>
+					<td class="calc-val">{{ basic_value_formatted }}</td>
+				</tr>
+				{% if is_intra_state %}
+					<tr class="calc-row">
+						<td colspan="4" class="noborder-left noborder-bottom"></td>
+						<td class="calc-label">CGST 9%</td>
+						<td class="calc-val">{{ cgst_val_formatted }}</td>
+					</tr>
+					<tr class="calc-row">
+						<td colspan="4" class="noborder-left noborder-bottom"></td>
+						<td class="calc-label">SGST 9%</td>
+						<td class="calc-val">{{ sgst_val_formatted }}</td>
+					</tr>
+				{% else %}
+					<tr class="calc-row">
+						<td colspan="4" class="noborder-left noborder-bottom"></td>
+						<td class="calc-label">IGST 18%</td>
+						<td class="calc-val">{{ igst_val_formatted }}</td>
+					</tr>
+				{% endif %}
+				<tr class="calc-row grand-total-row">
+					<td colspan="4" class="noborder-left noborder-bottom"></td>
+					<td class="calc-label">TOTAL RECEIVABLE</td>
+					<td class="calc-val">{{ total_value_formatted }}</td>
+				</tr>
+			</tbody>
+		</table>
+
+		{# Rupees in words row #}
+		<div class="invoice-words-row">
+			<div class="words-label">Rs.In Words</div>
+			<div class="words-value">{{ total_in_words }}</div>
+		</div>
+
+		{# Signatory bottom block #}
+		<div class="invoice-bottom-signatory-block">
+			<div class="sign-left-pad"></div>
+			<div class="sign-right-box">
+				<p class="sign-for-company">For {{ company_name }}</p>
+				<div class="sign-stamp-area">
+					{# Optional Stamp / Signature overlay placeholder #}
+				</div>
+				<p class="sign-line-label">Authorised Signatory</p>
+			</div>
+		</div>
+
+		{# Tiny footer line #}
+		<div class="invoice-office-footer-line">
+			Office : {{ company_address }}
+		</div>
+
+	</div>
+
+	{# ── BACK LINK ── #}
+	<div class="entity-back-link no-print">
+		{% if node.field_purchase_order.entity %}
+			<a href="{{ path('entity.node.canonical', {'node': node.field_purchase_order.target_id}) }}" class="btn-detail btn-detail--outline">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="19" y1="12" x2="5" y2="12"/>
+					<polyline points="12 19 5 12 12 5"/>
+				</svg>
+				Back to {{ node.field_purchase_order.entity.label }}
+			</a>
+		{% else %}
+			<a href="/projects" class="btn-detail btn-detail--outline">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="19" y1="12" x2="5" y2="12"/>
+					<polyline points="12 19 5 12 12 5"/>
+				</svg>
+				Back to Projects
+			</a>
+		{% endif %}
+	</div>
+
+</div>

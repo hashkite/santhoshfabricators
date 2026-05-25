@@ -1,0 +1,27 @@
+uuid: 37565ee6-0555-44be-833d-8e685df43c08
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_project
+    - node.type.invoice
+id: node.invoice.field_project
+field_name: field_project
+entity_type: node
+bundle: invoice
+label: Project
+description: 'Select the project this invoice belongs to.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      project_sites: project_sites
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

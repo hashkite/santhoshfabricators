@@ -1,0 +1,31 @@
+uuid: 2c10c08f-61d6-4e31-8c58-a7a4743b8324
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_invoice_items
+    - node.type.invoice
+    - paragraphs.paragraphs_type.invoice_item
+  module:
+    - entity_reference_revisions
+id: node.invoice.field_invoice_items
+field_name: field_invoice_items
+entity_type: node
+bundle: invoice
+label: 'Invoice Items'
+description: 'Itemized row details for this invoice.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      invoice_item: invoice_item
+    negate: 0
+    target_bundles_drag_drop:
+      invoice_item:
+        weight: 1
+        enabled: true
+field_type: entity_reference_revisions

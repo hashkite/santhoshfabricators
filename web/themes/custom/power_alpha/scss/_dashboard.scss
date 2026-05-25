@@ -883,6 +883,8 @@ body.sidebar-is-open {
   .budget-meta-bottom {
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 4px;
     font-size: 0.8rem;
     font-weight: 500;
     color: $color-tertiary-light;

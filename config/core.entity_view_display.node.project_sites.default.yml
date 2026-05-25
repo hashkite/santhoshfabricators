@@ -5,6 +5,7 @@ dependencies:
   config:
     - field.field.node.project_sites.body
     - field.field.node.project_sites.field_allocated_budget
+    - field.field.node.project_sites.field_client
     - field.field.node.project_sites.field_end_date
     - field.field.node.project_sites.field_image
     - field.field.node.project_sites.field_location
@@ -40,6 +41,14 @@ content:
       link_to_entity: false
     third_party_settings: {  }
     weight: 10
+    region: content
+  field_client:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 7
     region: content
   field_end_date:
     type: datetime_default

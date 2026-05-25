@@ -1,15 +1,15 @@
-uuid: 3edb7813-ae63-4057-a6d0-baa3289501df
+uuid: 75c3e873-ff72-4f19-9a34-814e0d985552
 langcode: en
 status: true
 dependencies:
   module:
     - node
-id: node.field_po_number
-field_name: field_po_number
+id: node.field_client
+field_name: field_client
 entity_type: node
 type: string
 settings:
-  max_length: 25
+  max_length: 255
   case_sensitive: false
   is_ascii: false
 module: core

@@ -4,6 +4,131 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\Node;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\ReplaceCommand;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_entity_presave().
+ *
+ * Auto-generates unique sequential IDs for content types:
+ *   - project_sites  → field_project_code  (PRJ-YYYY-NNNN)
+ *   - expenses       → title               (EXP-YYYY-NNNN)
+ *   - purchase_order → field_po_number     (PO-YYYY-NNNN)
+ *   - invoice        → field_invoice_no    (INV-YYYY-NNNN)
+ */
+function power_alpha_helper_entity_presave(EntityInterface $entity) {
+  if (!$entity instanceof \Drupal\node\NodeInterface) {
+    return;
+  }
+
+  // Only generate on new node creation.
+  if (!$entity->isNew()) {
+    return;
+  }
+
+  $bundle = $entity->getType();
+  $year = date('Y');
+
+  switch ($bundle) {
+    case 'project_sites':
+      // PRJ-2026-0001
+      if ($entity->hasField('field_project_code') && empty($entity->get('field_project_code')->value)) {
+        $next_id = _power_alpha_helper_get_next_id('project_sites', 'field_project_code', 'PRJ-' . $year . '-');
+        $entity->set('field_project_code', 'PRJ-' . $year . '-' . str_pad($next_id, 4, '0', STR_PAD_LEFT));
+      }
+      break;
+
+    case 'expenses':
+      // EXP-2026-0001 — set as the node title
+      $prefix = 'EXP-' . $year . '-';
+      $next_id = _power_alpha_helper_get_next_id_from_title('expenses', $prefix);
+      $auto_title = $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT);
+      $entity->setTitle($auto_title);
+      break;
+
+    case 'purchase_order':
+      // PO-2026-0001
+      if ($entity->hasField('field_po_number') && empty($entity->get('field_po_number')->value)) {
+        $prefix = 'PO-' . $year . '-';
+        $next_id = _power_alpha_helper_get_next_id('purchase_order', 'field_po_number', $prefix);
+        $entity->set('field_po_number', $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT));
+      }
+      break;
+
+    case 'invoice':
+      // INV-2026-0001
+      if ($entity->hasField('field_invoice_no') && empty($entity->get('field_invoice_no')->value)) {
+        $prefix = 'INV-' . $year . '-';
+        $next_id = _power_alpha_helper_get_next_id('invoice', 'field_invoice_no', $prefix);
+        $entity->set('field_invoice_no', $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT));
+      }
+      break;
+  }
+}
+
+/**
+ * Get the next sequential ID from a field value.
+ *
+ * Queries existing nodes for the highest number matching the prefix,
+ * then returns the next increment.
+ *
+ * @param string $bundle
+ *   The content type machine name.
+ * @param string $field_name
+ *   The field machine name to search.
+ * @param string $prefix
+ *   The prefix pattern (e.g. "PRJ-2026-").
+ *
+ * @return int
+ *   The next sequential number.
+ */
+function _power_alpha_helper_get_next_id($bundle, $field_name, $prefix) {
+  $database = \Drupal::database();
+  $table = 'node__' . $field_name;
+  $column = $field_name . '_value';
+
+  // Check if the table exists.
+  if (!$database->schema()->tableExists($table)) {
+    return 1;
+  }
+
+  $query = $database->select($table, 'f');
+  $query->addExpression("MAX(CAST(SUBSTRING($column, :len) AS UNSIGNED))", 'max_num', [
+    ':len' => strlen($prefix) + 1,
+  ]);
+  $query->join('node_field_data', 'n', 'n.nid = f.entity_id');
+  $query->condition('n.type', $bundle);
+  $query->condition('f.' . $column, $prefix . '%', 'LIKE');
+
+  $max = $query->execute()->fetchField();
+
+  return ($max ? (int) $max : 0) + 1;
+}
+
+/**
+ * Get the next sequential ID from the node title.
+ *
+ * @param string $bundle
+ *   The content type machine name.
+ * @param string $prefix
+ *   The prefix pattern (e.g. "EXP-2026-").
+ *
+ * @return int
+ *   The next sequential number.
+ */
+function _power_alpha_helper_get_next_id_from_title($bundle, $prefix) {
+  $database = \Drupal::database();
+
+  $query = $database->select('node_field_data', 'n');
+  $query->addExpression("MAX(CAST(SUBSTRING(n.title, :len) AS UNSIGNED))", 'max_num', [
+    ':len' => strlen($prefix) + 1,
+  ]);
+  $query->condition('n.type', $bundle);
+  $query->condition('n.title', $prefix . '%', 'LIKE');
+
+  $max = $query->execute()->fetchField();
+
+  return ($max ? (int) $max : 0) + 1;
+}
 
 /**
  * Implements hook_theme().
@@ -22,6 +147,55 @@ function power_alpha_helper_theme($existing, $type, $theme, $path) {
  */
 function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $form_id)
 {
+
+  // ── Auto-ID field management: hide on create, read-only on edit ──
+
+  // Expenses: hide title on create (auto-generated as EXP-YYYY-NNNN).
+  if ($form_id == 'node_expenses_form') {
+    if (isset($form['title'])) {
+      $form['title']['#access'] = FALSE;
+      // Set a placeholder so Drupal validation doesn't complain.
+      $form['title']['widget'][0]['value']['#default_value'] = 'Auto-generated';
+    }
+  }
+
+  // Purchase Order: hide PO number on create.
+  if ($form_id == 'node_purchase_order_form') {
+    if (isset($form['field_po_number'])) {
+      $form['field_po_number']['#access'] = FALSE;
+    }
+  }
+
+  // Invoice: hide invoice number on create.
+  if ($form_id == 'node_invoice_form') {
+    if (isset($form['field_invoice_no'])) {
+      $form['field_invoice_no']['#access'] = FALSE;
+    }
+  }
+
+  // Project Sites: hide project code on create.
+  if ($form_id == 'node_project_sites_form') {
+    if (isset($form['field_project_code'])) {
+      $form['field_project_code']['#access'] = FALSE;
+    }
+  }
+
+  // On edit forms, make auto-ID fields read-only (disabled).
+  if (in_array($form_id, ['node_expenses_edit_form'])) {
+    if (isset($form['title'])) {
+      $form['title']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+      $form['title']['widget'][0]['value']['#attributes']['class'][] = 'form-item--readonly';
+    }
+  }
+  if ($form_id == 'node_purchase_order_edit_form' && isset($form['field_po_number'])) {
+    $form['field_po_number']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+  }
+  if ($form_id == 'node_invoice_edit_form' && isset($form['field_invoice_no'])) {
+    $form['field_invoice_no']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+  }
+  if ($form_id == 'node_project_sites_edit_form' && isset($form['field_project_code'])) {
+    $form['field_project_code']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
+  }
 
   // Purchase Order dynamic calculations using AJAX
   if (in_array($form_id, ['node_purchase_order_form', 'node_purchase_order_edit_form'])) {
@@ -81,8 +255,23 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
     }
   }
 
-  // PF Calculation for node_expenses_form and node_expenses_edit_form
+  // PF and Parent Amount dynamic calculations using AJAX for node_expenses_form and node_expenses_edit_form
   if (in_array($form_id, ['node_expenses_form', 'node_expenses_edit_form'])) {
+    if (isset($form['field_amount'])) {
+      $form['field_amount']['#prefix'] = '<div id="parent-expense-amount-wrapper">';
+      $form['field_amount']['#suffix'] = '</div>';
+    }
+
+    $ajax_settings = [
+      'callback' => 'power_alpha_helper_expenses_ajax_callback',
+      'event' => 'change',
+      'progress' => [
+        'type' => 'throbber',
+        'message' => t('Calculating total amount...'),
+      ],
+    ];
+
+    // 1. Salary Paragraph
     if (isset($form['field_salary_details']['widget'])) {
       $elements = \Drupal\Core\Render\Element::children($form['field_salary_details']['widget']);
       foreach ($elements as $delta) {
@@ -106,15 +295,6 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
               $subform['field_esi']['#suffix'] = '</div>';
             }
 
-            $ajax_settings = [
-              'callback' => 'power_alpha_helper_salary_pf_ajax_callback',
-              'event' => 'change',
-              'progress' => [
-                'type' => 'throbber',
-                'message' => t('Calculating...'),
-              ],
-            ];
-
             $subform['field_wages_payment']['widget'][0]['value']['#ajax'] = $ajax_settings;
             if (isset($subform['field_other_payment'])) {
               $subform['field_other_payment']['widget'][0]['value']['#ajax'] = $ajax_settings;
@@ -123,15 +303,14 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
             // Calculations
             $wages = 0;
             $other = 0;
-            
             $user_input = $form_state->getUserInput();
-            
+
             if (isset($user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'])) {
                $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
             } elseif (isset($subform['field_wages_payment']['widget'][0]['value']['#default_value'])) {
                $wages = $subform['field_wages_payment']['widget'][0]['value']['#default_value'];
             }
-            
+
             if (isset($user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'])) {
                $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
             } elseif (isset($subform['field_other_payment']['widget'][0]['value']['#default_value'])) {
@@ -148,7 +327,6 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
               }
               
               if (isset($subform['field_esi'])) {
-                // ESI 4% (0.75% + 3.25%)
                 $esi = $wages * 0.04;
                 $subform['field_esi']['widget'][0]['value']['#value'] = number_format($esi, 2, '.', '');
               }
@@ -162,82 +340,291 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
         }
       }
     }
+
+    // 2. Inventory Paragraph
+    if (isset($form['field_inventory_details']['widget'])) {
+      $elements = \Drupal\Core\Render\Element::children($form['field_inventory_details']['widget']);
+      foreach ($elements as $delta) {
+        if (is_numeric($delta)) {
+          $subform = &$form['field_inventory_details']['widget'][$delta]['subform'];
+          if (isset($subform['field_amount'])) {
+            $subform['field_amount']['widget'][0]['value']['#ajax'] = $ajax_settings;
+          }
+        }
+      }
+    }
+
+    // 3. Room Rent Paragraph
+    if (isset($form['field_room_rent_details']['widget'])) {
+      $elements = \Drupal\Core\Render\Element::children($form['field_room_rent_details']['widget']);
+      foreach ($elements as $delta) {
+        if (is_numeric($delta)) {
+          $subform = &$form['field_room_rent_details']['widget'][$delta]['subform'];
+          if (isset($subform['field_amounts'])) {
+            $subform['field_amounts']['widget'][0]['value']['#ajax'] = $ajax_settings;
+          }
+        }
+      }
+    }
+
+    // 4. Calculate total for the parent field_amount
+    $user_input = $form_state->getUserInput();
+    
+    // Sum salary
+    $salary_total = 0;
+    if (isset($form['field_salary_details']['widget'])) {
+      foreach (\Drupal\Core\Render\Element::children($form['field_salary_details']['widget']) as $delta) {
+        if (is_numeric($delta)) {
+          $wages = 0;
+          $other = 0;
+          if (isset($user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'])) {
+             $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
+          } elseif (isset($form['field_salary_details']['widget'][$delta]['subform']['field_wages_payment']['widget'][0]['value']['#default_value'])) {
+             $wages = $form['field_salary_details']['widget'][$delta]['subform']['field_wages_payment']['widget'][0]['value']['#default_value'];
+          }
+          if (isset($user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'])) {
+             $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
+          } elseif (isset($form['field_salary_details']['widget'][$delta]['subform']['field_other_payment']['widget'][0]['value']['#default_value'])) {
+             $other = $form['field_salary_details']['widget'][$delta]['subform']['field_other_payment']['widget'][0]['value']['#default_value'];
+          }
+          $salary_total += (float)$wages + (float)$other;
+        }
+      }
+    }
+
+    // Sum inventory
+    $inventory_total = 0;
+    if (isset($form['field_inventory_details']['widget'])) {
+      foreach (\Drupal\Core\Render\Element::children($form['field_inventory_details']['widget']) as $delta) {
+        if (is_numeric($delta)) {
+          $amt = 0;
+          if (isset($user_input['field_inventory_details'][$delta]['subform']['field_amount'][0]['value'])) {
+             $amt = $user_input['field_inventory_details'][$delta]['subform']['field_amount'][0]['value'];
+          } elseif (isset($form['field_inventory_details']['widget'][$delta]['subform']['field_amount']['widget'][0]['value']['#default_value'])) {
+             $amt = $form['field_inventory_details']['widget'][$delta]['subform']['field_amount']['widget'][0]['value']['#default_value'];
+          }
+          $inventory_total += (float)$amt;
+        }
+      }
+    }
+
+    // Sum room rent
+    $room_rent_total = 0;
+    if (isset($form['field_room_rent_details']['widget'])) {
+      foreach (\Drupal\Core\Render\Element::children($form['field_room_rent_details']['widget']) as $delta) {
+        if (is_numeric($delta)) {
+          $amt = 0;
+          if (isset($user_input['field_room_rent_details'][$delta]['subform']['field_amounts'][0]['value'])) {
+             $amt = $user_input['field_room_rent_details'][$delta]['subform']['field_amounts'][0]['value'];
+          } elseif (isset($form['field_room_rent_details']['widget'][$delta]['subform']['field_amounts']['widget'][0]['value']['#default_value'])) {
+             $amt = $form['field_room_rent_details']['widget'][$delta]['subform']['field_amounts']['widget'][0]['value']['#default_value'];
+          }
+          $room_rent_total += (float)$amt;
+        }
+      }
+    }
+
+    $total_expense = $salary_total + $inventory_total + $room_rent_total;
+
+    if ($total_expense > 0 || isset($user_input['field_salary_details']) || isset($user_input['field_inventory_details']) || isset($user_input['field_room_rent_details'])) {
+      $form['field_amount']['widget'][0]['value']['#value'] = number_format($total_expense, 2, '.', '');
+    }
   }
 
-  // Step 3.1: Define target forms
+  // Invoice form: AJAX calculation for basic value (from items) and basic value + GST (18%).
+  if (in_array($form_id, ['node_invoice_form', 'node_invoice_edit_form'])) {
+    if (isset($form['field_basic_value']['widget'][0]['value'])) {
+      // Wrap target fields for AJAX replacement.
+      $form['field_basic_value']['#prefix'] = '<div id="invoice-basic-value-wrapper">';
+      $form['field_basic_value']['#suffix'] = '</div>';
+
+      $form['field_basic_value_gst']['#prefix'] = '<div id="invoice-gst-wrapper">';
+      $form['field_basic_value_gst']['#suffix'] = '</div>';
+
+      // Ajax settings for paragraph quantity/rate changes
+      $items_ajax_settings = [
+        'callback' => 'power_alpha_helper_invoice_items_ajax_callback',
+        'event' => 'change',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Calculating total...'),
+        ],
+      ];
+
+      // Attach AJAX callback to child elements inside the invoice items paragraphs widget
+      if (isset($form['field_invoice_items']['widget'])) {
+        $elements = \Drupal\Core\Render\Element::children($form['field_invoice_items']['widget']);
+        foreach ($elements as $delta) {
+          if (is_numeric($delta)) {
+            $subform = &$form['field_invoice_items']['widget'][$delta]['subform'];
+            if (isset($subform['field_quantity'])) {
+              $subform['field_quantity']['widget'][0]['value']['#ajax'] = $items_ajax_settings;
+            }
+            if (isset($subform['field_rate'])) {
+              $subform['field_rate']['widget'][0]['value']['#ajax'] = $items_ajax_settings;
+            }
+          }
+        }
+      }
+
+      // Also attach AJAX callback to the manual basic value field (for fallback)
+      $form['field_basic_value']['widget'][0]['value']['#ajax'] = [
+        'callback' => 'power_alpha_helper_invoice_gst_ajax_callback',
+        'event' => 'change',
+        'progress' => [
+          'type' => 'throbber',
+          'message' => t('Calculating GST...'),
+        ],
+      ];
+
+      // Perform calculations based on inputs
+      $user_input = $form_state->getUserInput();
+      $items_total = 0.0;
+      $has_items = FALSE;
+
+      if (isset($form['field_invoice_items']['widget'])) {
+        foreach (\Drupal\Core\Render\Element::children($form['field_invoice_items']['widget']) as $delta) {
+          if (is_numeric($delta)) {
+            $qty = 0;
+            $rate = 0.0;
+            $row_has_val = FALSE;
+
+            if (isset($user_input['field_invoice_items'][$delta]['subform']['field_quantity'][0]['value'])) {
+              $qty = $user_input['field_invoice_items'][$delta]['subform']['field_quantity'][0]['value'];
+              $row_has_val = TRUE;
+            } elseif (isset($form['field_invoice_items']['widget'][$delta]['subform']['field_quantity']['widget'][0]['value']['#default_value'])) {
+              $qty = $form['field_invoice_items']['widget'][$delta]['subform']['field_quantity']['widget'][0]['value']['#default_value'];
+              $row_has_val = TRUE;
+            }
+
+            if (isset($user_input['field_invoice_items'][$delta]['subform']['field_rate'][0]['value'])) {
+              $rate = $user_input['field_invoice_items'][$delta]['subform']['field_rate'][0]['value'];
+              $row_has_val = TRUE;
+            } elseif (isset($form['field_invoice_items']['widget'][$delta]['subform']['field_rate']['widget'][0]['value']['#default_value'])) {
+              $rate = $form['field_invoice_items']['widget'][$delta]['subform']['field_rate']['widget'][0]['value']['#default_value'];
+              $row_has_val = TRUE;
+            }
+
+            if ($row_has_val) {
+              $has_items = TRUE;
+              $items_total += (int)$qty * (float)$rate;
+            }
+          }
+        }
+      }
+
+      if ($has_items || !empty($user_input['field_invoice_items'])) {
+        $formatted_basic = number_format($items_total, 2, '.', '');
+        $form['field_basic_value']['widget'][0]['value']['#value'] = $formatted_basic;
+
+        $total_gst = $items_total * 1.18;
+        $formatted_gst = number_format($total_gst, 2, '.', '');
+        if (substr($formatted_gst, -3) === '.00') {
+          $formatted_gst = number_format($total_gst, 0, '.', '');
+        }
+        $form['field_basic_value_gst']['widget'][0]['value']['#value'] = $formatted_gst;
+      }
+      else {
+        // Fallback: calculate GST based on manual basic value
+        $basic_value = 0;
+        if (isset($user_input['field_basic_value'][0]['value'])) {
+          $basic_value = $user_input['field_basic_value'][0]['value'];
+        } elseif (isset($form['field_basic_value']['widget'][0]['value']['#default_value'])) {
+          $basic_value = $form['field_basic_value']['widget'][0]['value']['#default_value'];
+        }
+        $basic_value = (float) $basic_value;
+
+        if ($basic_value > 0 || isset($user_input['field_basic_value'])) {
+          $total = $basic_value * 1.18;
+          $formatted_total = number_format($total, 2, '.', '');
+          if (substr($formatted_total, -3) === '.00') {
+            $formatted_total = number_format($total, 0, '.', '');
+          }
+          $form['field_basic_value_gst']['widget'][0]['value']['#value'] = $formatted_total;
+        }
+      }
+    }
+  }
+
+  // Define target forms for project_id pre-fill.
   $target_forms = [
     'node_documents_form',
     'node_expenses_form',
     'node_esi_compliance_data_form',
     'node_purchase_order_form',
     'node_attendance_form',
+    'node_invoice_form',
   ];
 
   if ($form_id == 'node_expenses_edit_form') {
 
   }
 
-  // Step 3.2: Skip if not matching form
+  // Skip if not matching form.
   if (!in_array($form_id, $target_forms)) {
     return;
   }
 
-  // Step 3.3: Get project_id from URL
-  $project_id = \Drupal::request()->query->get('project_id');
+  $request = \Drupal::request();
 
-  if (empty($project_id)) {
-    return;
+  // Pre-fill project from URL (project_id or field_project).
+  $project_id = $request->query->get('project_id') ?: $request->query->get('field_project');
+  if (!empty($project_id)) {
+    $project_node = Node::load($project_id);
+    if ($project_node && isset($form['field_project']['widget'][0]['target_id'])) {
+      $form['field_project']['widget'][0]['target_id']['#default_value'] = $project_node;
+    }
   }
 
-  // Step 3.4: Load project node safely
-  $project_node = Node::load($project_id);
-
-  if (!$project_node) {
-    return;
-  }
-
-  // Step 3.5: Set default value
-  if (isset($form['field_project']['widget'][0]['target_id'])) {
-
-    $form['field_project']['widget'][0]['target_id']['#default_value'] = $project_node;
-
-    // Step 3.6: Hide field (optional but recommended)
-    $form['field_project']['#access'] = FALSE;
+  // Pre-fill purchase order from URL (field_purchase_order).
+  $po_id = $request->query->get('field_purchase_order');
+  if (!empty($po_id)) {
+    $po_node = Node::load($po_id);
+    if ($po_node && isset($form['field_purchase_order']['widget'][0]['target_id'])) {
+      $form['field_purchase_order']['widget'][0]['target_id']['#default_value'] = $po_node;
+    }
   }
 }
 
 /**
- * AJAX callback to return the updated fields in salary details.
+ * AJAX callback to return the updated fields in expenses form.
  */
-function power_alpha_helper_salary_pf_ajax_callback(array &$form, FormStateInterface $form_state)
+function power_alpha_helper_expenses_ajax_callback(array &$form, FormStateInterface $form_state)
 {
   $triggering_element = $form_state->getTriggeringElement();
   $parents = $triggering_element['#array_parents'];
-  
-  $subform_parents = array_slice($parents, 0, -4);
-  $delta = $subform_parents[2]; // 'field_salary_details', 'widget', $delta, 'subform'
-  
   $response = new AjaxResponse();
-  
-  $pf_parents = array_merge($subform_parents, ['field_pf']);
-  $total_parents = array_merge($subform_parents, ['field_total']);
-  $esi_parents = array_merge($subform_parents, ['field_esi']);
-  
-  $pf_element = \Drupal\Component\Utility\NestedArray::getValue($form, $pf_parents);
-  if ($pf_element) {
-    $response->addCommand(new ReplaceCommand('#salary-pf-wrapper-' . $delta, $pf_element));
+
+  // If inside salary details, replace paragraph sub-fields
+  if (in_array('field_salary_details', $parents)) {
+    $subform_parents = array_slice($parents, 0, -4);
+    $delta = $subform_parents[2]; // 'field_salary_details', 'widget', $delta, 'subform'
+
+    $pf_parents = array_merge($subform_parents, ['field_pf']);
+    $total_parents = array_merge($subform_parents, ['field_total_amount']);
+    $esi_parents = array_merge($subform_parents, ['field_esi']);
+
+    $pf_element = \Drupal\Component\Utility\NestedArray::getValue($form, $pf_parents);
+    if ($pf_element) {
+      $response->addCommand(new ReplaceCommand('#salary-pf-wrapper-' . $delta, $pf_element));
+    }
+
+    $total_element = \Drupal\Component\Utility\NestedArray::getValue($form, $total_parents);
+    if ($total_element) {
+      $response->addCommand(new ReplaceCommand('#salary-total-wrapper-' . $delta, $total_element));
+    }
+
+    $esi_element = \Drupal\Component\Utility\NestedArray::getValue($form, $esi_parents);
+    if ($esi_element) {
+      $response->addCommand(new ReplaceCommand('#salary-esi-wrapper-' . $delta, $esi_element));
+    }
   }
-  
-  $total_element = \Drupal\Component\Utility\NestedArray::getValue($form, $total_parents);
-  if ($total_element) {
-    $response->addCommand(new ReplaceCommand('#salary-total-wrapper-' . $delta, $total_element));
+
+  // Always replace parent field_amount
+  if (isset($form['field_amount'])) {
+    $response->addCommand(new ReplaceCommand('#parent-expense-amount-wrapper', $form['field_amount']));
   }
-  
-  $esi_element = \Drupal\Component\Utility\NestedArray::getValue($form, $esi_parents);
-  if ($esi_element) {
-    $response->addCommand(new ReplaceCommand('#salary-esi-wrapper-' . $delta, $esi_element));
-  }
-  
+
   return $response;
 }
 
@@ -256,5 +643,36 @@ function power_alpha_helper_purchase_order_ajax_callback(array &$form, FormState
     $response->addCommand(new ReplaceCommand('#po-gst-wrapper', $form['field_gst']));
   }
   
+  return $response;
+}
+
+/**
+ * AJAX callback to return updated Basic Value + GST field for invoices.
+ */
+function power_alpha_helper_invoice_gst_ajax_callback(array &$form, FormStateInterface $form_state)
+{
+  $response = new AjaxResponse();
+  
+  if (isset($form['field_basic_value_gst'])) {
+    $response->addCommand(new ReplaceCommand('#invoice-gst-wrapper', $form['field_basic_value_gst']));
+  }
+  
+  return $response;
+}
+
+/**
+ * AJAX callback to return updated basic value and basic value + GST fields for invoices.
+ */
+function power_alpha_helper_invoice_items_ajax_callback(array &$form, FormStateInterface $form_state) {
+  $response = new AjaxResponse();
+
+  if (isset($form['field_basic_value'])) {
+    $response->addCommand(new ReplaceCommand('#invoice-basic-value-wrapper', $form['field_basic_value']));
+  }
+
+  if (isset($form['field_basic_value_gst'])) {
+    $response->addCommand(new ReplaceCommand('#invoice-gst-wrapper', $form['field_basic_value_gst']));
+  }
+
   return $response;
 }

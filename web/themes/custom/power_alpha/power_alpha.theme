@@ -49,38 +49,125 @@ function power_alpha_preprocess_node(&$variables)
     $allocated_raw = $node->get('field_allocated_budget')->value;
     if (!empty($allocated_raw)) {
       $query = \Drupal::entityQuery('node')
-        ->condition('type', 'expenses')
+        ->condition('type', 'purchase_order')
         ->condition('field_project', $node->id())
         ->condition('status', 1)
         ->accessCheck(FALSE);
       $nids = $query->execute();
       $spent = 0;
       if (!empty($nids)) {
-        foreach (\Drupal\node\Entity\Node::loadMultiple($nids) as $expense) {
-          $spent += (float) $expense->get('field_amount')->value;
+        foreach (\Drupal\node\Entity\Node::loadMultiple($nids) as $po) {
+          $po_val = $po->get('field_amount_gst')->value;
+          if (empty($po_val)) {
+            $po_val = $po->get('field_basic_amount')->value;
+          }
+          $spent += (float) $po_val;
         }
       }
       $allocated = (float) $allocated_raw;
       $remaining = max(0.0, $allocated - $spent);
       $percent = $allocated > 0 ? round(($spent / $allocated) * 100) : 0;
 
-      if ($allocated >= 10000000) {
-        $variables['budget_allocated'] = '₹' . number_format($allocated / 10000000, 2) . ' Cr';
-      } else {
-        $variables['budget_allocated'] = '₹' . number_format($allocated / 100000, 2) . ' L';
-      }
+      $format_val = function ($val) {
+        if ($val >= 10000000) {
+          return '₹' . number_format($val / 10000000, 2) . ' Cr';
+        } else {
+          return '₹' . number_format($val / 100000, 2) . ' L';
+        }
+      };
 
-      if ($remaining >= 10000000) {
-        $variables['budget_remaining'] = '₹' . number_format($remaining / 10000000, 2) . ' Cr';
-      } else {
-        $variables['budget_remaining'] = '₹' . number_format($remaining / 100000, 2) . ' L';
-      }
+      $variables['budget_allocated'] = $format_val($allocated);
+      $variables['budget_utilized'] = $format_val($spent);
+      $variables['budget_remaining'] = $format_val($remaining);
       $variables['budget_percent'] = $percent;
     } else {
       $variables['budget_allocated'] = NULL;
+      $variables['budget_utilized'] = NULL;
       $variables['budget_remaining'] = NULL;
       $variables['budget_percent'] = NULL;
     }
+
+    // Expenses Calculation for project detail page.
+    $exp_query = \Drupal::entityQuery('node')
+      ->condition('type', 'expenses')
+      ->condition('field_project', $node->id())
+      ->condition('status', 1)
+      ->accessCheck(FALSE);
+    $exp_nids = $exp_query->execute();
+
+    $total_exp = 0;
+    $salary_exp = 0;
+    $inventory_exp = 0;
+    $rent_exp = 0;
+    $other_exp = 0;
+
+    if (!empty($exp_nids)) {
+      foreach (\Drupal\node\Entity\Node::loadMultiple($exp_nids) as $expense) {
+        $exp_type = $expense->get('field_expense_type')->value;
+        $exp_amount = 0;
+
+        $val = $expense->get('field_amount')->value;
+        if (!empty($val)) {
+          $exp_amount = (float) $val;
+        } else {
+          if ($expense->hasField('field_salary_details') && !$expense->get('field_salary_details')->isEmpty()) {
+            foreach ($expense->get('field_salary_details')->referencedEntities() as $paragraph) {
+              if ($paragraph->hasField('field_total_amount')) {
+                $exp_amount += (float) $paragraph->get('field_total_amount')->value;
+              }
+            }
+          }
+          if ($expense->hasField('field_inventory_details') && !$expense->get('field_inventory_details')->isEmpty()) {
+            foreach ($expense->get('field_inventory_details')->referencedEntities() as $paragraph) {
+              if ($paragraph->hasField('field_amount')) {
+                $exp_amount += (float) $paragraph->get('field_amount')->value;
+              }
+            }
+          }
+          if ($expense->hasField('field_room_rent_details') && !$expense->get('field_room_rent_details')->isEmpty()) {
+            foreach ($expense->get('field_room_rent_details')->referencedEntities() as $paragraph) {
+              if ($paragraph->hasField('field_amounts')) {
+                $exp_amount += (float) $paragraph->get('field_amounts')->value;
+              }
+            }
+          }
+        }
+
+        $total_exp += $exp_amount;
+
+        if ($exp_type == 'salary') {
+          $salary_exp += $exp_amount;
+        } elseif ($exp_type == 'vendor') {
+          $inventory_exp += $exp_amount;
+        } elseif ($exp_type == 'room_rent_utility') {
+          $rent_exp += $exp_amount;
+        } else {
+          $other_exp += $exp_amount;
+        }
+      }
+    }
+
+    $format_val_exp = function ($val) {
+      if ($val >= 10000000) {
+        return '₹' . number_format($val / 10000000, 2) . ' Cr';
+      } elseif ($val >= 100000) {
+        return '₹' . number_format($val / 100000, 2) . ' L';
+      } else {
+        return '₹' . number_format($val, 2);
+      }
+    };
+
+    $variables['expenses_total_raw'] = $total_exp;
+    $variables['expenses_total'] = $format_val_exp($total_exp);
+    $variables['expenses_salary'] = $format_val_exp($salary_exp);
+    $variables['expenses_inventory'] = $format_val_exp($inventory_exp);
+    $variables['expenses_rent'] = $format_val_exp($rent_exp);
+    $variables['expenses_other'] = $format_val_exp($other_exp);
+
+    $variables['expenses_salary_pct'] = $total_exp > 0 ? round(($salary_exp / $total_exp) * 100) : 0;
+    $variables['expenses_inventory_pct'] = $total_exp > 0 ? round(($inventory_exp / $total_exp) * 100) : 0;
+    $variables['expenses_rent_pct'] = $total_exp > 0 ? round(($rent_exp / $total_exp) * 100) : 0;
+    $variables['expenses_other_pct'] = $total_exp > 0 ? round(($other_exp / $total_exp) * 100) : 0;
 
     // Days Remaining Calculation.
     $start_date = $node->get('field_start_date')->value;
@@ -98,6 +185,253 @@ function power_alpha_preprocess_node(&$variables)
       $variables['days_left'] = '-';
     }
   }
+
+  if ($node->getType() == 'invoice' && $variables['view_mode'] == 'full') {
+    $config = \Drupal::config('power_alpha_helper.invoice_settings');
+    $variables['company_name'] = $config->get('company_name') ?: 'SANTHOSH FABRICATORS PVT. LTD.';
+    $variables['company_tagline'] = $config->get('company_tagline') ?: 'Spl. Fabrication & Erection of Pipe Lines & Structures, Maintenance of W. T. Plants, D. M. Plants & RO-MB Plants.';
+    $variables['company_address'] = $config->get('company_address') ?: 'PLOT NO 50/19, TIRUPATI PARK, SIKKA, SIKKA JAMNAGAR, Jamnagar, Gujarat, 361141';
+    $variables['company_gstin'] = $config->get('company_gstin') ?: '24AAQCS3102E1ZP';
+    $variables['company_pan'] = $config->get('company_pan') ?: 'AAQCS3102E';
+    $variables['company_sac'] = $config->get('company_sac') ?: '995442';
+    $variables['company_ra'] = $config->get('company_ra') ?: '10';
+
+    // Resolve Custom Logo URL if available
+    $logo_url = '';
+    $company_logo_fid = $config->get('company_logo');
+    if (!empty($company_logo_fid)) {
+      $fid = reset($company_logo_fid);
+      $file = \Drupal\file\Entity\File::load($fid);
+      if ($file) {
+        $logo_url = \Drupal::service('file_url_generator')->generateString($file->getFileUri());
+      }
+    }
+    $variables['company_logo_url'] = $logo_url;
+
+    // Bank settings
+    $variables['bank_name'] = $config->get('bank_name') ?: 'State Bank of India';
+    $variables['bank_account_number'] = $config->get('bank_account_number') ?: '123456789012';
+    $variables['bank_ifsc'] = $config->get('bank_ifsc') ?: 'SBIN0000123';
+    $variables['bank_branch'] = $config->get('bank_branch') ?: 'Salem Main Branch';
+
+    // ── BILL DETAILS ──
+    $variables['invoice_no'] = $node->hasField('field_invoice_no') && !$node->get('field_invoice_no')->isEmpty()
+      ? $node->get('field_invoice_no')->value : '-';
+
+    $variables['invoice_date'] = $node->hasField('field_invoice_date') && !$node->get('field_invoice_date')->isEmpty()
+      ? \Drupal::service('date.formatter')->format(strtotime($node->get('field_invoice_date')->value), 'custom', 'd.m.Y') : '-';
+
+    $variables['financial_year'] = $node->hasField('field_financial_year') && !$node->get('field_financial_year')->isEmpty()
+      ? $node->get('field_financial_year')->value : '-';
+
+    // ── PROJECT DETAILS & CLIENT ──
+    $project_code = '-';
+    $project_name = '-';
+    $project_client = '';
+    if ($node->hasField('field_project') && !$node->get('field_project')->isEmpty()) {
+      $project_node = $node->get('field_project')->entity;
+      if ($project_node) {
+        $project_name = $project_node->label();
+        $project_code = $project_node->hasField('field_project_code') && !$project_node->get('field_project_code')->isEmpty()
+          ? $project_node->get('field_project_code')->value : '-';
+        if ($project_node->hasField('field_client') && !$project_node->get('field_client')->isEmpty()) {
+          $project_client = $project_node->get('field_client')->value;
+        }
+      }
+    }
+    $variables['project_code'] = $project_code;
+    $variables['project_name'] = $project_name;
+
+    // ── WORK ORDER (PO) DETAILS ──
+    $work_order_no = '-';
+    $work_order_date = '-';
+    $buyer_name = $project_client ?: ($config->get('default_buyer_name') ?: 'AQUATECH SYSTEMS (ASIA) PVT. LTD.');
+    $buyer_address = $config->get('default_buyer_address') ?: "Altimus, 601-602, 6th Floor, Besides\nEmbassy Market, Shreyas Colony, Navrangpura";
+    $buyer_gstin = $config->get('default_buyer_gstin') ?: '24AABCA1850C2ZE';
+
+    if ($node->hasField('field_purchase_order') && !$node->get('field_purchase_order')->isEmpty()) {
+      $po = $node->get('field_purchase_order')->entity;
+      if ($po) {
+        $work_order_no = $po->hasField('field_po_number') && !$po->get('field_po_number')->isEmpty()
+          ? $po->get('field_po_number')->value : $po->label();
+
+        if ($po->hasField('field_po_date') && !$po->get('field_po_date')->isEmpty()) {
+          $work_order_date = \Drupal::service('date.formatter')->format(strtotime($po->get('field_po_date')->value), 'custom', 'j F, Y');
+        }
+
+        if ($po->hasField('field_company_name') && !$po->get('field_company_name')->isEmpty()) {
+          $buyer_name = $po->get('field_company_name')->value;
+        }
+
+        if ($po->hasField('field_address') && !$po->get('field_address')->isEmpty()) {
+          $addr = $po->get('field_address')->first();
+          $addr_parts = [];
+          if ($addr->address_line1)
+            $addr_parts[] = $addr->address_line1;
+          if ($addr->address_line2)
+            $addr_parts[] = $addr->address_line2;
+          if ($addr->locality)
+            $addr_parts[] = $addr->locality;
+          if ($addr->administrative_area)
+            $addr_parts[] = $addr->administrative_area;
+          if ($addr->postal_code)
+            $addr_parts[] = $addr->postal_code;
+          $buyer_address = implode(', ', $addr_parts);
+        }
+        if ($po->hasField('field_gst') && !$po->get('field_gst')->isEmpty()) {
+          $buyer_gstin = $po->get('field_gst')->value;
+        }
+      }
+    }
+
+    $variables['work_order_no'] = $work_order_no;
+    $variables['work_order_date'] = $work_order_date;
+    $variables['buyer_name'] = $buyer_name;
+    $variables['buyer_address'] = $buyer_address;
+    $variables['buyer_gstin'] = $buyer_gstin;
+
+    // ── FINANCIAL & MULTI-ITEM COMPUTATIONS ──
+    $items = [];
+    $basic_value = 0.0;
+
+    if ($node->hasField('field_invoice_items') && !$node->get('field_invoice_items')->isEmpty()) {
+      $item_index = 1;
+      foreach ($node->get('field_invoice_items') as $item_ref) {
+        $paragraph = $item_ref->entity;
+        if ($paragraph && $paragraph->bundle() === 'invoice_item') {
+          $desc = $paragraph->hasField('field_description') && !$paragraph->get('field_description')->isEmpty()
+            ? $paragraph->get('field_description')->value : '';
+          $uom = $paragraph->hasField('field_uom') && !$paragraph->get('field_uom')->isEmpty()
+            ? $paragraph->get('field_uom')->value : 'PU';
+          $qty = $paragraph->hasField('field_quantity') && !$paragraph->get('field_quantity')->isEmpty()
+            ? (int) $paragraph->get('field_quantity')->value : 1;
+          $rate = $paragraph->hasField('field_rate') && !$paragraph->get('field_rate')->isEmpty()
+            ? (float) $paragraph->get('field_rate')->value : 0.0;
+
+          $amount = $qty * $rate;
+          $basic_value += $amount;
+
+          $items[] = [
+            'sr_no' => $item_index++,
+            'description' => $desc,
+            'uom' => $uom,
+            'qty' => $qty,
+            'rate' => power_alpha_format_indian_currency($rate),
+            'amount' => power_alpha_format_indian_currency($amount),
+          ];
+        }
+      }
+    }
+
+    // Fallback if no items entered
+    if (empty($items)) {
+      if ($node->hasField('field_basic_value') && !$node->get('field_basic_value')->isEmpty()) {
+        $basic_value = (float) $node->get('field_basic_value')->value;
+      }
+
+      $company_sac = $config->get('company_sac') ?: '995442';
+      $fallback_desc = "INSTALLATION COST\nSITE-" . $project_code . " - " . $project_name . "\nHSN/SAC CODE : " . $company_sac . "\nPR/ITEM: / 00000";
+
+      $items[] = [
+        'sr_no' => 1,
+        'description' => $fallback_desc,
+        'uom' => 'PU',
+        'qty' => 1,
+        'rate' => power_alpha_format_indian_currency($basic_value),
+        'amount' => power_alpha_format_indian_currency($basic_value),
+      ];
+    }
+
+    $variables['invoice_items'] = $items;
+    $variables['basic_value_formatted'] = power_alpha_format_indian_currency($basic_value);
+
+    // GST split calculation based on state prefixes (first 2 digits of GSTIN)
+    $seller_state = substr(preg_replace('/[^a-zA-Z0-9]/', '', $variables['company_gstin']), 0, 2);
+    $buyer_state = substr(preg_replace('/[^a-zA-Z0-9]/', '', $buyer_gstin), 0, 2);
+
+    $is_intra_state = ($seller_state === $buyer_state && !empty($seller_state));
+    $variables['is_intra_state'] = $is_intra_state;
+
+    if ($is_intra_state) {
+      $cgst_val = $basic_value * 0.09;
+      $sgst_val = $basic_value * 0.09;
+      $igst_val = 0.0;
+      $variables['cgst_rate'] = '9%';
+      $variables['sgst_rate'] = '9%';
+      $variables['cgst_val_formatted'] = power_alpha_format_indian_currency($cgst_val);
+      $variables['sgst_val_formatted'] = power_alpha_format_indian_currency($sgst_val);
+      $variables['igst_val_formatted'] = '0.00';
+    } else {
+      $cgst_val = 0.0;
+      $sgst_val = 0.0;
+      $igst_val = $basic_value * 0.18;
+      $variables['cgst_rate'] = '0%';
+      $variables['sgst_rate'] = '0%';
+      $variables['cgst_val_formatted'] = '0.00';
+      $variables['sgst_val_formatted'] = '0.00';
+      $variables['igst_val_formatted'] = power_alpha_format_indian_currency($igst_val);
+    }
+
+    $total_val = $basic_value + $cgst_val + $sgst_val + $igst_val;
+    $variables['total_value_formatted'] = power_alpha_format_indian_currency($total_val);
+
+    // In Words
+    $variables['total_in_words'] = power_alpha_helper_num_to_words_indian($total_val);
+  }
+
+  if ($node->getType() == 'purchase_order' && $variables['view_mode'] == 'full') {
+    $variables['invoice_block'] = [
+      '#type' => 'view',
+      '#name' => 'invoice',
+      '#display_id' => 'block_1',
+      '#arguments' => [$node->id()],
+    ];
+
+    // ── PO Utilization Dashboard Calculations ──
+    $po_total_raw = $node->get('field_amount_gst')->value;
+    $po_basic_raw = $node->get('field_basic_amount')->value;
+    $po_total = (float) $po_total_raw;
+    $po_basic = (float) $po_basic_raw;
+
+    // Query all invoices linked to this PO.
+    $invoice_query = \Drupal::entityQuery('node')
+      ->condition('type', 'invoice')
+      ->condition('field_purchase_order', $node->id())
+      ->condition('status', 1)
+      ->accessCheck(FALSE);
+    $invoice_nids = $invoice_query->execute();
+
+    $total_invoiced = 0;
+    $total_invoiced_basic = 0;
+    $invoice_count = 0;
+
+    if (!empty($invoice_nids)) {
+      $invoices = \Drupal\node\Entity\Node::loadMultiple($invoice_nids);
+      $invoice_count = count($invoices);
+      foreach ($invoices as $invoice) {
+        $total_invoiced += (float) $invoice->get('field_basic_value_gst')->value;
+        $total_invoiced_basic += (float) $invoice->get('field_basic_value')->value;
+      }
+    }
+
+    $remaining = max(0.0, $po_total - $total_invoiced);
+    $percent_utilized = $po_total > 0 ? min(100, round(($total_invoiced / $po_total) * 100)) : 0;
+
+    // Format amounts for display.
+    $variables['po_dashboard'] = [
+      'po_total' => '₹' . number_format($po_total, 2),
+      'po_basic' => '₹' . number_format($po_basic, 2),
+      'total_invoiced' => '₹' . number_format($total_invoiced, 2),
+      'total_invoiced_basic' => '₹' . number_format($total_invoiced_basic, 2),
+      'remaining' => '₹' . number_format($remaining, 2),
+      'percent' => $percent_utilized,
+      'invoice_count' => $invoice_count,
+      'po_total_raw' => $po_total,
+      'total_invoiced_raw' => $total_invoiced,
+      'remaining_raw' => $remaining,
+      'is_exceeded' => $total_invoiced > $po_total,
+    ];
+  }
 }
 
 /**
@@ -114,14 +448,21 @@ function power_alpha_preprocess_page(array &$variables)
 function power_alpha_form_alter(&$form, FormStateInterface $form_state, $form_id)
 {
   // Target document node form
-  if ($form_id == 'node_documents_form' || $form_id == 'node_expenses_form' || $form_id == 'node_esi_compliance_data_form' || $form_id == 'node_purchase_order_form' || $form_id == 'node_attendance_form') {
+  if ($form_id == 'node_documents_form' || $form_id == 'node_expenses_form' || $form_id == 'node_esi_compliance_data_form' || $form_id == 'node_purchase_order_form' || $form_id == 'node_attendance_form' || $form_id == 'node_invoice_form') {
 
     $request = \Drupal::request();
-    $project_id = $request->query->get('project_id');
+    $project_id = $request->query->get('project_id') ?: $request->query->get('field_project');
 
     if ($project_id && isset($form['field_project'])) {
       $form['field_project']['widget'][0]['target_id']['#default_value'] =
         \Drupal\node\Entity\Node::load($project_id);
+    }
+
+    // Pre-fill purchase order reference if provided via URL.
+    $po_id = $request->query->get('field_purchase_order');
+    if ($po_id && isset($form['field_purchase_order'])) {
+      $form['field_purchase_order']['widget'][0]['target_id']['#default_value'] =
+        \Drupal\node\Entity\Node::load($po_id);
     }
   }
 }
@@ -158,8 +499,21 @@ function power_alpha_preprocess_views_view_fields(&$variables)
       $variables['project_code'] = !empty($code) ? $code : '#FT-2024-095';
 
       // 3. Location (with fallback)
-      $location = $node->get('field_location')->value;
-      $variables['project_location'] = !empty($location) ? $location : 'Jamnagar, Gujarat';
+      $location_obj = $node->get('field_location');
+      $location_str = '';
+      if (!$location_obj->isEmpty()) {
+        $address = $location_obj->first()->getValue();
+        $locality = $address['locality'] ?? '';
+        $admin_area = $address['administrative_area'] ?? '';
+        if ($locality && $admin_area) {
+          $location_str = $locality . ', ' . $admin_area;
+        } elseif ($locality) {
+          $location_str = $locality;
+        } elseif ($admin_area) {
+          $location_str = $admin_area;
+        }
+      }
+      $variables['project_location'] = !empty($location_str) ? $location_str : 'Jamnagar, Gujarat';
 
       // 4. Status (with fallback)
       $status = $node->get('field_status')->value;
@@ -168,40 +522,43 @@ function power_alpha_preprocess_views_view_fields(&$variables)
       // 5. Budget Calculation (with fallback)
       $allocated_raw = $node->get('field_allocated_budget')->value;
       if (!empty($allocated_raw)) {
-        // Calculate spent budget
+        // Calculate spent budget based on Purchase Orders
         $query = \Drupal::entityQuery('node')
-          ->condition('type', 'expenses')
+          ->condition('type', 'purchase_order')
           ->condition('field_project', $node->id())
           ->condition('status', 1)
           ->accessCheck(FALSE);
         $nids = $query->execute();
         $spent = 0;
         if (!empty($nids)) {
-          foreach (\Drupal\node\Entity\Node::loadMultiple($nids) as $expense) {
-            $spent += (float) $expense->get('field_amount')->value;
+          foreach (\Drupal\node\Entity\Node::loadMultiple($nids) as $po) {
+            $po_val = $po->get('field_amount_gst')->value;
+            if (empty($po_val)) {
+              $po_val = $po->get('field_basic_amount')->value;
+            }
+            $spent += (float) $po_val;
           }
         }
         $allocated = (float) $allocated_raw;
         $remaining = max(0.0, $allocated - $spent);
         $percent = $allocated > 0 ? round(($spent / $allocated) * 100) : 0;
 
-        // Allocated budget format.
-        if ($allocated >= 10000000) {
-          $variables['budget_allocated'] = '₹' . number_format($allocated / 10000000, 2) . ' Cr';
-        } else {
-          $variables['budget_allocated'] = '₹' . number_format($allocated / 100000, 2) . ' L';
-        }
+        $format_val = function ($val) {
+          if ($val >= 10000000) {
+            return '₹' . number_format($val / 10000000, 2) . ' Cr';
+          } else {
+            return '₹' . number_format($val / 100000, 2) . ' L';
+          }
+        };
 
-        // Remaining budget format.
-        if ($remaining >= 10000000) {
-          $variables['budget_remaining'] = '₹' . number_format($remaining / 10000000, 2) . ' Cr';
-        } else {
-          $variables['budget_remaining'] = '₹' . number_format($remaining / 100000, 2) . ' L';
-        }
+        $variables['budget_allocated'] = $format_val($allocated);
+        $variables['budget_utilized'] = $format_val($spent);
+        $variables['budget_remaining'] = $format_val($remaining);
         $variables['budget_percent'] = $percent;
       } else {
         // Fallback mock data matching the visual mock
         $variables['budget_allocated'] = null;
+        $variables['budget_utilized'] = null;
         $variables['budget_remaining'] = null;
         $variables['budget_percent'] = null;
       }
@@ -251,6 +608,141 @@ function power_alpha_theme_suggestions_page_alter(array &$suggestions, array $va
   if ($route_name === 'power_alpha_helper.dashboard') {
     $suggestions[] = 'page__dashboard';
   }
+}
+
+/**
+ * Format currency in Indian numbering system format (e.g. 49,28,456.80).
+ */
+function power_alpha_format_indian_currency($number)
+{
+  $number = (float) $number;
+  $decimal = "";
+  if (strpos((string) $number, '.') !== FALSE) {
+    list($num_part, $dec_part) = explode('.', sprintf("%.2f", $number));
+    $decimal = "." . $dec_part;
+  } else {
+    $decimal = ".00";
+    $num_part = (string) $number;
+  }
+
+  $number_val = (int) $num_part;
+  $number_str = (string) $number_val;
+  $length = strlen($number_str);
+
+  if ($length <= 3) {
+    return $number_str . $decimal;
+  }
+
+  $last_three = substr($number_str, -3);
+  $remaining = substr($number_str, 0, -3);
+  $remaining_reversed = strrev($remaining);
+
+  $chunks = str_split($remaining_reversed, 2);
+  $chunks_imploded = implode(',', $chunks);
+  $chunks_imploded_correct = strrev($chunks_imploded);
+
+  return $chunks_imploded_correct . ',' . $last_three . $decimal;
+}
+
+/**
+ * Convert number to words in Indian numbering system format.
+ */
+function power_alpha_helper_num_to_words_indian($number)
+{
+  $number = (float) $number;
+  $no = (int) floor($number);
+  $point = (int) round(($number - $no) * 100);
+
+  $crores = (int) ($no / 10000000);
+  $no = $no % 10000000;
+  $lakhs = (int) ($no / 100000);
+  $no = $no % 100000;
+  $thousands = (int) ($no / 1000);
+  $no = $no % 1000;
+  $hundreds = (int) ($no / 100);
+  $tens = $no % 100;
+
+  $res = "";
+
+  if ($crores > 0) {
+    $res .= power_alpha_helper_num_to_words_indian_below_hundred($crores) . " Crore ";
+  }
+  if ($lakhs > 0) {
+    $res .= power_alpha_helper_num_to_words_indian_below_hundred($lakhs) . " Lakh ";
+  }
+  if ($thousands > 0) {
+    $res .= power_alpha_helper_num_to_words_indian_below_hundred($thousands) . " Thousand ";
+  }
+  if ($hundreds > 0) {
+    $res .= power_alpha_helper_num_to_words_indian_below_hundred($hundreds) . " Hundred ";
+  }
+  if ($tens > 0) {
+    if ($res !== "") {
+      $res .= "and ";
+    }
+    $res .= power_alpha_helper_num_to_words_indian_below_hundred($tens) . " ";
+  }
+
+  $res = trim($res);
+  if ($res === "") {
+    $res = "Zero";
+  }
+
+  $res .= " Rupees";
+
+  if ($point > 0) {
+    $res .= " and " . power_alpha_helper_num_to_words_indian_below_hundred($point) . " Paise";
+  }
+
+  $res .= " Only.";
+
+  return $res;
+}
+
+/**
+ * Helper to convert digits below 100.
+ */
+function power_alpha_helper_num_to_words_indian_below_hundred($num)
+{
+  $words = [
+    0 => '',
+    1 => 'One',
+    2 => 'Two',
+    3 => 'Three',
+    4 => 'Four',
+    5 => 'Five',
+    6 => 'Six',
+    7 => 'Seven',
+    8 => 'Eight',
+    9 => 'Nine',
+    10 => 'Ten',
+    11 => 'Eleven',
+    12 => 'Twelve',
+    13 => 'Thirteen',
+    14 => 'Fourteen',
+    15 => 'Fifteen',
+    16 => 'Sixteen',
+    17 => 'Seventeen',
+    18 => 'Eighteen',
+    19 => 'Nineteen',
+    20 => 'Twenty',
+    30 => 'Thirty',
+    40 => 'Forty',
+    50 => 'Fifty',
+    60 => 'Sixty',
+    70 => 'Seventy',
+    80 => 'Eighty',
+    90 => 'Ninety'
+  ];
+  if ($num < 20) {
+    return $words[$num];
+  }
+  $tens = (int) ($num / 10) * 10;
+  $units = $num % 10;
+  if ($units > 0) {
+    return $words[$tens] . " " . $words[$units];
+  }
+  return $words[$tens];
 }
 
 

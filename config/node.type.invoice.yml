@@ -1,0 +1,13 @@
+uuid: c9a38dca-e1fc-4a09-83b3-e2b67541d70c
+langcode: en
+status: true
+dependencies: {  }
+_core:
+  default_config_hash: null
+name: Invoice
+type: invoice
+description: 'Invoice records linked to Purchase Orders and Projects.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

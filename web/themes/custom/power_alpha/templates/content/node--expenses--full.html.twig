@@ -2,6 +2,7 @@
 /**
  * @file
  * Premium expense detail page template.
+ *
  * Displays expense metadata, amount, type, project reference,
  * and the paragraph detail section matching the expense type.
  *
@@ -18,13 +19,24 @@
 	{# ── BREADCRUMB ── #}
 	<div class="entity-breadcrumb">
 		<a href="/dashboard" class="breadcrumb-link">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+				<polyline points="9 22 9 12 15 12 15 22"/>
+			</svg>
 			Dashboard
 		</a>
-		<span class="breadcrumb-sep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+		<span class="breadcrumb-sep">
+			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+				<polyline points="9 18 15 12 9 6"/>
+			</svg>
+		</span>
 		{% if content.field_project.0 %}
-		<a href="{{ content.field_project.0['#url']|default('/projects') }}" class="breadcrumb-link">{{ content.field_project.0|render|striptags|trim }}</a>
-		<span class="breadcrumb-sep"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></span>
+			<a href="{{ content.field_project.0['#url']|default('/projects') }}" class="breadcrumb-link">{{ content.field_project.0|render|striptags|trim }}</a>
+			<span class="breadcrumb-sep">
+				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+					<polyline points="9 18 15 12 9 6"/>
+				</svg>
+			</span>
 		{% endif %}
 		<span class="breadcrumb-current">Expense</span>
 	</div>
@@ -38,12 +50,15 @@
 			{% endif %}
 		</div>
 		{% if logged_in %}
-		<div class="entity-detail-header__actions">
-			<a href="{{ path('entity.node.edit_form', {'node': node.id}) }}" class="btn-detail btn-detail--outline">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-				Edit
-			</a>
-		</div>
+			<div class="entity-detail-header__actions">
+				<a href="{{ path('entity.node.edit_form', {'node': node.id}) }}" class="btn-detail btn-detail--outline">
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+					</svg>
+					Edit
+				</a>
+			</div>
 		{% endif %}
 	</div>
 
@@ -52,38 +67,47 @@
 		<div class="entity-hero-card__accent"></div>
 		<div class="entity-hero-card__body">
 			{% if content.field_amount.0 %}
-			<div class="hero-amount-section">
-				<span class="hero-amount-label">Total Amount</span>
-				<span class="hero-amount-value">{{ content.field_amount.0 }}</span>
-			</div>
+				<div class="hero-amount-section">
+					<span class="hero-amount-label">Total Amount</span>
+					<span class="hero-amount-value">{{ content.field_amount.0 }}</span>
+				</div>
 			{% endif %}
 			<div class="hero-meta-group">
 				{% if content.field_date.0 %}
-				<div class="hero-meta-item">
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-					<div>
-						<span class="meta-label">Date</span>
-						<span class="meta-value">{{ content.field_date.0 }}</span>
+					<div class="hero-meta-item">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+							<line x1="16" y1="2" x2="16" y2="6"/>
+							<line x1="8" y1="2" x2="8" y2="6"/>
+							<line x1="3" y1="10" x2="21" y2="10"/>
+						</svg>
+						<div>
+							<span class="meta-label">Date</span>
+							<span class="meta-value">{{ content.field_date.0 }}</span>
+						</div>
 					</div>
-				</div>
 				{% endif %}
 				{% if expense_type %}
-				<div class="hero-meta-item">
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-					<div>
-						<span class="meta-label">Type</span>
-						<span class="meta-value">{{ expense_type }}</span>
+					<div class="hero-meta-item">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+						</svg>
+						<div>
+							<span class="meta-label">Type</span>
+							<span class="meta-value">{{ expense_type }}</span>
+						</div>
 					</div>
-				</div>
 				{% endif %}
 				{% if content.field_project.0 %}
-				<div class="hero-meta-item">
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
-					<div>
-						<span class="meta-label">Project</span>
-						<span class="meta-value">{{ content.field_project.0 }}</span>
+					<div class="hero-meta-item">
+						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+						</svg>
+						<div>
+							<span class="meta-label">Project</span>
+							<span class="meta-value">{{ content.field_project.0 }}</span>
+						</div>
 					</div>
-				</div>
 				{% endif %}
 			</div>
 		</div>
@@ -91,19 +115,24 @@
 
 	{# ── DESCRIPTION ── #}
 	{% if content.field_description.0|render|striptags|trim %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-				Description
-			</h2>
-		</div>
-		<div class="entity-section-card__body">
-			<div class="entity-description-text">
-				{{ content.field_description }}
+		<div class="entity-section-card">
+			<div class="entity-section-card__header">
+				<h2 class="entity-section-card__title">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+						<polyline points="14 2 14 8 20 8"/>
+						<line x1="16" y1="13" x2="8" y2="13"/>
+						<line x1="16" y1="17" x2="8" y2="17"/>
+					</svg>
+					Description
+				</h2>
+			</div>
+			<div class="entity-section-card__body">
+				<div class="entity-description-text">
+					{{ content.field_description }}
+				</div>
 			</div>
 		</div>
-	</div>
 	{% endif %}
 
 	{# ══════════════════════════════════════════════════════════
@@ -115,64 +144,80 @@
 
 	{# ── SALARY DETAILS (only for salary type) ── #}
 	{% if expense_type_raw == 'salary' and not node.field_salary_details.isEmpty() %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-				Salary Details
-			</h2>
+		<div class="entity-section-card">
+			<div class="entity-section-card__header">
+				<h2 class="entity-section-card__title">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+						<circle cx="9" cy="7" r="4"/>
+						<path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+						<path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+					</svg>
+					Salary Details
+				</h2>
+			</div>
+			<div class="entity-section-card__body">
+				{{ content.field_salary_details }}
+			</div>
 		</div>
-		<div class="entity-section-card__body">
-			{{ content.field_salary_details }}
-		</div>
-	</div>
 	{% endif %}
 
 	{# ── ROOM RENT DETAILS (only for room_rent_utility type) ── #}
 	{% if expense_type_raw == 'room_rent_utility' and not node.field_room_rent_details.isEmpty() %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-				Room Rent & Utility Details
-			</h2>
+		<div class="entity-section-card">
+			<div class="entity-section-card__header">
+				<h2 class="entity-section-card__title">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+						<polyline points="9 22 9 12 15 12 15 22"/>
+					</svg>
+					Room Rent & Utility Details
+				</h2>
+			</div>
+			<div class="entity-section-card__body">
+				{{ content.field_room_rent_details }}
+			</div>
 		</div>
-		<div class="entity-section-card__body">
-			{{ content.field_room_rent_details }}
-		</div>
-	</div>
 	{% endif %}
 
 	{# ── INVENTORY / VENDOR DETAILS (for vendor & daily_expenses types) ── #}
 	{% if expense_type_raw in ['vendor', 'daily_expenses'] and not node.field_inventory_details.isEmpty() %}
-	<div class="entity-section-card">
-		<div class="entity-section-card__header">
-			<h2 class="entity-section-card__title">
-				<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-				{% if expense_type_raw == 'vendor' %}Vendor Details{% else %}Expense Details{% endif %}
-			</h2>
+		<div class="entity-section-card">
+			<div class="entity-section-card__header">
+				<h2 class="entity-section-card__title">
+					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+						<polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
+						<line x1="12" y1="22.08" x2="12" y2="12"/>
+					</svg>
+					{% if expense_type_raw == 'vendor' %}Vendor Details{% else %}Expense Details{% endif %}
+				</h2>
+			</div>
+			<div class="entity-section-card__body">
+				{{ content.field_inventory_details }}
+			</div>
 		</div>
-		<div class="entity-section-card__body">
-			{{ content.field_inventory_details }}
-		</div>
-	</div>
 	{% endif %}
 
 	{# ── BACK LINK ── #}
 	<div class="entity-back-link">
 		{% if node.field_project.entity %}
-		<a href="{{ path('entity.node.canonical', {'node': node.field_project.target_id}) }}" class="btn-detail btn-detail--outline">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-			Back to {{ node.field_project.entity.label }}
-		</a>
+			<a href="{{ path('entity.node.canonical', {'node': node.field_project.target_id}) }}" class="btn-detail btn-detail--outline">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="19" y1="12" x2="5" y2="12"/>
+					<polyline points="12 19 5 12 12 5"/>
+				</svg>
+				Back to {{ node.field_project.entity.label }}
+			</a>
 		{% else %}
-		<a href="/projects" class="btn-detail btn-detail--outline">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-			Back to Projects
-		</a>
+			<a href="/projects" class="btn-detail btn-detail--outline">
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="19" y1="12" x2="5" y2="12"/>
+					<polyline points="12 19 5 12 12 5"/>
+				</svg>
+				Back to Projects
+			</a>
 		{% endif %}
 	</div>
 
 </div>
-
-

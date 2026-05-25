@@ -68,3 +68,34 @@ nav.tabs-wrapper .tabs--primary {
 // GLOBAL SCROLLBAR
 // -------------------------
 @include custom-scrollbar;
+
+// -------------------------
+// UTILITY CLASSES
+// -------------------------
+.text-center {
+  text-align: center !important;
+}
+
+.text-right {
+  text-align: right !important;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-mono {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace !important;
+}
