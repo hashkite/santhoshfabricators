@@ -1,0 +1,68 @@
+uuid: a8ee850e-9a40-4601-aeb3-a291728efd31
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.ra_bill_item.field_amount_claimed
+    - field.field.paragraph.ra_bill_item.field_boq_item
+    - field.field.paragraph.ra_bill_item.field_cumulative_qty
+    - field.field.paragraph.ra_bill_item.field_current_qty
+    - field.field.paragraph.ra_bill_item.field_item_code
+    - field.field.paragraph.ra_bill_item.field_item_description
+    - field.field.paragraph.ra_bill_item.field_previous_qty
+    - field.field.paragraph.ra_bill_item.field_validation_status
+    - paragraphs.paragraphs_type.ra_bill_item
+id: paragraph.ra_bill_item.default
+targetEntityType: paragraph
+bundle: ra_bill_item
+mode: default
+content:
+  field_amount_claimed:
+    type: number
+    weight: 3
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_boq_item:
+    type: entity_reference_autocomplete
+    weight: 5
+    region: content
+    settings:
+      match_operator: CONTAINS
+      match_limit: 10
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_cumulative_qty:
+    type: number
+    weight: 2
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_current_qty:
+    type: number
+    weight: 1
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_previous_qty:
+    type: number
+    weight: 0
+    region: content
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+  field_validation_status:
+    type: options_select
+    weight: 4
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+hidden:
+  created: true
+  field_item_code: true
+  field_item_description: true
+  status: true

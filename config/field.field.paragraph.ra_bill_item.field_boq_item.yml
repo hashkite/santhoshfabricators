@@ -1,0 +1,29 @@
+uuid: 4145da75-dc9e-4e2a-984f-8a0374dbb189
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_boq_item
+    - node.type.boq_item
+    - paragraphs.paragraphs_type.ra_bill_item
+id: paragraph.ra_bill_item.field_boq_item
+field_name: field_boq_item
+entity_type: paragraph
+bundle: ra_bill_item
+label: 'BOQ Item'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      boq_item: boq_item
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

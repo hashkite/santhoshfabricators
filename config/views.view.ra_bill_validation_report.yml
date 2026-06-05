@@ -1,0 +1,153 @@
+uuid: 5ba3c1f8-0b11-42ac-a88f-429aea078c19
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_boq_item
+    - field.storage.paragraph.field_cumulative_qty
+    - field.storage.paragraph.field_current_qty
+    - field.storage.paragraph.field_item_code
+    - field.storage.paragraph.field_item_description
+    - field.storage.paragraph.field_previous_qty
+    - field.storage.paragraph.field_validation_status
+    - paragraphs.paragraphs_type.ra_bill_item
+  module:
+    - node
+    - paragraphs
+    - views
+id: ra_bill_validation_report
+label: 'RA Bill Validation Report'
+module: views
+description: 'Shows over-claimed items and validation status details.'
+tag: ''
+base_table: paragraphs_item_field_data
+base_field: id
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'RA Bill Validation Report'
+      fields:
+        field_item_code:
+          id: field_item_code
+          table: paragraph__field_item_code
+          field: field_item_code
+          plugin_id: field
+          label: 'Item Code'
+        field_item_description:
+          id: field_item_description
+          table: paragraph__field_item_description
+          field: field_item_description
+          plugin_id: field
+          label: Description
+        field_approved_quantity:
+          id: field_approved_quantity
+          table: node__field_approved_quantity
+          field: field_approved_quantity
+          relationship: field_boq_item
+          plugin_id: field
+          label: 'BOQ Qty'
+        field_current_qty:
+          id: field_current_qty
+          table: paragraph__field_current_qty
+          field: field_current_qty
+          plugin_id: field
+          label: 'Current Claimed Qty'
+        field_cumulative_qty:
+          id: field_cumulative_qty
+          table: paragraph__field_cumulative_qty
+          field: field_cumulative_qty
+          plugin_id: field
+          label: 'Cumulative Qty'
+        expression:
+          id: expression
+          table: views
+          field: expression
+          plugin_id: math
+          label: 'Quantity Difference (Over Claimed)'
+          expression: '[field_cumulative_qty] - [field_approved_quantity]'
+      pager:
+        type: mini
+        options:
+          offset: 0
+          pagination_heading_level: h4
+          items_per_page: 50
+      exposed_form:
+        type: basic
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          plugin_id: text_custom
+          empty: true
+          content: 'No over-claimed items found. All items are valid.'
+      filters:
+        status:
+          id: status
+          table: paragraphs_item_field_data
+          field: status
+          plugin_id: boolean
+          value: '1'
+        type:
+          id: type
+          table: paragraphs_item_field_data
+          field: type
+          plugin_id: bundle
+          value:
+            ra_bill_item: ra_bill_item
+        field_validation_status_value:
+          id: field_validation_status_value
+          table: paragraph__field_validation_status
+          field: field_validation_status_value
+          plugin_id: list_field
+          value:
+            over_claimed: over_claimed
+      style:
+        type: table
+        options:
+          columns:
+            field_item_code: field_item_code
+            field_item_description: field_item_description
+            field_approved_quantity: field_approved_quantity
+            field_current_qty: field_current_qty
+            field_cumulative_qty: field_cumulative_qty
+            expression: expression
+          default: field_item_code
+          info:
+            field_item_code:
+              sortable: true
+            field_cumulative_qty:
+              sortable: true
+      row:
+        type: fields
+      query:
+        type: views_query
+      relationships:
+        field_boq_item:
+          id: field_boq_item
+          table: paragraph__field_boq_item
+          field: field_boq_item
+          plugin_id: standard
+          required: true
+  page_validation_report:
+    id: page_validation_report
+    display_title: 'Validation Report Page'
+    display_plugin: page
+    position: 1
+    display_options:
+      path: admin/ra-bills/validation
+      menu:
+        type: normal
+        title: 'Validation Report'
+        description: 'View list of over-claimed items'
+        parent: system.admin_structure

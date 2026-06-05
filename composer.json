@@ -35,7 +35,8 @@
         "drupal/computed_field": "^4.0",
         "drupal/address": "^2.0",
         "drupal/pathauto": "^1.15",
-        "drupal/invoicemgmt": "^1.0"
+        "drupal/invoicemgmt": "^1.0",
+        "phpoffice/phpspreadsheet": "^5.7"
     },
     "require-dev": {
         "drupal/core-dev": "^10"

@@ -1,0 +1,54 @@
+ra_bill_manager.vendor_billing_report:
+  path: '/admin/ra-bills/vendor-billing'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\VendorBillingController::report'
+    _title: 'Vendor Billing Report'
+  requirements:
+    _permission: 'access content'
+
+ra_bill_manager.export_excel:
+  path: '/admin/ra-bills/export'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\ExcelExportController::export'
+    _title: 'Export RA Bills to Excel'
+  requirements:
+    _permission: 'access content'
+
+ra_bill_manager.export_excel_single:
+  path: '/admin/ra-bills/export/{node}'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\ExcelExportController::exportSingle'
+    _title: 'Export RA Bill to Excel'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+
+ra_bill_manager.create_invoice:
+  path: '/admin/ra-bills/{node}/create-invoice'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\InvoiceGenerationController::generateInvoice'
+    _title: 'Create Invoice from RA Bill'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+
+ra_bill_manager.update_quantities:
+  path: '/admin/ra-bills/{node}/update-quantities'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\InlineEditController::updateQuantities'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+

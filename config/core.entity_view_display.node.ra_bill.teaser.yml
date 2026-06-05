@@ -1,0 +1,64 @@
+uuid: 58a2f36f-ae6b-4a69-904c-bc3704608cf6
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.ra_bill.body
+    - field.field.node.ra_bill.field_basic_amount
+    - field.field.node.ra_bill.field_bill_date
+    - field.field.node.ra_bill.field_bill_number
+    - field.field.node.ra_bill.field_cgst
+    - field.field.node.ra_bill.field_excel_file
+    - field.field.node.ra_bill.field_ocr_text
+    - field.field.node.ra_bill.field_pdf_document
+    - field.field.node.ra_bill.field_po_number
+    - field.field.node.ra_bill.field_project
+    - field.field.node.ra_bill.field_purchase_order
+    - field.field.node.ra_bill.field_ra_bill_items
+    - field.field.node.ra_bill.field_ra_bill_number
+    - field.field.node.ra_bill.field_sgst
+    - field.field.node.ra_bill.field_total_amount
+    - field.field.node.ra_bill.field_validation_status
+    - field.field.node.ra_bill.field_vendor
+    - field.field.node.ra_bill.field_workflow_status
+    - node.type.ra_bill
+  module:
+    - text
+    - user
+id: node.ra_bill.teaser
+targetEntityType: node
+bundle: ra_bill
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_basic_amount: true
+  field_bill_date: true
+  field_bill_number: true
+  field_cgst: true
+  field_excel_file: true
+  field_ocr_text: true
+  field_pdf_document: true
+  field_po_number: true
+  field_project: true
+  field_purchase_order: true
+  field_ra_bill_items: true
+  field_ra_bill_number: true
+  field_sgst: true
+  field_total_amount: true
+  field_validation_status: true
+  field_vendor: true
+  field_workflow_status: true

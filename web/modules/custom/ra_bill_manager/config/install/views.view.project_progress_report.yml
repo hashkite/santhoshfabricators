@@ -1,0 +1,159 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_approved_quantity
+    - field.storage.node.field_item_description
+    - field.storage.node.field_project
+    - node.type.boq_item
+  module:
+    - node
+    - paragraphs
+    - views
+id: project_progress_report
+label: 'Project Progress Report'
+module: views
+description: 'Shows item progress based on approved and executed quantities.'
+tag: ''
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'Project Progress Report'
+      group_by: true
+      fields:
+        title:
+          id: title
+          table: node_field_data
+          field: title
+          plugin_id: field
+          label: 'BOQ Item'
+        field_item_description:
+          id: field_item_description
+          table: node__field_item_description
+          field: field_item_description
+          plugin_id: field
+          label: Description
+        field_project:
+          id: field_project
+          table: node__field_project
+          field: field_project
+          plugin_id: field
+          label: Project
+          type: entity_reference_label
+          settings:
+            link: true
+        field_approved_quantity:
+          id: field_approved_quantity
+          table: node__field_approved_quantity
+          field: field_approved_quantity
+          plugin_id: field
+          label: 'Approved Qty'
+          type: number_decimal
+        field_current_qty:
+          id: field_current_qty
+          table: paragraph__field_current_qty
+          field: field_current_qty
+          relationship: reverse__paragraph__field_boq_item
+          plugin_id: field
+          label: 'Executed Qty'
+          group_type: sum
+          type: number_decimal
+        expression_balance:
+          id: expression_balance
+          table: views
+          field: expression
+          plugin_id: math
+          label: 'Balance Qty'
+          expression: '[field_approved_quantity] - [field_current_qty]'
+        expression_progress:
+          id: expression_progress
+          table: views
+          field: expression
+          plugin_id: math
+          label: 'Progress %'
+          expression: '([field_current_qty] / [field_approved_quantity]) * 100'
+      relationships:
+        reverse__paragraph__field_boq_item:
+          id: reverse__paragraph__field_boq_item
+          table: node_field_data
+          field: reverse__paragraph__field_boq_item
+          plugin_id: entity_reverse
+          required: false
+      pager:
+        type: mini
+        options:
+          offset: 0
+          items_per_page: 50
+      exposed_form:
+        type: basic
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          plugin_id: text_custom
+          empty: true
+          content: 'No BOQ items found.'
+      filters:
+        status:
+          id: status
+          table: node_field_data
+          field: status
+          entity_type: node
+          entity_field: status
+          plugin_id: boolean
+          value: '1'
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
+          value:
+            boq_item: boq_item
+      style:
+        type: table
+        options:
+          columns:
+            title: title
+            field_item_description: field_item_description
+            field_project: field_project
+            field_approved_quantity: field_approved_quantity
+            field_current_qty: field_current_qty
+            expression_balance: expression_balance
+            expression_progress: expression_progress
+          default: title
+          info:
+            title:
+              sortable: true
+            field_project:
+              sortable: true
+      row:
+        type: fields
+      query:
+        type: views_query
+  page_progress_report:
+    id: page_progress_report
+    display_title: 'Progress Report Page'
+    display_plugin: page
+    position: 1
+    display_options:
+      path: admin/ra-bills/progress
+      menu:
+        type: normal
+        title: 'Project Progress Report'
+        description: 'View project progress and balance quantities'
+        parent: system.admin_structure

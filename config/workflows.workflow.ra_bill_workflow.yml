@@ -1,0 +1,86 @@
+uuid: 11209ee6-7fc3-45bc-abf8-a04139b07668
+langcode: en
+status: true
+dependencies:
+  module:
+    - content_moderation
+id: ra_bill_workflow
+label: 'RA Bill Workflow'
+type: content_moderation
+type_settings:
+  states:
+    draft:
+      label: Draft
+      weight: -5
+      published: false
+      default_revision: false
+    engineer_review:
+      label: 'Engineer Review'
+      weight: -4
+      published: false
+      default_revision: false
+    finance_review:
+      label: 'Finance Review'
+      weight: -2
+      published: false
+      default_revision: false
+    manager_review:
+      label: 'Manager Review'
+      weight: -3
+      published: false
+      default_revision: false
+    paid:
+      label: Paid
+      weight: 0
+      published: true
+      default_revision: true
+    published:
+      label: Approved
+      weight: -1
+      published: true
+      default_revision: true
+  transitions:
+    approve:
+      label: Approve
+      from:
+        - finance_review
+      to: published
+      weight: -1
+    create_new_draft:
+      label: 'Create New Draft'
+      from:
+        - draft
+        - engineer_review
+        - manager_review
+        - finance_review
+        - published
+        - paid
+      to: draft
+      weight: -5
+    pay:
+      label: Pay
+      from:
+        - published
+      to: paid
+      weight: 0
+    submit_to_engineer:
+      label: 'Submit to Engineer'
+      from:
+        - draft
+      to: engineer_review
+      weight: -4
+    submit_to_finance:
+      label: 'Submit to Finance'
+      from:
+        - manager_review
+      to: finance_review
+      weight: -2
+    submit_to_manager:
+      label: 'Submit to Manager'
+      from:
+        - engineer_review
+      to: manager_review
+      weight: -3
+  entity_types:
+    node:
+      - ra_bill

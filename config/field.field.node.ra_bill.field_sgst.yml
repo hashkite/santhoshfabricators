@@ -1,0 +1,19 @@
+uuid: dcb7a389-6999-4955-bd8c-ae3fc95bba22
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_sgst
+    - node.type.ra_bill
+id: node.ra_bill.field_sgst
+field_name: field_sgst
+entity_type: node
+bundle: ra_bill
+label: SGST
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

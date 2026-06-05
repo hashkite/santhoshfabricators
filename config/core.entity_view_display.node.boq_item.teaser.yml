@@ -1,0 +1,44 @@
+uuid: f30dd59f-f426-4669-af5c-e042202ee2de
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.boq_item.body
+    - field.field.node.boq_item.field_approved_quantity
+    - field.field.node.boq_item.field_item_code
+    - field.field.node.boq_item.field_item_description
+    - field.field.node.boq_item.field_project
+    - field.field.node.boq_item.field_total_value
+    - field.field.node.boq_item.field_unit
+    - field.field.node.boq_item.field_unit_rate
+    - node.type.boq_item
+  module:
+    - text
+    - user
+id: node.boq_item.teaser
+targetEntityType: node
+bundle: boq_item
+mode: teaser
+content:
+  body:
+    type: text_summary_or_trimmed
+    label: hidden
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+    weight: 101
+    region: content
+  links:
+    settings: {  }
+    third_party_settings: {  }
+    weight: 100
+    region: content
+hidden:
+  field_approved_quantity: true
+  field_item_code: true
+  field_item_description: true
+  field_project: true
+  field_total_value: true
+  field_unit: true
+  field_unit_rate: true

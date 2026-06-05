@@ -1,0 +1,19 @@
+uuid: e84a58d1-df15-401d-b2d2-89bcf92ad6e2
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - text
+id: node.field_ocr_text
+field_name: field_ocr_text
+entity_type: node
+type: text_long
+settings: {  }
+module: text
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

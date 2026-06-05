@@ -1,0 +1,23 @@
+uuid: f739f4b2-22f8-4e21-a11e-418f92c6e120
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_approved_quantity
+    - node.type.boq_item
+id: node.boq_item.field_approved_quantity
+field_name: field_approved_quantity
+entity_type: node
+bundle: boq_item
+label: 'Approved Quantity'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

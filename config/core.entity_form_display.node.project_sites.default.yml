@@ -9,6 +9,7 @@ dependencies:
     - field.field.node.project_sites.field_end_date
     - field.field.node.project_sites.field_image
     - field.field.node.project_sites.field_location
+    - field.field.node.project_sites.field_po_number
     - field.field.node.project_sites.field_project_code
     - field.field.node.project_sites.field_project_manager
     - field.field.node.project_sites.field_start_date
@@ -145,3 +146,4 @@ content:
     third_party_settings: {  }
 hidden:
   body: true
+  field_po_number: true

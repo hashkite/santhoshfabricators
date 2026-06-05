@@ -1,0 +1,18 @@
+uuid: 3f06d671-5cc9-48fb-b14f-22d315c3947e
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+third_party_settings:
+  menu_ui:
+    available_menus:
+      - main
+    parent: 'main:'
+name: 'RA Bill'
+type: ra_bill
+description: 'Running Account bill guide breaks it down in simple, practical terms for builders, contractors, project managers, billing engineers, and site engineers.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: false

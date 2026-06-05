@@ -194,7 +194,14 @@ function power_alpha_preprocess_node(&$variables)
     $variables['company_gstin'] = $config->get('company_gstin') ?: '24AAQCS3102E1ZP';
     $variables['company_pan'] = $config->get('company_pan') ?: 'AAQCS3102E';
     $variables['company_sac'] = $config->get('company_sac') ?: '995442';
-    $variables['company_ra'] = $config->get('company_ra') ?: '10';
+    // Dynamically retrieve RA Bill number from invoice node title if possible,
+    // fallback to config.
+    $company_ra = $config->get('company_ra') ?: '10';
+    $node_title = $node->label();
+    if (preg_match('/RA Bill\s*#?(\d+)/', $node_title, $matches)) {
+      $company_ra = $matches[1];
+    }
+    $variables['company_ra'] = is_numeric($company_ra) ? sprintf('%02d', intval($company_ra)) : $company_ra;
 
     // Resolve Custom Logo URL if available
     $logo_url = '';
@@ -316,7 +323,7 @@ function power_alpha_preprocess_node(&$variables)
             'description' => $desc,
             'uom' => $uom,
             'qty' => $qty,
-            'rate' => power_alpha_format_indian_currency($rate),
+            'rate' => ($uom === 'PU' || $uom === 'pu' || $uom === 'Pu') ? '' : power_alpha_format_indian_currency($rate),
             'amount' => power_alpha_format_indian_currency($amount),
           ];
         }
@@ -386,6 +393,22 @@ function power_alpha_preprocess_node(&$variables)
       '#display_id' => 'block_1',
       '#arguments' => [$node->id()],
     ];
+
+    // Associated RA Bills Block
+    $variables['ra_bills_block'] = [
+      '#type' => 'view',
+      '#name' => 'ra_bills',
+      '#display_id' => 'block_po_bills',
+      '#arguments' => [$node->id()],
+    ];
+
+    // Import Excel Form Block
+    if (\Drupal::currentUser()->isAuthenticated()) {
+      $variables['ra_import_form'] = \Drupal::formBuilder()->getForm('Drupal\ra_bill_manager\Form\RAExcelImportForm', $node->id());
+    }
+    else {
+      $variables['ra_import_form'] = NULL;
+    }
 
     // ── PO Utilization Dashboard Calculations ──
     $po_total_raw = $node->get('field_amount_gst')->value;

@@ -1,0 +1,21 @@
+uuid: 1d21e9f4-14d1-4899-ba36-6f5b3dc7d857
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_validation_status
+    - paragraphs.paragraphs_type.ra_bill_item
+  module:
+    - options
+id: paragraph.ra_bill_item.field_validation_status
+field_name: field_validation_status
+entity_type: paragraph
+bundle: ra_bill_item
+label: 'Validation Status'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

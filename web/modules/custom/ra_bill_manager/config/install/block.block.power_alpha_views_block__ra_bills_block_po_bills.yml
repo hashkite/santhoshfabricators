@@ -1,0 +1,32 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - views.view.ra_bills
+  module:
+    - node
+    - views
+  theme:
+    - power_alpha
+id: power_alpha_views_block__ra_bills_block_po_bills
+theme: power_alpha
+region: content
+weight: 10
+provider: null
+plugin: 'views_block:ra_bills-block_po_bills'
+settings:
+  id: 'views_block:ra_bills-block_po_bills'
+  label: 'Associated RA Bills'
+  label_display: '0'
+  provider: views
+  context_mapping: {  }
+  views_label: ''
+  items_per_page: none
+visibility:
+  'entity_bundle:node':
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: '@node.node_route_context:node'
+    bundles:
+      purchase_order: purchase_order

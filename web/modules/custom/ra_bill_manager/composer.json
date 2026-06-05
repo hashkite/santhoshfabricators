@@ -1,0 +1,8 @@
+{
+  "name": "drupal/ra_bill_manager",
+  "description": "RA Bill Management custom module.",
+  "type": "drupal-module",
+  "require": {
+    "phpoffice/phpspreadsheet": "^5.7"
+  }
+}

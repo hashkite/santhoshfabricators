@@ -1,0 +1,24 @@
+uuid: 7f987d3d-cdc8-419f-9afa-c6953fdf6833
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_ocr_text
+    - filter.format.basic_html
+    - node.type.ra_bill
+  module:
+    - text
+id: node.ra_bill.field_ocr_text
+field_name: field_ocr_text
+entity_type: node
+bundle: ra_bill
+label: 'OCR Text'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats:
+    - basic_html
+field_type: text_long

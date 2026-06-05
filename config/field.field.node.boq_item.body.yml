@@ -1,0 +1,24 @@
+uuid: 339c7b3e-83ef-45c1-ad1e-f82c00f5bbb0
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.boq_item
+  module:
+    - text
+id: node.boq_item.body
+field_name: body
+entity_type: node
+bundle: boq_item
+label: Body
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+  required_summary: false
+  allowed_formats: {  }
+field_type: text_with_summary

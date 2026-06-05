@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_gst_number
+    - node.type.vendor
+id: node.vendor.field_gst_number
+field_name: field_gst_number
+entity_type: node
+bundle: vendor
+label: 'GST Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

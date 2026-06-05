@@ -1,0 +1,45 @@
+uuid: 4b10e307-339f-4b73-8ae5-6275def84677
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - options
+id: node.field_unit
+field_name: field_unit
+entity_type: node
+type: list_string
+settings:
+  allowed_values:
+    -
+      value: nos
+      label: Nos
+    -
+      value: kg
+      label: Kg
+    -
+      value: ton
+      label: Ton
+    -
+      value: meter
+      label: Meter
+    -
+      value: sqm
+      label: Sqm
+    -
+      value: cum
+      label: Cum
+    -
+      value: inch_dia
+      label: 'Inch Dia'
+    -
+      value: lot
+      label: Lot
+  allowed_values_function: ''
+module: options
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

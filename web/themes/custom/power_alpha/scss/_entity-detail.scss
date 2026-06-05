@@ -486,9 +486,10 @@
 }
 
 // ─────────────────────────────────────────
-// INVOICE VIEW TABLE (inside PO detail)
+// INVOICE & RA BILL VIEW TABLES (inside PO detail)
 // ─────────────────────────────────────────
-.view-invoices-table {
+.view-invoices-table,
+.view-ra-bills {
   .view-content {
     overflow-x: auto;
   }
@@ -1110,6 +1111,177 @@
     border-top: 1px solid #111111;
     padding-top: $space-1;
     margin-top: $space-2;
+  }
+}
+
+// ─────────────────────────────────────────
+// EXTRA RA BILL & FORM STYLINGS
+// ─────────────────────────────────────────
+.btn-detail--small {
+  padding: 6px 12px !important;
+  font-size: 0.725rem !important;
+  border-radius: 4px !important;
+  gap: $space-1 !important;
+}
+
+.view-ra-bills {
+  // Column alignments
+  .views-field-field-basic-amount,
+  .views-field-field-cgst,
+  .views-field-field-sgst,
+  .views-field-field-total-amount {
+    text-align: right;
+    font-weight: 600;
+    
+    &::before {
+      content: "₹";
+      margin-right: 2px;
+      color: $color-neutral-600;
+    }
+  }
+  
+  .views-field-field-total-amount {
+    font-weight: 700;
+    color: $color-primary;
+  }
+  
+  .views-field-field-validation-status {
+    text-align: center;
+  }
+  
+  // Badge styling inside views
+  .ra-badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    width: fit-content;
+    
+    &-verified {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid rgba(6, 95, 70, 0.15);
+    }
+    &-review {
+      background-color: #fee2e2;
+      color: #991b1b;
+      border: 1px solid rgba(153, 27, 27, 0.15);
+    }
+  }
+
+  // Action column alignment
+  .views-field-nothing {
+    white-space: nowrap;
+    
+    .btn-detail {
+      margin-right: 4px;
+      
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.ra-import-form-section {
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-4;
+    background: #f8fafc;
+    padding: $space-5;
+    border-radius: $radius-md;
+    border: 1px dashed $color-neutral-300;
+    transition: $transition-base;
+
+    &:hover {
+      border-color: $color-primary;
+      background: rgba($color-primary, 0.01);
+    }
+
+    .form-item-excel-file-upload {
+      margin-bottom: 0;
+    }
+
+    .form-item__label {
+      font-size: $font-size-xs !important;
+      font-weight: 700 !important;
+      text-transform: uppercase !important;
+      color: $color-secondary !important;
+      letter-spacing: 0.5px !important;
+      margin-bottom: $space-2 !important;
+    }
+
+    .js-form-managed-file.form-managed-file {
+      display: flex;
+      flex-direction: column;
+      gap: $space-3;
+      
+      .form-element {
+        border: 1px solid $color-neutral-300;
+        padding: $space-3;
+        border-radius: $radius-sm;
+        background: $color-white;
+        font-size: $font-size-sm;
+        transition: $transition-base;
+
+        &:focus {
+          border-color: $color-primary;
+          box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+        }
+      }
+
+      input[type="file"] {
+        padding: $space-2;
+        font-family: $font-body;
+        font-size: $font-size-sm;
+        cursor: pointer;
+      }
+      
+      .form-item__description {
+        font-size: 0.725rem !important;
+        color: $color-neutral-500 !important;
+        margin-top: 4px !important;
+      }
+    }
+
+    .form-actions {
+      margin-top: $space-2;
+      display: flex;
+      justify-content: flex-start;
+      
+      input[type="submit"].button {
+        background: $gradient-primary !important;
+        color: $color-white !important;
+        box-shadow: 0 2px 8px rgba($color-primary, 0.25) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: $space-2 !important;
+        padding: 10px 20px !important;
+        border-radius: $radius-sm !important;
+        font-family: $font-body !important;
+        font-size: $font-size-sm !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        transition: $transition-base !important;
+        border: none !important;
+
+        &:hover {
+          transform: translateY(-1px) !important;
+          box-shadow: 0 4px 16px rgba($color-primary, 0.35) !important;
+          filter: brightness(1.08) !important;
+        }
+
+        &:active {
+          transform: translateY(0) !important;
+        }
+      }
+    }
   }
 }
 

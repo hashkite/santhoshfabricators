@@ -1,0 +1,23 @@
+uuid: 087d99c9-4fb8-4cc8-b054-44720aac43dc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_amount_claimed
+    - paragraphs.paragraphs_type.ra_bill_item
+id: paragraph.ra_bill_item.field_amount_claimed
+field_name: field_amount_claimed
+entity_type: paragraph
+bundle: ra_bill_item
+label: 'Amount Claimed'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

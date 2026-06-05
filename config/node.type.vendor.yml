@@ -1,0 +1,13 @@
+uuid: aefb652b-8903-406d-b990-30a6143cac7d
+langcode: en
+status: true
+dependencies:
+  module:
+    - menu_ui
+name: Vendor
+type: vendor
+description: 'Store GST and contact details for vendors.'
+help: null
+new_revision: true
+preview_mode: 1
+display_submitted: true

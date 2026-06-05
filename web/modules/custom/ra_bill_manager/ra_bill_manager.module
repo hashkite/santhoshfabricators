@@ -1,0 +1,590 @@
+<?php
+
+/**
+ * @file
+ * Primary module hooks for RA Bill Manager module.
+ */
+
+use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\NodeInterface;
+
+/**
+ * Implements hook_entity_prepare_form().
+ *
+ * Prepopulates Project and Purchase Order fields from a 'po' query parameter.
+ */
+function ra_bill_manager_entity_prepare_form(EntityInterface $entity, $operation, FormStateInterface $form_state) {
+  if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'ra_bill' && $operation === 'default') {
+    $request = \Drupal::request();
+    $po_id = $request->query->get('po');
+    if ($po_id && is_numeric($po_id)) {
+      $po_node = \Drupal::entityTypeManager()->getStorage('node')->load($po_id);
+      if ($po_node && $po_node->bundle() === 'purchase_order') {
+        $entity->set('field_purchase_order', $po_id);
+        
+        // Copy project reference from the Purchase Order
+        if (!$po_node->get('field_project')->isEmpty()) {
+          $entity->set('field_project', $po_node->get('field_project')->target_id);
+        }
+        
+        // Copy PO number
+        if (!$po_node->get('field_po_number')->isEmpty()) {
+          $entity->set('field_po_number', $po_node->get('field_po_number')->value);
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave() for node entities.
+ *
+ * Automatically parses Excel sheets, validates item quantities, and calculates totals.
+ */
+function ra_bill_manager_node_presave(NodeInterface $node) {
+  if ($node->bundle() !== 'ra_bill') {
+    return;
+  }
+
+  // 1. Process Excel File Upload if it exists and has changed
+  $file_changed = FALSE;
+  if ($node->hasField('field_excel_file') && !$node->get('field_excel_file')->isEmpty()) {
+    $file_id = $node->get('field_excel_file')->target_id;
+
+    if ($node->isNew()) {
+      $file_changed = TRUE;
+    }
+    else {
+      $original = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($node->id());
+      $orig_file_id = $original && !$original->get('field_excel_file')->isEmpty() 
+        ? $original->get('field_excel_file')->target_id 
+        : NULL;
+      if ($file_id != $orig_file_id) {
+        $file_changed = TRUE;
+      }
+    }
+
+    if ($file_changed) {
+      $file = \Drupal::entityTypeManager()->getStorage('file')->load($file_id);
+      if ($file) {
+        $file_uri = $file->getFileUri();
+        /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+        $file_system = \Drupal::service('file_system');
+        $file_path = $file_system->realpath($file_uri);
+
+        if ($file_path && file_exists($file_path)) {
+          /** @var \Drupal\ra_bill_manager\Parser\ExcelParser $excel_parser */
+          $excel_parser = \Drupal::service('ra_bill_manager.excel_parser');
+          
+          try {
+            $parsed_data = $excel_parser->parse($file_path);
+            
+            // Clear existing paragraphs to prevent orphaned entities
+            /** @var \Drupal\ra_bill_manager\Paragraph\ParagraphManager $paragraph_creator */
+            $paragraph_creator = \Drupal::service('ra_bill_manager.paragraph_creator');
+            $paragraph_creator->clearBillItems($node);
+
+            // Match or create Project node
+            $project_id = !$node->get('field_project')->isEmpty() ? $node->get('field_project')->target_id : NULL;
+            if (!$project_id) {
+              $proj_title = !empty($parsed_data['metadata']['project_code']) ? $parsed_data['metadata']['project_code'] : 'Imported Project';
+              $proj_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+                ->accessCheck(FALSE)
+                ->condition('type', 'project_sites');
+              
+              $or_group = $proj_query->orConditionGroup()
+                ->condition('title', $proj_title)
+                ->condition('field_project_code', $proj_title);
+              $proj_query->condition($or_group);
+              
+              $proj_ids = $proj_query->execute();
+              
+              if (!empty($proj_ids)) {
+                $project_id = reset($proj_ids);
+                $node->set('field_project', $project_id);
+              }
+            }
+
+            // Match or create Vendor node
+            $vendor_id = !$node->get('field_vendor')->isEmpty() ? $node->get('field_vendor')->target_id : NULL;
+            if (!$vendor_id && !empty($parsed_data['metadata']['vendor_name'])) {
+              $vendor_name = $parsed_data['metadata']['vendor_name'];
+              $v_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+                ->accessCheck(FALSE)
+                ->condition('type', 'vendor')
+                ->condition('title', $vendor_name);
+              $v_ids = $v_query->execute();
+
+              if (!empty($v_ids)) {
+                $vendor_id = reset($v_ids);
+              }
+              else {
+                // Auto-create Vendor node
+                $v_node = \Drupal::entityTypeManager()->getStorage('node')->create([
+                  'type' => 'vendor',
+                  'title' => $vendor_name,
+                  'status' => 1,
+                ]);
+                $v_node->save();
+                $vendor_id = $v_node->id();
+              }
+              $node->set('field_vendor', $vendor_id);
+            }
+
+            // Match Purchase Order node by project reference
+            $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
+            if (!$po_id && $project_id) {
+              $po_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+                ->accessCheck(FALSE)
+                ->condition('type', 'purchase_order')
+                ->condition('field_project', $project_id);
+              $po_ids = $po_query->execute();
+              
+              if (!empty($po_ids)) {
+                $po_id = reset($po_ids);
+                $node->set('field_purchase_order', $po_id);
+                
+                $po_node = \Drupal::entityTypeManager()->getStorage('node')->load($po_id);
+                if ($po_node && !$po_node->get('field_po_number')->isEmpty()) {
+                  $node->set('field_po_number', $po_node->get('field_po_number')->value);
+                }
+              }
+            }
+
+            // Update metadata if empty on form
+            if ($node->get('field_bill_number')->isEmpty() && !empty($parsed_data['metadata']['bill_number'])) {
+              $node->set('field_bill_number', $parsed_data['metadata']['bill_number']);
+            }
+            if ($node->get('field_ra_bill_number')->isEmpty() && !empty($parsed_data['metadata']['ra_bill_number'])) {
+              $node->set('field_ra_bill_number', $parsed_data['metadata']['ra_bill_number']);
+            }
+            if ($node->get('field_bill_date')->isEmpty() && !empty($parsed_data['metadata']['bill_date'])) {
+              $node->set('field_bill_date', $parsed_data['metadata']['bill_date']);
+            }
+
+            // Auto-populate parsed financial totals
+            $node->set('field_basic_amount', $parsed_data['metadata']['basic_amount']);
+            $node->set('field_cgst', $parsed_data['metadata']['cgst']);
+            $node->set('field_sgst', $parsed_data['metadata']['sgst']);
+            $node->set('field_total_amount', $parsed_data['metadata']['total_amount']);
+
+            // Parse and create paragraph items
+            $paragraphs = [];
+            foreach ($parsed_data['items'] as $item) {
+              $paragraphs[] = $paragraph_creator->createBillItem(
+                $node->isNew() ? NULL : $node->id(),
+                $project_id,
+                $item
+              );
+            }
+            $node->set('field_ra_bill_items', $paragraphs);
+          }
+          catch (\Exception $e) {
+            \Drupal::messenger()->addError(t('Failed to parse Excel file: @msg', ['@msg' => $e->getMessage()]));
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Perform validations, cumulative tracking, and sum totals for ALL items
+  // (Both automatically imported and manually added/edited items)
+  if ($node->hasField('field_ra_bill_items') && !$node->get('field_ra_bill_items')->isEmpty()) {
+    $project_id = !$node->get('field_project')->isEmpty() ? $node->get('field_project')->target_id : NULL;
+    
+    if ($project_id) {
+      /** @var \Drupal\ra_bill_manager\Validation\BOQValidator $boq_validator */
+      $boq_validator = \Drupal::service('ra_bill_manager.boq_validator');
+      
+      $items = $node->get('field_ra_bill_items')->referencedEntities();
+      $has_over_claimed = FALSE;
+      $calculated_basic = 0.0;
+
+      foreach ($items as $paragraph) {
+        if ($paragraph->bundle() !== 'ra_bill_item') {
+          continue;
+        }
+
+        // Match the BOQ Item
+        $boq_item_id = !$paragraph->get('field_boq_item')->isEmpty() ? $paragraph->get('field_boq_item')->target_id : NULL;
+        
+        // If BOQ Item is missing, try to auto-find or create it
+        if (!$boq_item_id) {
+          $item_code = !$paragraph->get('field_item_code')->isEmpty() ? $paragraph->get('field_item_code')->value : '';
+          $description = !$paragraph->get('field_item_description')->isEmpty() ? $paragraph->get('field_item_description')->value : '';
+          if (!empty($description)) {
+            $current_qty = floatval($paragraph->get('field_current_qty')->value ?? 0.0);
+            $boq_node = $boq_validator->getOrCreateBOQItem($project_id, $item_code, $description, 'Nos', $current_qty, 0.0);
+            $boq_item_id = $boq_node->id();
+            $paragraph->set('field_boq_item', $boq_item_id);
+          }
+        }
+
+        if ($boq_item_id) {
+          $boq_item = \Drupal::entityTypeManager()->getStorage('node')->load($boq_item_id);
+          if ($boq_item) {
+            $current_qty = floatval($paragraph->get('field_current_qty')->value ?? 0.0);
+            $prev_qty = $boq_validator->getPreviousQuantity($boq_item_id, $node->isNew() ? NULL : $node->id());
+            $validation = $boq_validator->validate($boq_item, $current_qty, $prev_qty);
+
+            $unit_rate = floatval($boq_item->get('field_unit_rate')->value ?? 0.0);
+            $amount_claimed = $current_qty * $unit_rate;
+
+            $paragraph->set('field_previous_qty', $prev_qty);
+            $paragraph->set('field_cumulative_qty', $prev_qty + $current_qty);
+            $paragraph->set('field_amount_claimed', $amount_claimed);
+            $paragraph->set('field_validation_status', $validation['status']);
+            $paragraph->save();
+
+            $calculated_basic += $amount_claimed;
+
+            if ($validation['status'] === 'over_claimed') {
+              $has_over_claimed = TRUE;
+            }
+          }
+        }
+      }
+
+      // If we didn't just parse from Excel, recalculate the node totals from the items
+      if (!$file_changed && $calculated_basic > 0) {
+        $cgst = $calculated_basic * 0.09;
+        $sgst = $calculated_basic * 0.09;
+        $total = $calculated_basic + $cgst + $sgst;
+
+        $node->set('field_basic_amount', $calculated_basic);
+        $node->set('field_cgst', $cgst);
+        $node->set('field_sgst', $sgst);
+        $node->set('field_total_amount', $total);
+      }
+
+      // Set node validation status based on items
+      if ($has_over_claimed) {
+        $node->set('field_validation_status', 'need_review');
+      }
+      else {
+        $node->set('field_validation_status', 'verified');
+      }
+
+      // Automatically update the title with the parsed/input RA Bill Number
+      $ra_bill_no = !$node->get('field_ra_bill_number')->isEmpty() ? $node->get('field_ra_bill_number')->value : NULL;
+      if ($ra_bill_no) {
+        // Use the project name dynamically instead of hardcoded location
+        $project_label = '';
+        if ($project_id) {
+          $proj_node = \Drupal::entityTypeManager()->getStorage('node')->load($project_id);
+          if ($proj_node) {
+            $project_label = $proj_node->label();
+          }
+        }
+        $title_suffix = !empty($project_label) ? ' - ' . $project_label : '';
+        $node->setTitle(t('RA Bill @num@suffix', ['@num' => $ra_bill_no, '@suffix' => $title_suffix]));
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ *
+ * Automatically populates basic details when the Excel sheet is uploaded.
+ */
+function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  // Only target the ra_bill node form.
+  $node = $form_state->getFormObject()->getEntity();
+  if ($node->getEntityTypeId() === 'node' && $node->bundle() === 'ra_bill') {
+    // Check if a file is uploaded in field_excel_file
+    $file_ids = $form_state->getValue(['field_excel_file', 0, 'fids']);
+    if (!empty($file_ids)) {
+      $fid = reset($file_ids);
+      
+      // Store on form state to avoid parsing on every AJAX rebuild
+      if ($form_state->get('parsed_excel_fid') != $fid) {
+        $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+        if ($file) {
+          $file_uri = $file->getFileUri();
+          $file_path = \Drupal::service('file_system')->realpath($file_uri);
+          if ($file_path && file_exists($file_path)) {
+            try {
+              /** @var \Drupal\ra_bill_manager\Parser\ExcelParser $excel_parser */
+              $excel_parser = \Drupal::service('ra_bill_manager.excel_parser');
+              $parsed_data = $excel_parser->parse($file_path);
+              
+              $form_state->set('parsed_excel_data', $parsed_data);
+              $form_state->set('parsed_excel_fid', $fid);
+              
+              // Populate form values
+              $metadata = $parsed_data['metadata'];
+              $input = &$form_state->getUserInput();
+              
+              if (!empty($metadata['bill_number'])) {
+                $form_state->setValue(['field_bill_number', 0, 'value'], $metadata['bill_number']);
+                $input['field_bill_number'][0]['value'] = $metadata['bill_number'];
+              }
+              if (!empty($metadata['ra_bill_number'])) {
+                $form_state->setValue(['field_ra_bill_number', 0, 'value'], $metadata['ra_bill_number']);
+                $input['field_ra_bill_number'][0]['value'] = $metadata['ra_bill_number'];
+              }
+              if (!empty($metadata['bill_date'])) {
+                $date_obj = new \Drupal\Core\Datetime\DrupalDateTime($metadata['bill_date']);
+                $form_state->setValue(['field_bill_date', 0, 'value'], $date_obj);
+                $input['field_bill_date'][0]['value']['date'] = $metadata['bill_date'];
+              }
+              if (isset($metadata['basic_amount'])) {
+                $form_state->setValue(['field_basic_amount', 0, 'value'], $metadata['basic_amount']);
+                $input['field_basic_amount'][0]['value'] = $metadata['basic_amount'];
+              }
+              if (isset($metadata['cgst'])) {
+                $form_state->setValue(['field_cgst', 0, 'value'], $metadata['cgst']);
+                $input['field_cgst'][0]['value'] = $metadata['cgst'];
+              }
+              if (isset($metadata['sgst'])) {
+                $form_state->setValue(['field_sgst', 0, 'value'], $metadata['sgst']);
+                $input['field_sgst'][0]['value'] = $metadata['sgst'];
+              }
+              if (isset($metadata['total_amount'])) {
+                $form_state->setValue(['field_total_amount', 0, 'value'], $metadata['total_amount']);
+                $input['field_total_amount'][0]['value'] = $metadata['total_amount'];
+              }
+              
+              // Auto-populate Project reference if found
+              if (!empty($metadata['project_code'])) {
+                $proj_title = $metadata['project_code'];
+                $proj_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+                  ->accessCheck(FALSE)
+                  ->condition('type', 'project_sites');
+                $or_group = $proj_query->orConditionGroup()
+                  ->condition('title', $proj_title)
+                  ->condition('field_project_code', $proj_title);
+                $proj_query->condition($or_group);
+                $proj_ids = $proj_query->execute();
+                
+                if (!empty($proj_ids)) {
+                  $proj_id = reset($proj_ids);
+                  $proj_node = \Drupal::entityTypeManager()->getStorage('node')->load($proj_id);
+                  if ($proj_node) {
+                    $autocomplete_val = $proj_node->label() . ' (' . $proj_id . ')';
+                    $form_state->setValue(['field_project', 0, 'target_id'], $proj_id);
+                    $input['field_project'][0]['target_id'] = $autocomplete_val;
+                  }
+                }
+              }
+              
+              // Auto-populate Vendor reference if found
+              if (!empty($metadata['vendor_name'])) {
+                $vendor_name = $metadata['vendor_name'];
+                $v_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+                  ->accessCheck(FALSE)
+                  ->condition('type', 'vendor')
+                  ->condition('title', $vendor_name);
+                $v_ids = $v_query->execute();
+                
+                if (!empty($v_ids)) {
+                  $v_id = reset($v_ids);
+                  $v_node = \Drupal::entityTypeManager()->getStorage('node')->load($v_id);
+                  if ($v_node) {
+                    $autocomplete_val = $v_node->label() . ' (' . $v_id . ')';
+                    $form_state->setValue(['field_vendor', 0, 'target_id'], $v_id);
+                    $input['field_vendor'][0]['target_id'] = $autocomplete_val;
+                  }
+                }
+              }
+            }
+            catch (\Exception $e) {
+              \Drupal::logger('ra_bill_manager')->error('Form alter parsing failed: @msg', ['@msg' => $e->getMessage()]);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function ra_bill_manager_views_data_alter(array &$data) {
+  $data['views']['expression'] = [
+    'title' => t('Math expression'),
+    'help' => t('Evaluates a math expression using views tokens.'),
+    'field' => [
+      'id' => 'math',
+    ],
+  ];
+}
+
+/**
+ * Implements hook_theme().
+ */
+function ra_bill_manager_theme($existing, $type, $theme, $path) {
+  return [
+    'ra_bill_excel_view' => [
+      'variables' => [
+        'metadata' => [],
+        'items' => [],
+        'export_url' => '',
+        'create_invoice_url' => '',
+        'update_url' => '',
+        'ra_bill_nid' => '',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for node entities.
+ */
+function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
+  if ($node->bundle() === 'ra_bill' && $view_mode === 'full') {
+    // Hide standard elements to avoid double display
+    $build['field_ra_bill_items']['#access'] = FALSE;
+    $build['field_excel_file']['#access'] = FALSE;
+    $build['field_basic_amount']['#access'] = FALSE;
+    $build['field_cgst']['#access'] = FALSE;
+    $build['field_sgst']['#access'] = FALSE;
+    $build['field_total_amount']['#access'] = FALSE;
+    $build['field_validation_status']['#access'] = FALSE;
+    $build['field_project']['#access'] = FALSE;
+    $build['field_vendor']['#access'] = FALSE;
+    $build['field_purchase_order']['#access'] = FALSE;
+    $build['field_bill_date']['#access'] = FALSE;
+    $build['field_bill_number']['#access'] = FALSE;
+    $build['field_ra_bill_number']['#access'] = FALSE;
+
+    // Build metadata
+    $project_node = !$node->get('field_project')->isEmpty() ? $node->get('field_project')->entity : NULL;
+    $vendor_node = !$node->get('field_vendor')->isEmpty() ? $node->get('field_vendor')->entity : NULL;
+    $po_node = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->entity : NULL;
+
+    // Extract additional metadata for the Abstract header
+    $client_name = '';
+    if ($project_node && $project_node->hasField('field_client') && !$project_node->get('field_client')->isEmpty()) {
+      $client_name = $project_node->get('field_client')->value;
+    }
+    if (empty($client_name)) {
+      $client_name = 'Aquatech Systems (Asia) Pvt. Ltd.';
+    }
+
+    $po_number = '';
+    if ($po_node && $po_node->hasField('field_po_number') && !$po_node->get('field_po_number')->isEmpty()) {
+      $po_number = $po_node->get('field_po_number')->value;
+    }
+
+    $po_date = '';
+    if ($po_node && $po_node->hasField('field_start_date') && !$po_node->get('field_start_date')->isEmpty()) {
+      $po_date = date('d F, Y', strtotime($po_node->get('field_start_date')->value));
+    }
+    elseif ($po_node && $po_node->hasField('field_po_date') && !$po_node->get('field_po_date')->isEmpty()) {
+      $po_date = date('d F, Y', strtotime($po_node->get('field_po_date')->value));
+    }
+
+    $ra_no = $node->get('field_ra_bill_number')->value ?? '';
+    $bill_date_val = $node->get('field_bill_date')->value;
+
+    // Calculate Financial Year
+    $fy = '';
+    if ($bill_date_val) {
+      $time = strtotime($bill_date_val);
+      $year = intval(date('Y', $time));
+      $month = intval(date('n', $time));
+      if ($month >= 4) {
+        $fy = $year . '-' . substr(strval($year + 1), 2);
+      } else {
+        $fy = ($year - 1) . '-' . substr(strval($year), 2);
+      }
+    }
+    $ra_num_str = $ra_no ? sprintf('%02d', intval($ra_no)) : '';
+    $temp_invoice_no = !empty($fy) && !empty($ra_num_str) ? 'GJ/' . $fy . '/' . $ra_num_str : '';
+
+    $metadata = [
+      'vendor_name' => $vendor_node ? $vendor_node->label() : 'SANTHOSH FABRICATORS PVT. LTD.',
+      'client_name' => $client_name,
+      'po_number' => $po_number,
+      'po_date' => $po_date,
+      'project' => $project_node ? $project_node->label() : '',
+      'po_label' => $po_node ? $po_node->label() : '',
+      'po_id' => $po_node ? $po_node->id() : '',
+      'ra_bill_number' => $ra_no,
+      'bill_number' => $node->get('field_bill_number')->value ?? '',
+      'bill_date' => $bill_date_val ? date('d.m.Y', strtotime($bill_date_val)) : '',
+      'bill_date_long' => $bill_date_val ? date('d F, Y', strtotime($bill_date_val)) : '',
+      'invoice_no' => $temp_invoice_no,
+      'basic_amount' => floatval($node->get('field_basic_amount')->value ?? 0.0),
+      'cgst' => floatval($node->get('field_cgst')->value ?? 0.0),
+      'sgst' => floatval($node->get('field_sgst')->value ?? 0.0),
+      'total_amount' => floatval($node->get('field_total_amount')->value ?? 0.0),
+      'validation_status' => $node->get('field_validation_status')->value === 'verified' ? 'Verified' : 'Need Review',
+      'workflow_status' => ucfirst(str_replace('_', ' ', $node->get('moderation_state')->value ?? 'draft')),
+    ];
+
+    // Build items with computed amount columns
+    $items = [];
+    $total_po_amount = 0.0;
+    $total_prev_amount = 0.0;
+    $total_this_bill_amount = 0.0;
+    $total_upto_date_amount = 0.0;
+
+    if ($node->hasField('field_ra_bill_items') && !$node->get('field_ra_bill_items')->isEmpty()) {
+      $paragraphs = $node->get('field_ra_bill_items')->referencedEntities();
+      foreach ($paragraphs as $item) {
+        if ($item->bundle() !== 'ra_bill_item') {
+          continue;
+        }
+
+        $boq_item = !$item->get('field_boq_item')->isEmpty() ? $item->get('field_boq_item')->entity : NULL;
+        $approved_qty = $boq_item ? floatval($boq_item->get('field_approved_quantity')->value ?? 0.0) : 0.0;
+        $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
+        $uom = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
+
+        $prev_qty = floatval($item->get('field_previous_qty')->value ?? 0.0);
+        $current_qty = floatval($item->get('field_current_qty')->value ?? 0.0);
+        $cumulative_qty = floatval($item->get('field_cumulative_qty')->value ?? 0.0);
+
+        // Computed amount columns
+        $po_amount = $approved_qty * $unit_rate;
+        $prev_amount = $prev_qty * $unit_rate;
+        $current_amount = $current_qty * $unit_rate;
+        $cumulative_amount = $cumulative_qty * $unit_rate;
+
+        $total_po_amount += $po_amount;
+        $total_prev_amount += $prev_amount;
+        $total_this_bill_amount += $current_amount;
+        $total_upto_date_amount += $cumulative_amount;
+
+        $items[] = [
+          'paragraph_id' => $item->id(),
+          'item_code' => $item->get('field_item_code')->value ?? '',
+          'description' => $item->get('field_item_description')->value ?? '',
+          'uom' => $uom,
+          'rate' => $unit_rate,
+          'approved_qty' => $approved_qty,
+          'po_amount' => $po_amount,
+          'prev_qty' => $prev_qty,
+          'current_qty' => $current_qty,
+          'cumulative_qty' => $cumulative_qty,
+          'prev_amount' => $prev_amount,
+          'current_amount' => $current_amount,
+          'cumulative_amount' => $cumulative_amount,
+        ];
+      }
+    }
+
+    // Add totals to metadata
+    $metadata['total_po_amount'] = $total_po_amount;
+    $metadata['total_prev_amount'] = $total_prev_amount;
+    $metadata['total_this_bill_amount'] = $total_this_bill_amount;
+    $metadata['total_upto_date_amount'] = $total_upto_date_amount;
+
+    $build['ra_bill_excel_view'] = [
+      '#theme' => 'ra_bill_excel_view',
+      '#metadata' => $metadata,
+      '#items' => $items,
+      '#export_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.export_excel_single', ['node' => $node->id()])->toString(),
+      '#create_invoice_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.create_invoice', ['node' => $node->id()])->toString(),
+      '#update_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.update_quantities', ['node' => $node->id()])->toString(),
+      '#ra_bill_nid' => $node->id(),
+      '#weight' => -10,
+    ];
+  }
+}
+

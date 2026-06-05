@@ -1,0 +1,20 @@
+uuid: 65257818-32bb-4707-bc7f-2707d9848b98
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_unit_rate
+field_name: field_unit_rate
+entity_type: node
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,10 @@
+uuid: 92b6903e-ee91-4288-bab9-2cec6db61255
+langcode: en
+status: true
+dependencies: {  }
+id: ra_bill_item
+label: 'RA Bill Item'
+icon_uuid: null
+icon_default: null
+description: ''
+behavior_plugins: {  }

@@ -1,0 +1,19 @@
+uuid: e684f6dd-7a83-4f3d-949c-9d58e1d98cd7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_po_number
+    - node.type.ra_bill
+id: node.ra_bill.field_po_number
+field_name: field_po_number
+entity_type: node
+bundle: ra_bill
+label: 'PO Number'
+description: ''
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

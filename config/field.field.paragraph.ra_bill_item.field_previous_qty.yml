@@ -1,0 +1,23 @@
+uuid: 3d8bab7b-ff9f-4bb4-9d15-12cb0a0001ab
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_previous_qty
+    - paragraphs.paragraphs_type.ra_bill_item
+id: paragraph.ra_bill_item.field_previous_qty
+field_name: field_previous_qty
+entity_type: paragraph
+bundle: ra_bill_item
+label: 'Previous Qty'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

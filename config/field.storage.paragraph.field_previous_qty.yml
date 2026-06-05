@@ -1,0 +1,20 @@
+uuid: 3cf7fd7b-6f74-4df5-9ca7-9ca6d2283ab8
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_previous_qty
+field_name: field_previous_qty
+entity_type: paragraph
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

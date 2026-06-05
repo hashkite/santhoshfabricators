@@ -1,0 +1,14 @@
+name: 'RA Bill Manager'
+type: module
+description: 'Handles RA Bill Management with Excel imports, BOQ quantity validations, and dashboards.'
+package: Custom
+core_version_requirement: ^10
+dependencies:
+  - drupal:node
+  - drupal:views
+  - drupal:file
+  - drupal:datetime
+  - paragraphs:paragraphs
+  - entity_reference_revisions:entity_reference_revisions
+  - workflows:workflows
+  - content_moderation:content_moderation

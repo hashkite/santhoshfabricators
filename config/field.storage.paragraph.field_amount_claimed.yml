@@ -1,0 +1,20 @@
+uuid: 09e775c6-bc1b-4c3d-b84d-d2d3b66099a1
+langcode: en
+status: true
+dependencies:
+  module:
+    - paragraphs
+id: paragraph.field_amount_claimed
+field_name: field_amount_claimed
+entity_type: paragraph
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

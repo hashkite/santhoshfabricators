@@ -1,0 +1,270 @@
+uuid: 48c2fe81-5ca6-42eb-8542-953a80a78012
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_basic_amount
+    - field.storage.node.field_bill_date
+    - field.storage.node.field_bill_number
+    - field.storage.node.field_cgst
+    - field.storage.node.field_excel_file
+    - field.storage.node.field_project
+    - field.storage.node.field_purchase_order
+    - field.storage.node.field_ra_bill_number
+    - field.storage.node.field_sgst
+    - field.storage.node.field_total_amount
+    - field.storage.node.field_validation_status
+    - field.storage.node.field_vendor
+    - node.type.ra_bill
+  module:
+    - datetime
+    - node
+    - user
+    - views
+id: ra_bills
+label: 'RA Bills'
+module: views
+description: 'RA Bills listing and PO integration views.'
+tag: ''
+base_table: node_field_data
+base_field: nid
+display:
+  default:
+    id: default
+    display_title: Default
+    display_plugin: default
+    position: 0
+    display_options:
+      title: 'RA Bills Summary'
+      fields:
+        nid:
+          id: nid
+          table: node_field_data
+          field: nid
+          plugin_id: field
+          label: nid
+          exclude: true
+        field_ra_bill_number:
+          id: field_ra_bill_number
+          table: node__field_ra_bill_number
+          field: field_ra_bill_number
+          plugin_id: field
+          label: 'RA Bill No.'
+        field_bill_number:
+          id: field_bill_number
+          table: node__field_bill_number
+          field: field_bill_number
+          plugin_id: field
+          label: 'Bill Number'
+          alter:
+            make_link: true
+            path: 'node/{{ nid }}'
+        field_vendor:
+          id: field_vendor
+          table: node__field_vendor
+          field: field_vendor
+          plugin_id: field
+          label: Vendor
+          type: entity_reference_label
+          settings:
+            link: true
+        field_project:
+          id: field_project
+          table: node__field_project
+          field: field_project
+          plugin_id: field
+          label: Project
+          type: entity_reference_label
+          settings:
+            link: true
+        field_bill_date:
+          id: field_bill_date
+          table: node__field_bill_date
+          field: field_bill_date
+          plugin_id: field
+          label: Date
+          type: datetime_default
+          settings:
+            format_type: html_date
+        field_basic_amount:
+          id: field_basic_amount
+          table: node__field_basic_amount
+          field: field_basic_amount
+          plugin_id: field
+          label: 'Basic Amount'
+        field_cgst:
+          id: field_cgst
+          table: node__field_cgst
+          field: field_cgst
+          plugin_id: field
+          label: CGST
+        field_sgst:
+          id: field_sgst
+          table: node__field_sgst
+          field: field_sgst
+          plugin_id: field
+          label: SGST
+        field_total_amount:
+          id: field_total_amount
+          table: node__field_total_amount
+          field: field_total_amount
+          plugin_id: field
+          label: 'Total Amount'
+        field_validation_status:
+          id: field_validation_status
+          table: node__field_validation_status
+          field: field_validation_status
+          plugin_id: field
+          label: 'Validation Status'
+          alter:
+            alter_text: true
+            text: '<span class="ra-badge {% if field_validation_status == "verified" or field_validation_status == "Verified" %}ra-badge-verified{% else %}ra-badge-review{% endif %}">{{ field_validation_status }}</span>'
+        moderation_state:
+          id: moderation_state
+          table: content_moderation_state_field_data
+          field: moderation_state
+          plugin_id: field
+          label: 'Workflow Status'
+        nothing:
+          id: nothing
+          table: views
+          field: nothing
+          plugin_id: custom
+          label: Actions
+          alter:
+            text: '<a href="/node/{{ nid }}" class="btn-detail btn-detail--outline btn-detail--small">View Excel Sheet</a> &nbsp; <a href="/admin/ra-bills/export/{{ nid }}" class="btn-detail btn-detail--primary btn-detail--small">Export to Excel</a>'
+      pager:
+        type: mini
+        options:
+          offset: 0
+          pagination_heading_level: h4
+          items_per_page: 25
+      exposed_form:
+        type: basic
+      access:
+        type: perm
+        options:
+          perm: 'access content'
+      cache:
+        type: tag
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          plugin_id: text_custom
+          empty: true
+          content: 'No RA Bills found.'
+      sorts:
+        created:
+          id: created
+          table: node_field_data
+          field: created
+          plugin_id: date
+          order: DESC
+      filters:
+        type:
+          id: type
+          table: node_field_data
+          field: type
+          entity_type: node
+          entity_field: type
+          plugin_id: bundle
+          value:
+            ra_bill: ra_bill
+      style:
+        type: table
+        options:
+          columns:
+            field_ra_bill_number: field_ra_bill_number
+            field_bill_number: field_bill_number
+            field_vendor: field_vendor
+            field_project: field_project
+            field_bill_date: field_bill_date
+            field_basic_amount: field_basic_amount
+            field_cgst: field_cgst
+            field_sgst: field_sgst
+            field_total_amount: field_total_amount
+            field_validation_status: field_validation_status
+            moderation_state: moderation_state
+            nid: nid
+            nothing: nothing
+          default: field_ra_bill_number
+          info:
+            field_ra_bill_number:
+              sortable: true
+            field_bill_number:
+              sortable: true
+            field_bill_date:
+              sortable: true
+            field_total_amount:
+              sortable: true
+      row:
+        type: fields
+      query:
+        type: views_query
+  block_po_bills:
+    id: block_po_bills
+    display_title: 'PO RA Bills Block'
+    display_plugin: block
+    position: 2
+    display_options:
+      title: 'Associated RA Bills'
+      empty:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          plugin_id: text_custom
+          empty: true
+          content: 'No RA Bills associated with this Purchase Order. <br><br> <a href="/node/add/ra_bill?po={{ raw_arguments.field_purchase_order_target_id }}" class="btn-detail btn-detail--primary btn-detail--small">+ Add RA Bill</a>'
+          tokenize: true
+      arguments:
+        field_purchase_order_target_id:
+          id: field_purchase_order_target_id
+          table: node__field_purchase_order
+          field: field_purchase_order_target_id
+          plugin_id: numeric
+          default_action: default
+          default_argument_type: node
+          validate:
+            type: 'entity:node'
+            validate_options:
+              bundles:
+                purchase_order: purchase_order
+          break_phrase: false
+          not: false
+      defaults:
+        empty: false
+        title: false
+        arguments: false
+      header:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          plugin_id: text_custom
+          content: '<div class="action-buttons"><a href="/node/add/ra_bill?po={{ raw_arguments.field_purchase_order_target_id }}" class="btn-detail btn-detail--primary btn-detail--small">+ Add RA Bill</a></div>'
+          tokenize: true
+      block_description: 'PO RA Bills'
+  page_summary:
+    id: page_summary
+    display_title: 'RA Bill Summary Page'
+    display_plugin: page
+    position: 1
+    display_options:
+      defaults:
+        header: false
+      header:
+        area_text_custom:
+          id: area_text_custom
+          table: views
+          field: area_text_custom
+          plugin_id: text_custom
+          content: '<div class="action-buttons"><a href="/admin/ra-bills/export" class="button button--primary">Export All to Excel</a></div>'
+      path: admin/ra-bills/summary
+      menu:
+        type: normal
+        title: 'RA Bills'
+        description: 'View running account bills summary'
+        parent: system.admin_structure

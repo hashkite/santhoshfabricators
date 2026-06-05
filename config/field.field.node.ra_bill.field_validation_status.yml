@@ -1,0 +1,21 @@
+uuid: 8e5df4a2-01b5-4f45-9b48-be024e2e3df6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_validation_status
+    - node.type.ra_bill
+  module:
+    - options
+id: node.ra_bill.field_validation_status
+field_name: field_validation_status
+entity_type: node
+bundle: ra_bill
+label: 'Validation Status'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

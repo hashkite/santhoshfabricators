@@ -1,0 +1,716 @@
+<style>
+	.ra-excel-container {
+		font-family: 'Calibri', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		margin: 20px 0;
+		color: #1e293b;
+	}
+
+	/* Action Buttons */
+	.ra-header-actions {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 10px;
+		position: sticky;
+		top: var(--drupal-displace-offset-top, 0px);
+		z-index: 110;
+		background-color: #f8fafc;
+		padding: 10px 0;
+		margin-bottom: 0;
+		border-bottom: 1px solid #cbd5e1;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+	}
+	.ra-btn-export {
+		display: inline-flex;
+		align-items: center;
+		background-color: #10b981;
+		color: white !important;
+		padding: 10px 18px;
+		border-radius: 6px;
+		font-weight: 600;
+		text-decoration: none;
+		transition: background-color 0.2s ease;
+		box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+		font-size: 13px;
+	}
+	.ra-btn-export:hover {
+		background-color: #059669;
+		color: white !important;
+	}
+	.ra-btn-invoice {
+		display: inline-flex;
+		align-items: center;
+		background-color: #3b82f6;
+		color: white !important;
+		padding: 10px 18px;
+		border-radius: 6px;
+		font-weight: 600;
+		text-decoration: none;
+		transition: background-color 0.2s ease;
+		box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+		font-size: 13px;
+	}
+	.ra-btn-invoice:hover {
+		background-color: #2563eb;
+		color: white !important;
+	}
+	.ra-btn-save {
+		display: inline-flex;
+		align-items: center;
+		background-color: #f59e0b;
+		color: white !important;
+		padding: 10px 18px;
+		border-radius: 6px;
+		font-weight: 600;
+		text-decoration: none;
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
+		font-size: 13px;
+	}
+	.ra-btn-save:hover {
+		background-color: #d97706;
+		color: white !important;
+	}
+	.ra-btn-save:disabled {
+		background-color: #9ca3af;
+		cursor: not-allowed;
+		box-shadow: none;
+	}
+	.ra-btn-save.saving {
+		animation: pulse 1s infinite;
+	}
+	@keyframes pulse {
+		0,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.6;
+		}
+	}
+
+	/* ── ABSTRACT SHEET WRAPPER ── */
+	.ra-abstract-sheet {
+		border: 2px solid #1a1a2e;
+		border-radius: 4px;
+		overflow: hidden;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+		background: #fff;
+	}
+
+	/* ── VENDOR NAME BANNER ── */
+	.ra-vendor-banner {
+		background: #fff;
+		text-align: center;
+		padding: 10px 16px 6px;
+		border-bottom: 1px solid #1a1a2e;
+		font-size: 16px;
+		font-weight: 800;
+		color: #1a1a2e;
+		letter-spacing: 1px;
+		text-transform: uppercase;
+	}
+
+	/* ── HEADER INFO ROWS ── */
+	.ra-info-row {
+		display: flex;
+		border-bottom: 1px solid #1a1a2e;
+		font-size: 12px;
+		font-weight: 600;
+		color: #1e293b;
+		background: #fff;
+	}
+	.ra-info-cell {
+		padding: 5px 10px;
+		border-right: 1px solid #1a1a2e;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+	}
+	.ra-info-cell:last-child {
+		border-right: none;
+	}
+	.ra-info-label {
+		color: #4a5568;
+		white-space: nowrap;
+		font-weight: 700;
+		text-transform: uppercase;
+		font-size: 10px;
+	}
+	.ra-info-value {
+		color: #111;
+		font-weight: 600;
+		font-size: 12px;
+	}
+	.ra-info-cell--grow {
+		flex: 1;
+	}
+
+	/* ── ABSTRACT LABEL ── */
+	.ra-abstract-label {
+		text-align: center;
+		padding: 4px;
+		font-weight: 800;
+		font-size: 12px;
+		color: #1a1a2e;
+		border-bottom: 1px solid #1a1a2e;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		background: #f8f9fa;
+	}
+
+	/* ── DATA TABLE ── */
+	.ra-sheet-wrapper {
+		overflow-x: auto !important;
+		width: 100% !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table {
+		display: table !important;
+		width: 100% !important;
+		border-collapse: collapse !important;
+		background-color: white !important;
+		font-size: 11px !important;
+		table-layout: auto !important;
+		float: none !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table thead {
+		display: table-header-group !important;
+		float: none !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table tbody {
+		display: table-row-group !important;
+		float: none !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table tfoot {
+		display: table-footer-group !important;
+		float: none !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table tr {
+		display: table-row !important;
+		float: none !important;
+		width: auto !important;
+		height: auto !important;
+		background-color: transparent !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table th {
+		display: table-cell !important;
+		width: auto !important;
+		max-width: none !important;
+		min-width: none !important;
+		float: none !important;
+		flex: none !important;
+		background-color: #1a1a2e !important;
+		color: white !important;
+		font-weight: 700 !important;
+		padding: 6px 8px !important;
+		text-align: center !important;
+		border: 1px solid #0d0d1a !important;
+		white-space: nowrap !important;
+		vertical-align: middle !important;
+		font-size: 10px !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.3px !important;
+	}
+
+	.ra-sheet-wrapper table.ra-sheet-table td {
+		display: table-cell !important;
+		width: auto !important;
+		max-width: none !important;
+		min-width: none !important;
+		float: none !important;
+		flex: none !important;
+		padding: 5px 8px !important;
+		border: 1px solid #cbd5e1 !important;
+		vertical-align: middle !important;
+		background-color: transparent !important;
+		white-space: normal !important;
+		font-size: 11px !important;
+	}
+	.ra-sheet-table tr:nth-child(even) td {
+		background-color: #fafbfc !important;
+	}
+	.ra-sheet-table tr:hover td {
+		background-color: #f1f5f9 !important;
+	}
+
+	/* Disable any responsive pseudo-element labels */
+	.ra-sheet-table td::before,
+	.ra-sheet-table td::after,
+	.ra-sheet-table th::before,
+	.ra-sheet-table th::after {
+		display: none !important;
+		content: "" !important;
+	}
+
+	/* Header spanning groups */
+	.ra-sheet-table th.group-header {
+		background-color: #1a1a2e !important;
+		font-size: 11px !important;
+		letter-spacing: 0.5px !important;
+	}
+
+	/* Alignments */
+	.align-right {
+		text-align: right !important;
+	}
+	.align-center {
+		text-align: center !important;
+	}
+	.align-left {
+		text-align: left !important;
+	}
+	.text-bold {
+		font-weight: 700 !important;
+	}
+
+	/* Yellow highlight for "IN THIS BILL" column */
+	.highlight-cell {
+		background-color: #ffff00 !important;
+		font-weight: 700 !important;
+		color: #111 !important;
+	}
+	.ra-sheet-table tr:hover .highlight-cell {
+		background-color: #fff176 !important;
+	}
+
+	/* Totals row */
+	.ra-totals-row {
+		display: table-row !important;
+		background-color: #f1f5f9 !important;
+		font-weight: 700 !important;
+		border-top: 2px solid #1a1a2e !important;
+	}
+	.ra-totals-row td {
+		font-weight: 700 !important;
+		background-color: #f1f5f9 !important;
+		border-top: 2px solid #1a1a2e !important;
+		font-size: 11px !important;
+	}
+
+	/* Description cell width */
+	td.desc-cell {
+		max-width: 280px !important;
+		min-width: 180px !important;
+		font-size: 10.5px !important;
+		line-height: 1.3 !important;
+	}
+
+	/* ── Editable Input Styles ── */
+	.ra-qty-input {
+		width: 60px !important;
+		padding: 3px 4px !important;
+		border: 2px solid #e5a100 !important;
+		border-radius: 3px !important;
+		background: #fffde7 !important;
+		font-size: 11px !important;
+		font-weight: 700 !important;
+		text-align: center !important;
+		color: #111 !important;
+		transition: border-color 0.2s, box-shadow 0.2s !important;
+		-moz-appearance: textfield !important;
+	}
+	.ra-qty-input::-webkit-outer-spin-button,
+	.ra-qty-input::-webkit-inner-spin-button {
+		-webkit-appearance: none !important;
+		margin: 0 !important;
+	}
+	.ra-qty-input:focus {
+		outline: none !important;
+		border-color: #f59e0b !important;
+		box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
+		background: #fff !important;
+	}
+	.ra-qty-input.dirty {
+		border-color: #f59e0b !important;
+		background: #fff8e1 !important;
+	}
+	.ra-qty-input.saved {
+		border-color: #10b981 !important;
+		background: #ecfdf5 !important;
+	}
+
+	/* Status toast */
+	.ra-toast {
+		position: fixed;
+		top: 80px;
+		right: 20px;
+		z-index: 9999;
+		padding: 12px 20px;
+		border-radius: 8px;
+		font-size: 13px;
+		font-weight: 600;
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+		transition: opacity 0.3s, transform 0.3s;
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	.ra-toast.show {
+		opacity: 1;
+		transform: translateY(0);
+	}
+	.ra-toast.success {
+		background: #ecfdf5;
+		color: #065f46;
+		border: 1px solid #6ee7b7;
+	}
+	.ra-toast.error {
+		background: #fef2f2;
+		color: #991b1b;
+		border: 1px solid #fca5a5;
+	}
+</style>
+
+<div
+	class="ra-excel-container" id="ra-excel-container" data-update-url="{{ update_url }}" data-nid="{{ ra_bill_nid }}">
+
+	{# ── ACTION BUTTONS ── #}
+	<div class="ra-header-actions">
+		<button type="button" class="ra-btn-save" id="ra-save-btn" disabled onclick="raSaveChanges()">
+			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+				<polyline points="17 21 17 13 7 13 7 21"></polyline>
+				<polyline points="7 3 7 8 15 8"></polyline>
+			</svg>
+			Save Changes
+		</button>
+		{% if create_invoice_url %}
+			<a href="{{ create_invoice_url }}" class="ra-btn-invoice" onclick="return confirm('Are you sure you want to create a draft invoice from this RA Bill? This will generate invoice line items from all current bill items.');">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+					<polyline points="14 2 14 8 20 8"></polyline>
+					<line x1="16" y1="13" x2="8" y2="13"></line>
+					<line x1="16" y1="17" x2="8" y2="17"></line>
+				</svg>
+				Create Invoice
+			</a>
+		{% endif %}
+		<a href="{{ export_url }}" class="ra-btn-export">
+			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+				<polyline points="7 10 12 15 17 10"></polyline>
+				<line x1="12" y1="15" x2="12" y2="3"></line>
+			</svg>
+			Export to Excel
+		</a>
+	</div>
+
+	{# ── ABSTRACT SHEET ── #}
+	<div
+		class="ra-abstract-sheet">
+
+		{# Vendor Name Banner #}
+		<div class="ra-vendor-banner">{{ metadata.vendor_name }}</div>
+
+		{# Info Row 1: CLIENT | PO NO | PO DATE | INVOICE NO #}
+		<div class="ra-info-row">
+			<div class="ra-info-cell ra-info-cell--grow">
+				<span class="ra-info-label">CLIENT:</span>
+				<span class="ra-info-value">{{ metadata.client_name }}</span>
+			</div>
+			<div class="ra-info-cell">
+				<span class="ra-info-label">PO.NO.</span>
+				<span class="ra-info-value">{{ metadata.po_number }}</span>
+			</div>
+			<div class="ra-info-cell">
+				<span class="ra-info-label">P.O DATE:</span>
+				<span class="ra-info-value">{{ metadata.po_date }}</span>
+			</div>
+			<div class="ra-info-cell">
+				<span class="ra-info-label">INVOICE NO:</span>
+				<span class="ra-info-value">{{ metadata.invoice_no }}</span>
+			</div>
+		</div>
+
+		{# Info Row 2: PROJECT | R.A. No | INVOICE DATE #}
+		<div class="ra-info-row">
+			<div class="ra-info-cell ra-info-cell--grow">
+				<span class="ra-info-label">Project :</span>
+				<span class="ra-info-value">
+					{% if metadata.po_id %}
+						<a href="/node/{{ metadata.po_id }}" style="color: #2563eb; text-decoration: underline;">{{ metadata.project }}</a>
+					{% else %}
+						{{ metadata.project }}
+					{% endif %}
+				</span>
+			</div>
+			<div class="ra-info-cell">
+				<span class="ra-info-label">R.A. No.</span>
+				<span class="ra-info-value">{{ '%02d'|format(metadata.ra_bill_number) }}</span>
+			</div>
+			<div class="ra-info-cell">
+				<span class="ra-info-label">INVOICE Date :</span>
+				<span class="ra-info-value">{{ metadata.bill_date }}</span>
+			</div>
+		</div>
+
+		{# ABSTRACT Label #}
+		<div class="ra-abstract-label">ABSTRAC</div>
+
+		{# ── DATA TABLE ── #}
+		<div class="ra-sheet-wrapper">
+			<table class="ra-sheet-table" id="ra-abstract-table">
+				<thead>
+					{# Header Row 1 - Group headers #}
+					<tr>
+						<th rowspan="2">SL.NO.</th>
+						<th rowspan="2" style="min-width: 180px;">DESCRIPTION</th>
+						<th rowspan="2">UOM</th>
+						<th rowspan="2">QTY</th>
+						<th rowspan="2">RATE</th>
+						<th rowspan="2">AMOUNT</th>
+						<th colspan="3" class="group-header">QUANTITY</th>
+						<th colspan="3" class="group-header">AMOUNT</th>
+					</tr>
+					{# Header Row 2 - Sub-headers #}
+					<tr>
+						<th>UPTO PREV</th>
+						<th style="background-color: #c6a700 !important;">IN THIS BILL</th>
+						<th>UPTO DATE</th>
+						<th>UPTO PREV</th>
+						<th style="background-color: #c6a700 !important;">THIS BILL</th>
+						<th>UPTO DATE</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for item in items %}
+						<tr data-paragraph-id="{{ item.paragraph_id }}" data-rate="{{ item.rate }}">
+							<td class="align-center text-bold">{{ loop.index }}</td>
+							<td class="align-left desc-cell">{{ item.description }}</td>
+							<td class="align-center">{{ item.uom }}</td>
+							<td class="align-right">{{ item.approved_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-right">{{ item.rate|number_format(2, '.', ',') }}</td>
+							<td class="align-right">{{ item.po_amount|number_format(0, '.', ',') }}</td>
+							<td class="align-right" data-col="prev_qty">{{ item.prev_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-center highlight-cell" data-col="current_qty">
+								<input type="number" class="ra-qty-input" value="{{ item.current_qty|number_format(0) }}" data-original="{{ item.current_qty|number_format(0) }}" data-paragraph-id="{{ item.paragraph_id }}" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)"/>
+							</td>
+							<td class="align-right" data-col="cumulative_qty">{{ item.cumulative_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-right" data-col="prev_amount">{{ item.prev_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right highlight-cell" data-col="current_amount">{{ item.current_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right" data-col="cumulative_amount">{{ item.cumulative_amount|number_format(2, '.', ',') }}</td>
+						</tr>
+					{% else %}
+						<tr>
+							<td colspan="12" class="align-center" style="padding: 20px; color: #64748b;">No line items found.</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+				{% if items %}
+					<tfoot>
+						<tr class="ra-totals-row">
+							<td colspan="5" class="align-right text-bold">Total</td>
+							<td class="align-right text-bold" data-total="po_amount">{{ metadata.total_po_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right"></td>
+							<td class="align-center highlight-cell"></td>
+							<td class="align-right"></td>
+							<td class="align-right text-bold" data-total="prev_amount">{{ metadata.total_prev_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right highlight-cell text-bold" data-total="this_bill_amount">{{ metadata.total_this_bill_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right text-bold" data-total="upto_date_amount">{{ metadata.total_upto_date_amount|number_format(2, '.', ',') }}</td>
+						</tr>
+					</tfoot>
+				{% endif %}
+			</table>
+		</div>
+	</div>
+
+	{# ── Toast notification ── #}
+	<div class="ra-toast" id="ra-toast"></div>
+</div>
+
+<script>
+	(function () {
+'use strict';
+
+var dirtyFields = {};
+
+/**
+   * Mark a field as dirty when its value changes from original.
+   */
+window.raMarkDirty = function (input) {
+var pid = input.getAttribute('data-paragraph-id');
+var original = parseFloat(input.getAttribute('data-original')) || 0;
+var current = parseFloat(input.value) || 0;
+var row = input.closest('tr');
+var rate = parseFloat(row.getAttribute('data-rate')) || 0;
+
+if (current !== original) {
+input.classList.add('dirty');
+input.classList.remove('saved');
+dirtyFields[pid] = current;
+} else {
+input.classList.remove('dirty');
+delete dirtyFields[pid];
+}
+
+// Live preview: update cumulative_qty, current_amount, cumulative_amount in-row
+var prevQty = parseFloat((row.querySelector('[data-col="prev_qty"]').textContent || '0').replace(/,/g, ''));
+var cumQty = prevQty + current;
+var curAmt = current * rate;
+var cumAmt = cumQty * rate;
+var prevAmt = prevQty * rate;
+
+row.querySelector('[data-col="cumulative_qty"]').textContent = formatNumber(cumQty, 0);
+row.querySelector('[data-col="current_amount"]').textContent = formatNumber(curAmt, 2);
+row.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(cumAmt, 2);
+
+// Recalculate footer totals
+recalcTotals();
+
+// Toggle save button
+var saveBtn = document.getElementById('ra-save-btn');
+if (Object.keys(dirtyFields).length > 0) {
+saveBtn.disabled = false;
+} else {
+saveBtn.disabled = true;
+}
+};
+
+/**
+   * Recalculate footer totals from all rows.
+   */
+function recalcTotals() {
+var table = document.getElementById('ra-abstract-table');
+if (! table) 
+return;
+
+
+
+var rows = table.querySelectorAll('tbody tr[data-paragraph-id]');
+var totalPrev = 0,
+totalThis = 0,
+totalUpto = 0;
+
+rows.forEach(function (row) {
+totalPrev += parseCellNum(row.querySelector('[data-col="prev_amount"]'));
+totalThis += parseCellNum(row.querySelector('[data-col="current_amount"]'));
+totalUpto += parseCellNum(row.querySelector('[data-col="cumulative_amount"]'));
+});
+
+setTotalCell('prev_amount', totalPrev);
+setTotalCell('this_bill_amount', totalThis);
+setTotalCell('upto_date_amount', totalUpto);
+}
+
+function parseCellNum(cell) {
+if (! cell) 
+return 0;
+
+
+
+return parseFloat(cell.textContent.replace(/,/g, '')) || 0;
+}
+
+function setTotalCell(name, val) {
+var cell = document.querySelector('[data-total="' + name + '"]');
+if (cell) 
+cell.textContent = formatNumber(val, 2);
+
+
+
+}
+
+function formatNumber(num, decimals) {
+return num.toLocaleString('en-IN', {
+minimumFractionDigits: decimals,
+maximumFractionDigits: decimals
+});
+}
+
+/**
+   * Save all dirty fields via AJAX.
+   */
+window.raSaveChanges = function () {
+var keys = Object.keys(dirtyFields);
+if (keys.length === 0) 
+return;
+
+
+
+var container = document.getElementById('ra-excel-container');
+var updateUrl = container.getAttribute('data-update-url');
+var saveBtn = document.getElementById('ra-save-btn');
+
+saveBtn.disabled = true;
+saveBtn.classList.add('saving');
+saveBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;animation:spin 1s linear infinite"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> Saving...';
+
+var updates = keys.map(function (pid) {
+return {paragraph_id: parseInt(pid), current_qty: dirtyFields[pid]};
+});
+
+fetch(updateUrl, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'X-Requested-With': 'XMLHttpRequest'
+},
+body: JSON.stringify(
+{updates: updates}
+)
+}).then(function (response) {
+return response.json();
+}).then(function (data) {
+if (data.success) { // Update each row with server-confirmed data
+(data.rows || []).forEach(function (row) {
+var tr = document.querySelector('tr[data-paragraph-id="' + row.paragraph_id + '"]');
+if (! tr) 
+return;
+
+
+
+tr.querySelector('[data-col="prev_qty"]').textContent = formatNumber(row.prev_qty, 0);
+tr.querySelector('[data-col="cumulative_qty"]').textContent = formatNumber(row.cumulative_qty, 0);
+tr.querySelector('[data-col="prev_amount"]').textContent = formatNumber(row.prev_amount, 2);
+tr.querySelector('[data-col="current_amount"]').textContent = formatNumber(row.current_amount, 2);
+tr.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(row.cumulative_amount, 2);
+
+// Update input original value and mark as saved
+var input = tr.querySelector('.ra-qty-input');
+if (input) {
+input.setAttribute('data-original', row.current_qty);
+input.classList.remove('dirty');
+input.classList.add('saved');
+setTimeout(function () {
+input.classList.remove('saved');
+}, 2000);
+}
+});
+
+// Update totals
+if (data.totals) {
+setTotalCell('prev_amount', data.totals.total_prev_amount);
+setTotalCell('this_bill_amount', data.totals.total_this_bill_amount);
+setTotalCell('upto_date_amount', data.totals.total_upto_date_amount);
+setTotalCell('po_amount', data.totals.total_po_amount);
+}
+
+dirtyFields = {};
+showToast('Changes saved successfully!', 'success');
+} else {
+showToast('Error: ' + (
+data.error || 'Unknown error'
+), 'error');
+}
+}).catch(function (err) {
+showToast('Network error: ' + err.message, 'error');
+}). finally(function () {
+saveBtn.classList.remove('saving');
+saveBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg> Save Changes';
+saveBtn.disabled = Object.keys(dirtyFields).length === 0;
+});
+};
+
+function showToast(message, type) {
+var toast = document.getElementById('ra-toast');
+toast.textContent = message;
+toast.className = 'ra-toast ' + type + ' show';
+setTimeout(function () {
+toast.classList.remove('show');
+}, 3000);
+}
+})();
+</script>

@@ -1,0 +1,20 @@
+uuid: 1cd1adb8-c02c-4e19-a964-415d2731fce0
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_approved_quantity
+field_name: field_approved_quantity
+entity_type: node
+type: decimal
+settings:
+  precision: 10
+  scale: 2
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

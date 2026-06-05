@@ -1,0 +1,22 @@
+uuid: bccc18f2-8c7c-4ea4-8083-bfc930dd345b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_contact_details
+    - node.type.vendor
+  module:
+    - text
+id: node.vendor.field_contact_details
+field_name: field_contact_details
+entity_type: node
+bundle: vendor
+label: 'Contact Details'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  allowed_formats: {  }
+field_type: text_long

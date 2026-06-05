@@ -1,0 +1,21 @@
+uuid: 96590080-13a3-4771-a01a-d925d09e8a18
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_bill_date
+    - node.type.ra_bill
+  module:
+    - datetime
+id: node.ra_bill.field_bill_date
+field_name: field_bill_date
+entity_type: node
+bundle: ra_bill
+label: 'Bill Date'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: datetime

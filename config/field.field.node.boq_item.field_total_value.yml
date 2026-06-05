@@ -1,0 +1,23 @@
+uuid: 5d9ff719-649d-470b-99b5-320d995640df
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_total_value
+    - node.type.boq_item
+id: node.boq_item.field_total_value
+field_name: field_total_value
+entity_type: node
+bundle: boq_item
+label: 'Total Value'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

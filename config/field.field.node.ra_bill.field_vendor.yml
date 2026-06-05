@@ -1,0 +1,29 @@
+uuid: b42a4cec-e996-4ef8-aa52-33314ade91cc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_vendor
+    - node.type.ra_bill
+    - node.type.vendor
+id: node.ra_bill.field_vendor
+field_name: field_vendor
+entity_type: node
+bundle: ra_bill
+label: Vendor
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      vendor: vendor
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

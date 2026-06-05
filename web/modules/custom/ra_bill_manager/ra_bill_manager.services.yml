@@ -1,0 +1,16 @@
+services:
+  ra_bill_manager.excel_parser:
+    class: Drupal\ra_bill_manager\Parser\ExcelParser
+    arguments: ['@entity_type.manager', '@logger.factory']
+
+  ra_bill_manager.boq_validator:
+    class: Drupal\ra_bill_manager\Validation\BOQValidator
+    arguments: ['@entity_type.manager']
+
+  ra_bill_manager.paragraph_creator:
+    class: Drupal\ra_bill_manager\Paragraph\ParagraphManager
+    arguments: ['@entity_type.manager', '@ra_bill_manager.boq_validator']
+
+  ra_bill_manager.report_helper:
+    class: Drupal\ra_bill_manager\Report\ReportHelper
+    arguments: ['@database']

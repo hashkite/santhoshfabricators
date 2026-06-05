@@ -1,0 +1,29 @@
+uuid: 8163364f-fcfd-43a4-9a2c-ffd42f0de466
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_purchase_order
+    - node.type.ra_bill
+    - node.type.purchase_order
+id: node.ra_bill.field_purchase_order
+field_name: field_purchase_order
+entity_type: node
+bundle: ra_bill
+label: 'Purchase Order'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      purchase_order: purchase_order
+    sort:
+      field: _none
+      direction: ASC
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

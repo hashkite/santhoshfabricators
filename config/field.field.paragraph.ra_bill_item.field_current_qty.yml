@@ -1,0 +1,23 @@
+uuid: 40dd1248-4e31-42e5-bf23-3d73ccda275c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_current_qty
+    - paragraphs.paragraphs_type.ra_bill_item
+id: paragraph.ra_bill_item.field_current_qty
+field_name: field_current_qty
+entity_type: paragraph
+bundle: ra_bill_item
+label: 'Current Qty'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: null
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: decimal

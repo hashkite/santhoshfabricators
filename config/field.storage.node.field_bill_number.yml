@@ -1,0 +1,21 @@
+uuid: 18e469af-70e6-41ae-93fe-7dfca2233a7d
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_bill_number
+field_name: field_bill_number
+entity_type: node
+type: string
+settings:
+  max_length: 255
+  case_sensitive: false
+  is_ascii: false
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

@@ -1,0 +1,21 @@
+uuid: 4a2ec807-91bf-4367-a6dd-03b436c60cbe
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_unit
+    - node.type.boq_item
+  module:
+    - options
+id: node.boq_item.field_unit
+field_name: field_unit
+entity_type: node
+bundle: boq_item
+label: Unit
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

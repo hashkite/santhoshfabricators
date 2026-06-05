@@ -1,0 +1,27 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+    - ra_bill_manager
+  theme:
+    - power_alpha
+id: power_alpha_ra_excel_import
+theme: power_alpha
+region: content
+weight: 9
+provider: null
+plugin: ra_bill_manager_excel_import_block
+settings:
+  id: ra_bill_manager_excel_import_block
+  label: 'Import Excel'
+  label_display: 'visible'
+  provider: ra_bill_manager
+visibility:
+  'entity_bundle:node':
+    id: 'entity_bundle:node'
+    negate: false
+    context_mapping:
+      node: '@node.node_route_context:node'
+    bundles:
+      purchase_order: purchase_order

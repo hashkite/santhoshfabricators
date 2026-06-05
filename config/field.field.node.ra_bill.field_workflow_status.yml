@@ -1,0 +1,21 @@
+uuid: 575135ee-0891-4a1e-9987-8b8b1eddefa1
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_workflow_status
+    - node.type.ra_bill
+  module:
+    - options
+id: node.ra_bill.field_workflow_status
+field_name: field_workflow_status
+entity_type: node
+bundle: ra_bill
+label: 'Workflow Status'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: list_string

@@ -1,0 +1,46 @@
+uuid: 429890bc-1103-4d4a-9fa9-d7011192a786
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_ra_bill_items
+    - node.type.ra_bill
+    - paragraphs.paragraphs_type.ra_bill_item
+  module:
+    - entity_reference_revisions
+id: node.ra_bill.field_ra_bill_items
+field_name: field_ra_bill_items
+entity_type: node
+bundle: ra_bill
+label: 'RA Bill Items'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      ra_bill_item: ra_bill_item
+    negate: 0
+    target_bundles_drag_drop:
+      expenses:
+        weight: 7
+        enabled: false
+      inventory_expenses:
+        weight: 8
+        enabled: false
+      invoice_item:
+        weight: 9
+        enabled: false
+      ra_bill_item:
+        weight: 10
+        enabled: true
+      room_rent:
+        weight: 11
+        enabled: false
+      salary:
+        weight: 12
+        enabled: false
+field_type: entity_reference_revisions

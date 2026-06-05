@@ -1,0 +1,24 @@
+uuid: f9def0a6-9ec5-46c1-aaf7-8e141f30132e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.body
+    - node.type.ra_bill
+  module:
+    - text
+id: node.ra_bill.body
+field_name: body
+entity_type: node
+bundle: ra_bill
+label: Body
+description: ''
+required: false
+translatable: true
+default_value: {  }
+default_value_callback: ''
+settings:
+  display_summary: true
+  required_summary: false
+  allowed_formats: {  }
+field_type: text_with_summary

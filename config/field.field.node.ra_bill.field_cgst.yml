@@ -1,0 +1,19 @@
+uuid: 8fbd9213-978f-4752-94b1-a515f6691101
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_cgst
+    - node.type.ra_bill
+id: node.ra_bill.field_cgst
+field_name: field_cgst
+entity_type: node
+bundle: ra_bill
+label: CGST
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
