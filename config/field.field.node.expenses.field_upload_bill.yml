@@ -1,0 +1,27 @@
+uuid: b965f52d-74bd-4458-80a6-adb8ccec1f07
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_upload_bill
+    - node.type.expenses
+  module:
+    - file
+id: node.expenses.field_upload_bill
+field_name: field_upload_bill
+entity_type: node
+bundle: expenses
+label: 'Upload Bill'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:file'
+  handler_settings: {  }
+  file_directory: '[date:custom:Y]-[date:custom:m]'
+  file_extensions: 'txt pdf doc docx jpeg'
+  max_filesize: ''
+  description_field: false
+field_type: file

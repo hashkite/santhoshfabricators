@@ -8,21 +8,6 @@
 // TABLET LANDSCAPE / SMALL DESKTOP (≤1280px)
 // ─────────────────────────────────────────
 @include respond-to('xl') {
-  .fabritrack-sidebar {
-    width: 220px;
-    padding: $space-4 $space-3;
-
-    .brand-title {
-      font-size: 0.85rem;
-    }
-
-    .sidebar-nav .nav-item a,
-    .navigation .menu-item a {
-      font-size: 0.85rem;
-      padding: $space-2 $space-3;
-    }
-  }
-
   .fabritrack-main {
     padding: $space-6 $space-6;
   }
@@ -43,22 +28,6 @@
 // ─────────────────────────────────────────
 @include respond-to('lg') {
 
-  // Collapse sidebar into a hidden state
-  .fabritrack-sidebar {
-    position: fixed;
-    left: -280px;
-    top: 0;
-    height: 100vh;
-    width: 260px;
-    z-index: $z-overlay;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: none;
-
-    &.sidebar-open {
-      left: 0;
-      box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12);
-    }
-  }
 
   // When sidebar is collapsed, main takes full width
   .fabritrack-body {
@@ -666,6 +635,7 @@
 
   .fabritrack-header,
   .fabritrack-sidebar,
+  .fabritrack-main-menu,
   .sidebar-footer,
   .btn-new-project,
   .form-actions,

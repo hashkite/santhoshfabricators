@@ -6,30 +6,7 @@
 #}
 <div class="entity-detail-page entity-detail--invoice printable-invoice">
 
-	{# ── BREADCRUMB ── #}
-	<div class="entity-breadcrumb no-print">
-		<a href="/dashboard" class="breadcrumb-link">
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-				<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-				<polyline points="9 22 9 12 15 12 15 22"/>
-			</svg>
-			Dashboard
-		</a>
-		<span class="breadcrumb-sep">
-			<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-				<polyline points="9 18 15 12 9 6"/>
-			</svg>
-		</span>
-		{% if content.field_purchase_order.0 %}
-			<a href="{{ path('entity.node.canonical', {'node': node.field_purchase_order.target_id}) }}" class="breadcrumb-link">{{ node.field_purchase_order.entity.label }}</a>
-			<span class="breadcrumb-sep">
-				<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-					<polyline points="9 18 15 12 9 6"/>
-				</svg>
-			</span>
-		{% endif %}
-		<span class="breadcrumb-current">Tax Invoice</span>
-	</div>
+
 
 	{# ── ACTIONS ── #}
 	<div class="entity-detail-header no-print">

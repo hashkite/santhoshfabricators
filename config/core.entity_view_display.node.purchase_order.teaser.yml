@@ -11,6 +11,7 @@ dependencies:
     - field.field.node.purchase_order.field_basic_amount
     - field.field.node.purchase_order.field_company_name
     - field.field.node.purchase_order.field_gst
+    - field.field.node.purchase_order.field_gst_no
     - field.field.node.purchase_order.field_po_date
     - field.field.node.purchase_order.field_po_number
     - field.field.node.purchase_order.field_po_status
@@ -44,6 +45,7 @@ hidden:
   field_basic_amount: true
   field_company_name: true
   field_gst: true
+  field_gst_no: true
   field_po_date: true
   field_po_number: true
   field_po_status: true

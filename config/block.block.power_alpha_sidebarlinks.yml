@@ -10,7 +10,7 @@ dependencies:
     - power_alpha
 id: power_alpha_sidebarlinks
 theme: power_alpha
-region: sidebar_first
+region: main_menu
 weight: 0
 provider: null
 plugin: 'system_menu_block:side-bar-links'

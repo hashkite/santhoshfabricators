@@ -10,6 +10,7 @@ libraries:
 
 regions:
   header: Header
+  main_menu: 'Main Menu'
   pre_content: 'Pre-content'
   breadcrumb: Breadcrumb
   highlighted: Highlighted

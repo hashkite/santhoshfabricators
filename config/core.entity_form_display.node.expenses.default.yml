@@ -12,10 +12,13 @@ dependencies:
     - field.field.node.expenses.field_project
     - field.field.node.expenses.field_room_rent_details
     - field.field.node.expenses.field_salary_details
+    - field.field.node.expenses.field_upload_bill
     - node.type.expenses
   module:
     - conditional_fields
+    - content_moderation
     - datetime
+    - file
     - paragraphs
     - path
 id: node.expenses.default
@@ -31,7 +34,7 @@ content:
     third_party_settings: {  }
   field_amount:
     type: number
-    weight: 14
+    weight: 15
     region: content
     settings:
       placeholder: ''
@@ -177,6 +180,19 @@ content:
             effect: show
             effect_options: {  }
             selector: ''
+  field_upload_bill:
+    type: file_generic
+    weight: 14
+    region: content
+    settings:
+      progress_indicator: throbber
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 16
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   path:
     type: path
     weight: 6

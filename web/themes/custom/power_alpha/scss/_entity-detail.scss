@@ -126,6 +126,7 @@
   position: relative;
   overflow: hidden;
   margin-bottom: $space-6;
+  @include fade-in(0.4s, 12px);
 
   &__accent {
     position: absolute;
@@ -373,6 +374,7 @@
   @include card(md);
   overflow: hidden;
   margin-bottom: $space-6;
+  @include fade-in(0.6s, 16px);
 
   &__header {
     padding: $space-5 $space-6;
@@ -1314,6 +1316,7 @@
   nav,
   .gin-secondary-toolbar,
   .fabritrack-sidebar,
+  .fabritrack-main-menu,
   .entity-breadcrumb,
   .entity-detail-header,
   .entity-back-link,

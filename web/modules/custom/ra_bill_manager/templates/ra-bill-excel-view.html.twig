@@ -1,8 +1,8 @@
 <style>
 	.ra-excel-container {
-		font-family: 'Calibri', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+		font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 		margin: 20px 0;
-		color: #1e293b;
+		color: var(--pa-text, #263238);
 	}
 
 	/* Action Buttons */
@@ -10,73 +10,73 @@
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
-		gap: 10px;
+		gap: 12px;
 		position: sticky;
 		top: var(--drupal-displace-offset-top, 0px);
 		z-index: 110;
-		background-color: #f8fafc;
-		padding: 10px 0;
+		background-color: var(--pa-bg, #F8F9FA);
+		padding: 12px 16px;
 		margin-bottom: 0;
-		border-bottom: 1px solid #cbd5e1;
-		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+		border-bottom: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12));
+		box-shadow: var(--pa-shadow-sm);
+		border-radius: var(--pa-radius-lg, 16px) var(--pa-radius-lg, 16px) 0 0;
 	}
-	.ra-btn-export {
+	.ra-btn {
 		display: inline-flex;
 		align-items: center;
-		background-color: #10b981;
-		color: white !important;
+		justify-content: center;
 		padding: 10px 18px;
-		border-radius: 6px;
+		border-radius: var(--pa-radius-sm, 8px);
+		font-family: 'Inter', system-ui, sans-serif;
 		font-weight: 600;
-		text-decoration: none;
-		transition: background-color 0.2s ease;
-		box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
 		font-size: 13px;
-	}
-	.ra-btn-export:hover {
-		background-color: #059669;
-		color: white !important;
-	}
-	.ra-btn-invoice {
-		display: inline-flex;
-		align-items: center;
-		background-color: #3b82f6;
-		color: white !important;
-		padding: 10px 18px;
-		border-radius: 6px;
-		font-weight: 600;
-		text-decoration: none;
-		transition: background-color 0.2s ease;
-		box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
-		font-size: 13px;
-	}
-	.ra-btn-invoice:hover {
-		background-color: #2563eb;
-		color: white !important;
-	}
-	.ra-btn-save {
-		display: inline-flex;
-		align-items: center;
-		background-color: #f59e0b;
-		color: white !important;
-		padding: 10px 18px;
-		border-radius: 6px;
-		font-weight: 600;
 		text-decoration: none;
 		border: none;
 		cursor: pointer;
-		transition: all 0.2s ease;
-		box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
-		font-size: 13px;
+		transition: transform var(--pa-transition, 0.25s), background-color var(--pa-transition, 0.25s), box-shadow var(--pa-transition, 0.25s);
+		gap: 6px;
+	}
+	.ra-btn:hover {
+		transform: translateY(-1px);
+	}
+	.ra-btn:active {
+		transform: translateY(0);
+	}
+	.ra-btn-export {
+		background-color: #15803d;
+		color: white !important;
+		box-shadow: 0 2px 4px rgba(21, 128, 61, 0.15);
+	}
+	.ra-btn-export:hover {
+		background-color: #166534;
+		color: white !important;
+		box-shadow: 0 4px 8px rgba(21, 128, 61, 0.25);
+	}
+	.ra-btn-invoice {
+		background-color: var(--pa-primary-dark, #0277BD); /* Shifted to dark primary blue to pass contrast requirements */
+		color: white !important;
+		box-shadow: 0 2px 4px rgba(2, 119, 189, 0.15);
+	}
+	.ra-btn-invoice:hover {
+		background-color: #01579b;
+		color: white !important;
+		box-shadow: 0 4px 8px rgba(2, 119, 189, 0.25);
+	}
+	.ra-btn-save {
+		background-color: #a16207;
+		color: white !important;
+		box-shadow: 0 2px 4px rgba(161, 98, 7, 0.15);
 	}
 	.ra-btn-save:hover {
-		background-color: #d97706;
+		background-color: #854d0e;
 		color: white !important;
+		box-shadow: 0 4px 8px rgba(161, 98, 7, 0.25);
 	}
 	.ra-btn-save:disabled {
-		background-color: #9ca3af;
+		background-color: var(--pa-text-faint, #ADB5BD);
 		cursor: not-allowed;
 		box-shadow: none;
+		transform: none;
 	}
 	.ra-btn-save.saving {
 		animation: pulse 1s infinite;
@@ -93,38 +93,39 @@
 
 	/* ── ABSTRACT SHEET WRAPPER ── */
 	.ra-abstract-sheet {
-		border: 2px solid #1a1a2e;
-		border-radius: 4px;
+		border: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12));
+		border-radius: 0 0 var(--pa-radius-lg, 16px) var(--pa-radius-lg, 16px);
 		overflow: hidden;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-		background: #fff;
+		box-shadow: var(--pa-shadow-md);
+		background: var(--pa-surface, #fff);
 	}
 
 	/* ── VENDOR NAME BANNER ── */
 	.ra-vendor-banner {
-		background: #fff;
+		background: var(--pa-surface, #fff);
 		text-align: center;
-		padding: 10px 16px 6px;
-		border-bottom: 1px solid #1a1a2e;
+		padding: 12px 16px 8px;
+		border-bottom: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12));
 		font-size: 16px;
 		font-weight: 800;
-		color: #1a1a2e;
+		color: var(--pa-text, #263238);
 		letter-spacing: 1px;
 		text-transform: uppercase;
+		font-family: 'Manrope', system-ui, sans-serif;
 	}
 
 	/* ── HEADER INFO ROWS ── */
 	.ra-info-row {
 		display: flex;
-		border-bottom: 1px solid #1a1a2e;
+		border-bottom: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12));
 		font-size: 12px;
 		font-weight: 600;
-		color: #1e293b;
-		background: #fff;
+		color: var(--pa-text, #263238);
+		background: var(--pa-surface, #fff);
 	}
 	.ra-info-cell {
-		padding: 5px 10px;
-		border-right: 1px solid #1a1a2e;
+		padding: 8px 12px;
+		border-right: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12));
 		display: flex;
 		align-items: center;
 		gap: 6px;
@@ -133,16 +134,17 @@
 		border-right: none;
 	}
 	.ra-info-label {
-		color: #4a5568;
+		color: var(--pa-text-muted, #455A64);
 		white-space: nowrap;
 		font-weight: 700;
 		text-transform: uppercase;
-		font-size: 10px;
+		font-size: 11px;
+		letter-spacing: 0.5px;
 	}
 	.ra-info-value {
-		color: #111;
+		color: var(--pa-text, #263238);
 		font-weight: 600;
-		font-size: 12px;
+		font-size: 13px;
 	}
 	.ra-info-cell--grow {
 		flex: 1;
@@ -151,14 +153,15 @@
 	/* ── ABSTRACT LABEL ── */
 	.ra-abstract-label {
 		text-align: center;
-		padding: 4px;
+		padding: 6px;
 		font-weight: 800;
 		font-size: 12px;
-		color: #1a1a2e;
-		border-bottom: 1px solid #1a1a2e;
+		color: var(--pa-text, #263238);
+		border-bottom: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12));
 		text-transform: uppercase;
 		letter-spacing: 1px;
-		background: #f8f9fa;
+		background: var(--pa-bg, #f8f9fa);
+		font-family: 'Manrope', system-ui, sans-serif;
 	}
 
 	/* ── DATA TABLE ── */
@@ -171,7 +174,7 @@
 		width: 100% !important;
 		border-collapse: collapse !important;
 		background-color: white !important;
-		font-size: 11px !important;
+		font-size: 12px !important;
 		table-layout: auto !important;
 		float: none !important;
 		margin: 0 !important;
@@ -203,17 +206,20 @@
 		min-width: none !important;
 		float: none !important;
 		flex: none !important;
-		background-color: #1a1a2e !important;
+		background: var(--pa-primary-gradient, linear-gradient(135deg, #0091EA 0%, #0277BD 50%, #0277BD 100%)) !important;
 		color: white !important;
 		font-weight: 700 !important;
-		padding: 6px 8px !important;
+		padding: 10px 12px !important;
 		text-align: center !important;
-		border: 1px solid #0d0d1a !important;
+		border: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12)) !important;
 		white-space: nowrap !important;
 		vertical-align: middle !important;
-		font-size: 10px !important;
+		font-size: 11px !important;
 		text-transform: uppercase !important;
-		letter-spacing: 0.3px !important;
+		letter-spacing: 0.5px !important;
+	}
+	.ra-sheet-wrapper table.ra-sheet-table th.highlight-header {
+		background: #d97706 !important;
 	}
 
 	.ra-sheet-wrapper table.ra-sheet-table td {
@@ -223,18 +229,20 @@
 		min-width: none !important;
 		float: none !important;
 		flex: none !important;
-		padding: 5px 8px !important;
-		border: 1px solid #cbd5e1 !important;
+		padding: 8px 12px !important;
+		border: 1px solid var(--pa-border-light, rgba(0, 145, 234, 0.06)) !important;
 		vertical-align: middle !important;
 		background-color: transparent !important;
 		white-space: normal !important;
-		font-size: 11px !important;
+		font-size: 12px !important;
+		color: var(--pa-text, #263238) !important;
+		transition: background-color var(--pa-transition, 0.25s) ease;
 	}
 	.ra-sheet-table tr:nth-child(even) td {
-		background-color: #fafbfc !important;
+		background-color: rgba(0, 145, 234, 0.02) !important;
 	}
 	.ra-sheet-table tr:hover td {
-		background-color: #f1f5f9 !important;
+		background-color: rgba(0, 145, 234, 0.04) !important;
 	}
 
 	/* Disable any responsive pseudo-element labels */
@@ -248,8 +256,8 @@
 
 	/* Header spanning groups */
 	.ra-sheet-table th.group-header {
-		background-color: #1a1a2e !important;
-		font-size: 11px !important;
+		background: var(--pa-primary-gradient, linear-gradient(135deg, #0091EA 0%, #0277BD 50%, #0277BD 100%)) !important;
+		font-size: 12px !important;
 		letter-spacing: 0.5px !important;
 	}
 
@@ -269,48 +277,49 @@
 
 	/* Yellow highlight for "IN THIS BILL" column */
 	.highlight-cell {
-		background-color: #ffff00 !important;
+		background-color: rgba(245, 158, 11, 0.05) !important;
 		font-weight: 700 !important;
-		color: #111 !important;
+		color: var(--pa-text, #263238) !important;
 	}
 	.ra-sheet-table tr:hover .highlight-cell {
-		background-color: #fff176 !important;
+		background-color: rgba(245, 158, 11, 0.1) !important;
 	}
 
 	/* Totals row */
 	.ra-totals-row {
 		display: table-row !important;
-		background-color: #f1f5f9 !important;
+		background-color: var(--pa-bg, #f1f5f9) !important;
 		font-weight: 700 !important;
-		border-top: 2px solid #1a1a2e !important;
+		border-top: 2px solid var(--pa-border, rgba(0, 145, 234, 0.12)) !important;
 	}
 	.ra-totals-row td {
 		font-weight: 700 !important;
-		background-color: #f1f5f9 !important;
-		border-top: 2px solid #1a1a2e !important;
-		font-size: 11px !important;
+		background-color: var(--pa-bg, #f1f5f9) !important;
+		border-top: 2px solid var(--pa-border, rgba(0, 145, 234, 0.12)) !important;
+		font-size: 12px !important;
+		color: var(--pa-text, #263238) !important;
 	}
 
 	/* Description cell width */
 	td.desc-cell {
 		max-width: 280px !important;
 		min-width: 180px !important;
-		font-size: 10.5px !important;
-		line-height: 1.3 !important;
+		font-size: 12px !important;
+		line-height: 1.4 !important;
 	}
 
 	/* ── Editable Input Styles ── */
 	.ra-qty-input {
-		width: 60px !important;
-		padding: 3px 4px !important;
-		border: 2px solid #e5a100 !important;
-		border-radius: 3px !important;
-		background: #fffde7 !important;
-		font-size: 11px !important;
+		width: 70px !important;
+		padding: 4px 6px !important;
+		border: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12)) !important;
+		border-radius: var(--pa-radius-sm, 8px) !important;
+		background: var(--pa-surface, #fff) !important;
+		font-size: 12px !important;
 		font-weight: 700 !important;
 		text-align: center !important;
-		color: #111 !important;
-		transition: border-color 0.2s, box-shadow 0.2s !important;
+		color: var(--pa-text, #263238) !important;
+		transition: border-color var(--pa-transition, 0.25s), box-shadow var(--pa-transition, 0.25s), background-color var(--pa-transition, 0.25s) !important;
 		-moz-appearance: textfield !important;
 	}
 	.ra-qty-input::-webkit-outer-spin-button,
@@ -320,13 +329,13 @@
 	}
 	.ra-qty-input:focus {
 		outline: none !important;
-		border-color: #f59e0b !important;
-		box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25) !important;
-		background: #fff !important;
+		border-color: var(--pa-primary-dark, #0277BD) !important;
+		box-shadow: 0 0 0 3px rgba(2, 119, 189, 0.25) !important;
+		background: var(--pa-surface, #fff) !important;
 	}
 	.ra-qty-input.dirty {
 		border-color: #f59e0b !important;
-		background: #fff8e1 !important;
+		background: #fffde7 !important;
 	}
 	.ra-qty-input.saved {
 		border-color: #10b981 !important;
@@ -336,31 +345,32 @@
 	/* Status toast */
 	.ra-toast {
 		position: fixed;
-		top: 80px;
+		top: 100px;
 		right: 20px;
 		z-index: 9999;
-		padding: 12px 20px;
-		border-radius: 8px;
+		padding: 12px 24px;
+		border-radius: var(--pa-radius-md, 12px);
 		font-size: 13px;
 		font-weight: 600;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		transition: opacity 0.3s, transform 0.3s;
+		box-shadow: var(--pa-shadow-lg);
+		transition: opacity var(--pa-transition, 0.25s), transform var(--pa-transition, 0.25s);
 		opacity: 0;
 		transform: translateY(-10px);
+		font-family: 'Inter', system-ui, sans-serif;
 	}
 	.ra-toast.show {
 		opacity: 1;
 		transform: translateY(0);
 	}
 	.ra-toast.success {
-		background: #ecfdf5;
-		color: #065f46;
-		border: 1px solid #6ee7b7;
+		background: #dcfce7;
+		color: #15803d;
+		border: 1px solid rgba(21, 128, 61, 0.2);
 	}
 	.ra-toast.error {
-		background: #fef2f2;
-		color: #991b1b;
-		border: 1px solid #fca5a5;
+		background: #fee2e2;
+		color: #dc2626;
+		border: 1px solid rgba(220, 38, 38, 0.2);
 	}
 </style>
 
@@ -369,8 +379,8 @@
 
 	{# ── ACTION BUTTONS ── #}
 	<div class="ra-header-actions">
-		<button type="button" class="ra-btn-save" id="ra-save-btn" disabled onclick="raSaveChanges()">
-			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+		<button type="button" class="ra-btn ra-btn-save" id="ra-save-btn" disabled onclick="raSaveChanges()">
+			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
 				<polyline points="17 21 17 13 7 13 7 21"></polyline>
 				<polyline points="7 3 7 8 15 8"></polyline>
@@ -378,8 +388,8 @@
 			Save Changes
 		</button>
 		{% if create_invoice_url %}
-			<a href="{{ create_invoice_url }}" class="ra-btn-invoice" onclick="return confirm('Are you sure you want to create a draft invoice from this RA Bill? This will generate invoice line items from all current bill items.');">
-				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+			<a href="{{ create_invoice_url }}" class="ra-btn ra-btn-invoice" onclick="return confirm('Are you sure you want to create a draft invoice from this RA Bill? This will generate invoice line items from all current bill items.');">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 					<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
 					<polyline points="14 2 14 8 20 8"></polyline>
 					<line x1="16" y1="13" x2="8" y2="13"></line>
@@ -388,8 +398,8 @@
 				Create Invoice
 			</a>
 		{% endif %}
-		<a href="{{ export_url }}" class="ra-btn-export">
-			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 6px;">
+		<a href="{{ export_url }}" class="ra-btn ra-btn-export">
+			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 				<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
 				<polyline points="7 10 12 15 17 10"></polyline>
 				<line x1="12" y1="15" x2="12" y2="3"></line>
@@ -431,7 +441,7 @@
 				<span class="ra-info-label">Project :</span>
 				<span class="ra-info-value">
 					{% if metadata.po_id %}
-						<a href="/node/{{ metadata.po_id }}" style="color: #2563eb; text-decoration: underline;">{{ metadata.project }}</a>
+						<a href="/node/{{ metadata.po_id }}" style="color: var(--pa-primary-dark, #0277BD); text-decoration: underline;">{{ metadata.project }}</a>
 					{% else %}
 						{{ metadata.project }}
 					{% endif %}
@@ -468,10 +478,10 @@
 					{# Header Row 2 - Sub-headers #}
 					<tr>
 						<th>UPTO PREV</th>
-						<th style="background-color: #c6a700 !important;">IN THIS BILL</th>
+						<th class="highlight-header">IN THIS BILL</th>
 						<th>UPTO DATE</th>
 						<th>UPTO PREV</th>
-						<th style="background-color: #c6a700 !important;">THIS BILL</th>
+						<th class="highlight-header">THIS BILL</th>
 						<th>UPTO DATE</th>
 					</tr>
 				</thead>
@@ -486,7 +496,7 @@
 							<td class="align-right">{{ item.po_amount|number_format(0, '.', ',') }}</td>
 							<td class="align-right" data-col="prev_qty">{{ item.prev_qty|number_format(0, '.', ',') }}</td>
 							<td class="align-center highlight-cell" data-col="current_qty">
-								<input type="number" class="ra-qty-input" value="{{ item.current_qty|number_format(0) }}" data-original="{{ item.current_qty|number_format(0) }}" data-paragraph-id="{{ item.paragraph_id }}" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)"/>
+								<input type="number" class="ra-qty-input" value="{{ item.current_qty|number_format(0) }}" data-original="{{ item.current_qty|number_format(0) }}" data-paragraph-id="{{ item.paragraph_id }}" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for {{ item.description|escape('html_attr') }}"/>
 							</td>
 							<td class="align-right" data-col="cumulative_qty">{{ item.cumulative_qty|number_format(0, '.', ',') }}</td>
 							<td class="align-right" data-col="prev_amount">{{ item.prev_amount|number_format(2, '.', ',') }}</td>
@@ -518,7 +528,7 @@
 	</div>
 
 	{# ── Toast notification ── #}
-	<div class="ra-toast" id="ra-toast"></div>
+	<div class="ra-toast" id="ra-toast" role="alert" aria-live="polite"></div>
 </div>
 
 <script>

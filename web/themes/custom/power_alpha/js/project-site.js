@@ -94,7 +94,7 @@
     attach: function (context, settings) {
       $(once('sidebarToggle', '.fabritrack-layout', context)).each(function () {
         var $layout = $(this);
-        var $sidebar = $layout.find('.fabritrack-sidebar');
+        var $sidebar = $layout.find('.fabritrack-main-menu');
         var $header = $layout.find('.fabritrack-header');
 
         // Create hamburger button (only visible on ≤1024px via CSS)
@@ -126,6 +126,14 @@
 
           $(document).on('keydown.sidebarToggle', function (e) {
             if (e.key === 'Escape' && $sidebar.hasClass('sidebar-open')) {
+              $sidebar.removeClass('sidebar-open');
+              $overlay.removeClass('active');
+              $('body').removeClass('sidebar-is-open');
+            }
+          });
+
+          $(window).on('resize.sidebarToggle', function () {
+            if ($(window).width() > 1024) {
               $sidebar.removeClass('sidebar-open');
               $overlay.removeClass('active');
               $('body').removeClass('sidebar-is-open');

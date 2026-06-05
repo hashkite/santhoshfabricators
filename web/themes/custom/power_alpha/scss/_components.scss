@@ -199,3 +199,32 @@
     }
   }
 }
+
+// -------------------------
+// GLOBAL LINK STYLES
+// -------------------------
+.fabritrack-main {
+  a:not(.button):not(.btn-detail):not(.tab):not(.ra-btn) {
+    color: $color-primary-dark;
+    text-decoration: none;
+    font-weight: $font-weight-medium;
+    transition: color $transition-base;
+
+    &:hover {
+      color: darken($color-primary-dark, 10%);
+      text-decoration: underline;
+    }
+  }
+}
+
+// -------------------------
+// PRINT BUTTON NORMALIZATION
+// -------------------------
+.btn-print-invoice {
+  gap: $space-2;
+
+  svg {
+    stroke: currentColor;
+    fill: none;
+  }
+}

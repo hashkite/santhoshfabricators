@@ -13,6 +13,7 @@ dependencies:
     - field.field.node.expenses.field_project
     - field.field.node.expenses.field_room_rent_details
     - field.field.node.expenses.field_salary_details
+    - field.field.node.expenses.field_upload_bill
     - node.type.expenses
   module:
     - text
@@ -44,3 +45,4 @@ hidden:
   field_project: true
   field_room_rent_details: true
   field_salary_details: true
+  field_upload_bill: true

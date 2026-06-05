@@ -9,26 +9,30 @@ use Drupal\file\Entity\File;
 /**
  * Invoice settings configuration form.
  */
-class InvoiceSettingsForm extends ConfigFormBase {
+class InvoiceSettingsForm extends ConfigFormBase
+{
 
   /**
    * {@inheritdoc}
    */
-  protected function getEditableConfigNames() {
+  protected function getEditableConfigNames()
+  {
     return ['power_alpha_helper.invoice_settings'];
   }
 
   /**
    * {@inheritdoc}
    */
-  public function getFormId() {
+  public function getFormId()
+  {
     return 'power_alpha_helper_invoice_settings_form';
   }
 
   /**
    * {@inheritdoc}
    */
-  public function buildForm(array $form, FormStateInterface $form_state) {
+  public function buildForm(array $form, FormStateInterface $form_state)
+  {
     $config = $this->config('power_alpha_helper.invoice_settings');
 
     $form['company_details'] = [
@@ -103,19 +107,19 @@ class InvoiceSettingsForm extends ConfigFormBase {
     $form['buyer_defaults']['default_buyer_name'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Buyer Company Name'),
-      '#default_value' => $config->get('default_buyer_name') ?: 'AQUATECH SYSTEMS (ASIA) PVT. LTD.',
+      '#default_value' => $config->get('default_buyer_name') ?: 'N/A',
     ];
 
     $form['buyer_defaults']['default_buyer_address'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Buyer Address'),
-      '#default_value' => $config->get('default_buyer_address') ?: "Altimus, 601-602, 6th Floor, Besides\nEmbassy Market, Shreyas Colony, Navrangpura",
+      '#default_value' => $config->get('default_buyer_address') ?: "N/A",
     ];
 
     $form['buyer_defaults']['default_buyer_gstin'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Buyer GSTIN'),
-      '#default_value' => $config->get('default_buyer_gstin') ?: '24AABCA1850C2ZE',
+      '#default_value' => $config->get('default_buyer_gstin') ?: 'N/A',
     ];
 
     return parent::buildForm($form, $form_state);
@@ -124,7 +128,8 @@ class InvoiceSettingsForm extends ConfigFormBase {
   /**
    * {@inheritdoc}
    */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+  public function submitForm(array &$form, FormStateInterface $form_state)
+  {
     $config = $this->config('power_alpha_helper.invoice_settings');
     $new_logo = $form_state->getValue('company_logo');
     $old_logo = $config->get('company_logo') ?: [];

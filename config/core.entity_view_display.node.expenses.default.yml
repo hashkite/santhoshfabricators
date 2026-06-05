@@ -12,10 +12,12 @@ dependencies:
     - field.field.node.expenses.field_project
     - field.field.node.expenses.field_room_rent_details
     - field.field.node.expenses.field_salary_details
+    - field.field.node.expenses.field_upload_bill
     - node.type.expenses
   module:
     - datetime
     - entity_reference_revisions
+    - file
     - options
     - text
     - user
@@ -96,6 +98,13 @@ content:
       link: ''
     third_party_settings: {  }
     weight: 7
+    region: content
+  field_upload_bill:
+    type: file_url_plain
+    label: hidden
+    settings: {  }
+    third_party_settings: {  }
+    weight: 11
     region: content
   links:
     settings: {  }

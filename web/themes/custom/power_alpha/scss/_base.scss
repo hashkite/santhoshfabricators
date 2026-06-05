@@ -99,3 +99,20 @@ nav.tabs-wrapper .tabs--primary {
 .font-mono {
   font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace !important;
 }
+
+// -------------------------
+// GLOBAL SELECTION & OUTLINE OVERRIDES
+// -------------------------
+::selection {
+  background: rgba($color-primary, 0.2) !important;
+  color: $color-primary-dark !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+*:focus-visible {
+  outline: 2px solid $color-primary !important;
+  outline-offset: 2px !important;
+}

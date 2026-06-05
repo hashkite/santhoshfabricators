@@ -252,9 +252,9 @@ function power_alpha_preprocess_node(&$variables)
     // ── WORK ORDER (PO) DETAILS ──
     $work_order_no = '-';
     $work_order_date = '-';
-    $buyer_name = $project_client ?: ($config->get('default_buyer_name') ?: 'AQUATECH SYSTEMS (ASIA) PVT. LTD.');
-    $buyer_address = $config->get('default_buyer_address') ?: "Altimus, 601-602, 6th Floor, Besides\nEmbassy Market, Shreyas Colony, Navrangpura";
-    $buyer_gstin = $config->get('default_buyer_gstin') ?: '24AABCA1850C2ZE';
+    $buyer_name = $project_client ?: ($config->get('default_buyer_name') ?: 'N/A');
+    $buyer_address = $config->get('default_buyer_address') ?: "N/A";
+    $buyer_gstin = $config->get('default_buyer_gstin') ?: 'N/A';
 
     if ($node->hasField('field_purchase_order') && !$node->get('field_purchase_order')->isEmpty()) {
       $po = $node->get('field_purchase_order')->entity;
@@ -285,8 +285,8 @@ function power_alpha_preprocess_node(&$variables)
             $addr_parts[] = $addr->postal_code;
           $buyer_address = implode(', ', $addr_parts);
         }
-        if ($po->hasField('field_gst') && !$po->get('field_gst')->isEmpty()) {
-          $buyer_gstin = $po->get('field_gst')->value;
+        if ($po->hasField('field_gst_no') && !$po->get('field_gst_no')->isEmpty()) {
+          $buyer_gstin = $po->get('field_gst_no')->value;
         }
       }
     }
@@ -405,8 +405,7 @@ function power_alpha_preprocess_node(&$variables)
     // Import Excel Form Block
     if (\Drupal::currentUser()->isAuthenticated()) {
       $variables['ra_import_form'] = \Drupal::formBuilder()->getForm('Drupal\ra_bill_manager\Form\RAExcelImportForm', $node->id());
-    }
-    else {
+    } else {
       $variables['ra_import_form'] = NULL;
     }
 
@@ -463,6 +462,30 @@ function power_alpha_preprocess_node(&$variables)
 function power_alpha_preprocess_page(array &$variables)
 {
   $variables['is_logged_in'] = \Drupal::currentUser()->isAuthenticated();
+  $variables['site_logo'] = theme_get_setting('logo.url');
+
+  // Build custom dynamic breadcrumbs for all frontend pages
+  $route_name = \Drupal::routeMatch()->getRouteName();
+  $breadcrumbs = [];
+
+  if ($route_name === 'entity.node.canonical') {
+    $node = \Drupal::routeMatch()->getParameter('node');
+    $breadcrumbs = _power_alpha_build_breadcrumbs($node);
+  } elseif ($route_name === 'entity.node.edit_form') {
+    $node = \Drupal::routeMatch()->getParameter('node');
+    $breadcrumbs = _power_alpha_build_breadcrumbs($node, FALSE, TRUE);
+  } elseif ($route_name === 'node.add') {
+    $node_type = \Drupal::routeMatch()->getParameter('node_type');
+    if ($node_type instanceof \Drupal\node\NodeTypeInterface) {
+      $breadcrumbs = _power_alpha_build_breadcrumbs($node_type->id(), TRUE);
+    } elseif (is_string($node_type)) {
+      $breadcrumbs = _power_alpha_build_breadcrumbs($node_type, TRUE);
+    }
+  } else {
+    $breadcrumbs = _power_alpha_build_breadcrumbs();
+  }
+
+  $variables['custom_breadcrumbs'] = $breadcrumbs;
 }
 
 /**
@@ -766,6 +789,252 @@ function power_alpha_helper_num_to_words_indian_below_hundred($num)
     return $words[$tens] . " " . $words[$units];
   }
   return $words[$tens];
+}
+
+/**
+ * Helper to build custom breadcrumbs for the frontend.
+ */
+function _power_alpha_build_breadcrumbs($node_or_type = NULL, $is_add = FALSE, $is_edit = FALSE)
+{
+  $breadcrumbs = [];
+
+  // Always start with Dashboard/Home
+  $breadcrumbs[] = [
+    'title' => t('Dashboard'),
+    'url' => '/dashboard',
+    'is_home' => TRUE,
+  ];
+
+  if ($node_or_type instanceof \Drupal\node\NodeInterface) {
+    $node = $node_or_type;
+    $type = $node->getType();
+    $title = $node->label();
+
+    if ($type === 'project_sites') {
+      $breadcrumbs[] = [
+        'title' => t('Projects'),
+        'url' => '/dashboard',
+      ];
+      if ($is_edit) {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'url' => '/node/' . $node->id(),
+        ];
+        $breadcrumbs[] = [
+          'title' => t('Edit'),
+          'current' => TRUE,
+        ];
+      } else {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'current' => TRUE,
+        ];
+      }
+    } elseif ($type === 'purchase_order') {
+      // Get parent project
+      if ($node->hasField('field_project') && !$node->get('field_project')->isEmpty()) {
+        $project = $node->get('field_project')->entity;
+        if ($project) {
+          $breadcrumbs[] = [
+            'title' => $project->label(),
+            'url' => '/node/' . $project->id(),
+          ];
+        }
+      }
+      $breadcrumbs[] = [
+        'title' => t('Purchase Orders'),
+      ];
+      if ($is_edit) {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'url' => '/node/' . $node->id(),
+        ];
+        $breadcrumbs[] = [
+          'title' => t('Edit'),
+          'current' => TRUE,
+        ];
+      } else {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'current' => TRUE,
+        ];
+      }
+    } elseif ($type === 'expenses') {
+      // Get parent project
+      if ($node->hasField('field_project') && !$node->get('field_project')->isEmpty()) {
+        $project = $node->get('field_project')->entity;
+        if ($project) {
+          $breadcrumbs[] = [
+            'title' => $project->label(),
+            'url' => '/node/' . $project->id(),
+          ];
+        }
+      }
+      $breadcrumbs[] = [
+        'title' => t('Expenses'),
+      ];
+      if ($is_edit) {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'url' => '/node/' . $node->id(),
+        ];
+        $breadcrumbs[] = [
+          'title' => t('Edit'),
+          'current' => TRUE,
+        ];
+      } else {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'current' => TRUE,
+        ];
+      }
+    } elseif ($type === 'invoice') {
+      // Get parent PO
+      if ($node->hasField('field_purchase_order') && !$node->get('field_purchase_order')->isEmpty()) {
+        $po = $node->get('field_purchase_order')->entity;
+        if ($po) {
+          // Get project from PO
+          if ($po->hasField('field_project') && !$po->get('field_project')->isEmpty()) {
+            $project = $po->get('field_project')->entity;
+            if ($project) {
+              $breadcrumbs[] = [
+                'title' => $project->label(),
+                'url' => '/node/' . $project->id(),
+              ];
+            }
+          }
+          $breadcrumbs[] = [
+            'title' => $po->label(),
+            'url' => '/node/' . $po->id(),
+          ];
+        }
+      }
+      $breadcrumbs[] = [
+        'title' => t('Invoices'),
+      ];
+      if ($is_edit) {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'url' => '/node/' . $node->id(),
+        ];
+        $breadcrumbs[] = [
+          'title' => t('Edit'),
+          'current' => TRUE,
+        ];
+      } else {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'current' => TRUE,
+        ];
+      }
+    } elseif ($type === 'ra_bill') {
+      // Get parent project
+      if ($node->hasField('field_project') && !$node->get('field_project')->isEmpty()) {
+        $project = $node->get('field_project')->entity;
+        if ($project) {
+          $breadcrumbs[] = [
+            'title' => $project->label(),
+            'url' => '/node/' . $project->id(),
+          ];
+        }
+      }
+      $breadcrumbs[] = [
+        'title' => t('RA Bills'),
+      ];
+      if ($is_edit) {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'url' => '/node/' . $node->id(),
+        ];
+        $breadcrumbs[] = [
+          'title' => t('Edit'),
+          'current' => TRUE,
+        ];
+      } else {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'current' => TRUE,
+        ];
+      }
+    } else {
+      // Other node types
+      if ($is_edit) {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'url' => '/node/' . $node->id(),
+        ];
+        $breadcrumbs[] = [
+          'title' => t('Edit'),
+          'current' => TRUE,
+        ];
+      } else {
+        $breadcrumbs[] = [
+          'title' => $title,
+          'current' => TRUE,
+        ];
+      }
+    }
+  } elseif (is_string($node_or_type)) {
+    // Node add form
+    $type = $node_or_type;
+    // Try to get project_id from query
+    $request = \Drupal::request();
+    $project_id = $request->query->get('project_id') ?: $request->query->get('field_project');
+    if ($project_id) {
+      $project = \Drupal\node\Entity\Node::load($project_id);
+      if ($project) {
+        $breadcrumbs[] = [
+          'title' => $project->label(),
+          'url' => '/node/' . $project->id(),
+        ];
+      }
+    }
+
+    if ($type === 'purchase_order') {
+      $breadcrumbs[] = [
+        'title' => t('Purchase Orders'),
+      ];
+    } elseif ($type === 'expenses') {
+      $breadcrumbs[] = [
+        'title' => t('Expenses'),
+      ];
+    } elseif ($type === 'invoice') {
+      $breadcrumbs[] = [
+        'title' => t('Invoices'),
+      ];
+    } elseif ($type === 'ra_bill') {
+      $breadcrumbs[] = [
+        'title' => t('RA Bills'),
+      ];
+    }
+
+    $breadcrumbs[] = [
+      'title' => t('Add New'),
+      'current' => TRUE,
+    ];
+  } else {
+    // Fallback: use current page title
+    $request = \Drupal::request();
+    $route_match = \Drupal::routeMatch();
+    $route_object = $route_match->getRouteObject();
+    if ($route_object) {
+      $title = \Drupal::service('title_resolver')->getTitle($request, $route_object);
+      if ($title) {
+        if (is_array($title)) {
+          $title = isset($title['#markup']) ? $title['#markup'] : '';
+        }
+        $title = strip_tags(trim($title));
+        if ($title !== 'Dashboard' && $title !== 'Home' && $title !== 'Project Sites') {
+          $breadcrumbs[] = [
+            'title' => $title,
+            'current' => TRUE,
+          ];
+        }
+      }
+    }
+  }
+
+  return $breadcrumbs;
 }
 
 
