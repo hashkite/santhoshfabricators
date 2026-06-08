@@ -90,6 +90,21 @@
 			opacity: 0.6;
 		}
 	}
+	.ra-btn-next {
+		background-color: #4f46e5;
+		color: white !important;
+		box-shadow: 0 2px 4px rgba(79, 70, 229, 0.15);
+	}
+	.ra-btn-next:hover {
+		background-color: #4338ca;
+		color: white !important;
+		box-shadow: 0 4px 8px rgba(79, 70, 229, 0.25);
+	}
+	.ra-qty-input.over-claimed {
+		border-color: #dc2626 !important;
+		background: #fee2e2 !important;
+		color: #dc2626 !important;
+	}
 
 	/* ── ABSTRACT SHEET WRAPPER ── */
 	.ra-abstract-sheet {
@@ -372,6 +387,177 @@
 		color: #dc2626;
 		border: 1px solid rgba(220, 38, 38, 0.2);
 	}
+
+	/* Modal Styles */
+	.ra-modal-backdrop {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		background: rgba(15, 23, 42, 0.4);
+		backdrop-filter: blur(8px);
+		z-index: 10000;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		opacity: 0;
+		visibility: hidden;
+		transition: opacity 0.3s ease, visibility 0.3s ease;
+	}
+	.ra-modal-backdrop.show {
+		opacity: 1;
+		visibility: visible;
+	}
+	.ra-modal {
+		background: #ffffff;
+		border-radius: var(--pa-radius-lg, 16px);
+		box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.05);
+		width: 100%;
+		max-width: 550px;
+		padding: 28px;
+		transform: scale(0.95);
+		transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+		border: 1px solid rgba(0, 145, 234, 0.1);
+	}
+	.ra-modal-backdrop.show .ra-modal {
+		transform: scale(1);
+	}
+	.ra-modal-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: 24px;
+		border-bottom: 1.5px solid rgba(0, 145, 234, 0.1);
+		padding-bottom: 14px;
+	}
+	.ra-modal-title {
+		font-size: 20px;
+		font-weight: 800;
+		color: #0277bd;
+		letter-spacing: -0.5px;
+		font-family: 'Manrope', system-ui, sans-serif;
+	}
+	.ra-modal-close {
+		background: none;
+		border: none;
+		cursor: pointer;
+		color: #64748b;
+		padding: 4px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: 50%;
+		transition: background-color 0.2s;
+	}
+	.ra-modal-close:hover {
+		background: #f1f5f9;
+		color: #0f172a;
+	}
+	.ra-form-grid {
+		display: grid !important;
+		grid-template-columns: repeat(12, 1fr) !important;
+		gap: 20px 24px !important;
+	}
+	.ra-col-span-4 {
+		grid-column: span 4 !important;
+	}
+	.ra-col-span-8 {
+		grid-column: span 8 !important;
+	}
+	.ra-col-span-6 {
+		grid-column: span 6 !important;
+	}
+	.ra-form-group {
+		display: flex !important;
+		flex-direction: column !important;
+		min-width: 0 !important;
+	}
+	.ra-form-label {
+		display: block;
+		font-size: 13px;
+		font-weight: 600;
+		color: #475569;
+		margin-bottom: 6px;
+	}
+	.ra-form-input, .ra-form-select {
+		width: 100% !important;
+		box-sizing: border-box !important;
+		border: 1.5px solid #cbd5e1 !important;
+		border-radius: 8px !important;
+		padding: 10px 14px !important;
+		font-size: 13.5px !important;
+		font-weight: 600 !important;
+		font-family: inherit;
+		background: #ffffff;
+		color: #0f172a;
+		transition: border-color 0.2s, box-shadow 0.2s;
+		box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.05) !important;
+	}
+	.ra-form-select {
+		appearance: none;
+		-webkit-appearance: none;
+		-moz-appearance: none;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+		background-position: right 12px center;
+		background-repeat: no-repeat;
+		background-size: 18px;
+		padding-right: 36px !important;
+		cursor: pointer;
+	}
+	.ra-form-input::placeholder {
+		color: #94a3b8;
+		font-weight: 450;
+	}
+	.ra-form-input:focus, .ra-form-select:focus {
+		outline: none;
+		border-color: #0277bd !important;
+		box-shadow: 0 0 0 4px rgba(2, 119, 189, 0.15) !important;
+	}
+	.ra-modal-footer {
+		display: flex;
+		justify-content: flex-end;
+		gap: 12px;
+		border-top: 1.5px solid rgba(0, 145, 234, 0.1);
+		padding-top: 20px;
+		margin-top: 28px;
+	}
+	.ra-btn-cancel {
+		background: #f8fafc;
+		color: #475569 !important;
+		border: 1.5px solid #cbd5e1;
+		transition: all 0.2s ease;
+	}
+	.ra-btn-cancel:hover {
+		background: #f1f5f9;
+		border-color: #94a3b8;
+	}
+	.ra-btn-submit {
+		background: #0277bd;
+		color: #ffffff !important;
+		transition: all 0.2s ease;
+	}
+	.ra-btn-submit:hover {
+		background: #01579b;
+		box-shadow: 0 4px 12px rgba(2, 119, 189, 0.25);
+	}
+	/* Add item button style */
+	.ra-add-item-row {
+		display: flex;
+		justify-content: flex-start;
+		padding: 16px;
+		background: #fff;
+		border-top: 1px dashed #cbd5e1;
+	}
+	.ra-btn-add-item {
+		background: #0277bd;
+		color: #ffffff !important;
+		box-shadow: 0 2px 4px rgba(2, 119, 189, 0.15);
+	}
+	.ra-btn-add-item:hover {
+		background: #01579b;
+		box-shadow: 0 4px 8px rgba(2, 119, 189, 0.25);
+	}
 </style>
 
 <div
@@ -406,6 +592,14 @@
 			</svg>
 			Export to Excel
 		</a>
+		{% if next_bill_url %}
+			<a href="{{ next_bill_url }}" class="ra-btn ra-btn-next" onclick="return confirm('Are you sure you want to create the Next RA Bill based on this bill\'s quantities? This will carry forward up-to-date quantities as previous quantities.');">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+					<polyline points="9 18 15 12 9 6"></polyline>
+				</svg>
+				Next RA Bill
+			</a>
+		{% endif %}
 	</div>
 
 	{# ── ABSTRACT SHEET ── #}
@@ -472,17 +666,19 @@
 						<th rowspan="2">QTY</th>
 						<th rowspan="2">RATE</th>
 						<th rowspan="2">AMOUNT</th>
-						<th colspan="3" class="group-header">QUANTITY</th>
-						<th colspan="3" class="group-header">AMOUNT</th>
+						<th colspan="4" class="group-header">QUANTITY</th>
+						<th colspan="4" class="group-header">AMOUNT</th>
 					</tr>
 					{# Header Row 2 - Sub-headers #}
 					<tr>
 						<th>UPTO PREV</th>
 						<th class="highlight-header">IN THIS BILL</th>
 						<th>UPTO DATE</th>
+						<th>BALANCE</th>
 						<th>UPTO PREV</th>
 						<th class="highlight-header">THIS BILL</th>
 						<th>UPTO DATE</th>
+						<th>BALANCE</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -496,16 +692,19 @@
 							<td class="align-right">{{ item.po_amount|number_format(0, '.', ',') }}</td>
 							<td class="align-right" data-col="prev_qty">{{ item.prev_qty|number_format(0, '.', ',') }}</td>
 							<td class="align-center highlight-cell" data-col="current_qty">
-								<input type="number" class="ra-qty-input" value="{{ item.current_qty|number_format(0) }}" data-original="{{ item.current_qty|number_format(0) }}" data-paragraph-id="{{ item.paragraph_id }}" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for {{ item.description|escape('html_attr') }}"/>
+								<input type="number" class="ra-qty-input {% if item.validation_status == 'over_claimed' %}over-claimed{% endif %}" value="{{ item.current_qty }}" data-original="{{ item.current_qty }}" data-approved="{{ item.approved_qty }}" data-paragraph-id="{{ item.paragraph_id }}" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for {{ item.description|escape('html_attr') }}"/>
+								<div class="ra-qty-warning" style="{% if item.validation_status != 'over_claimed' %}display: none;{% endif %} color: #dc2626; font-size: 10px; font-weight: bold; margin-top: 4px;">Quantity exceeds approved limit.</div>
 							</td>
 							<td class="align-right" data-col="cumulative_qty">{{ item.cumulative_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-right" data-col="balance_qty">{{ item.balance_qty|number_format(0, '.', ',') }}</td>
 							<td class="align-right" data-col="prev_amount">{{ item.prev_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right highlight-cell" data-col="current_amount">{{ item.current_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right" data-col="cumulative_amount">{{ item.cumulative_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right" data-col="balance_amount">{{ item.balance_amount|number_format(2, '.', ',') }}</td>
 						</tr>
 					{% else %}
 						<tr>
-							<td colspan="12" class="align-center" style="padding: 20px; color: #64748b;">No line items found.</td>
+							<td colspan="14" class="align-center" style="padding: 20px; color: #64748b;">No line items found.</td>
 						</tr>
 					{% endfor %}
 				</tbody>
@@ -517,13 +716,89 @@
 							<td class="align-right"></td>
 							<td class="align-center highlight-cell"></td>
 							<td class="align-right"></td>
+							<td class="align-right"></td>
 							<td class="align-right text-bold" data-total="prev_amount">{{ metadata.total_prev_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right highlight-cell text-bold" data-total="this_bill_amount">{{ metadata.total_this_bill_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right text-bold" data-total="upto_date_amount">{{ metadata.total_upto_date_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right text-bold" data-total="balance_amount">{{ metadata.total_balance_amount|number_format(2, '.', ',') }}</td>
 						</tr>
 					</tfoot>
 				{% endif %}
 			</table>
+		</div>
+		
+		{# Add Item Button Row #}
+		<div class="ra-add-item-row">
+			<button type="button" class="ra-btn ra-btn-add-item" onclick="raOpenAddItemModal()">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<line x1="12" y1="5" x2="12" y2="19"></line>
+					<line x1="5" y1="12" x2="19" y2="12"></line>
+				</svg>
+				Add New Item
+			</button>
+		</div>
+	</div>
+
+	{# ── Add Item Modal ── #}
+	<div class="ra-modal-backdrop" id="ra-add-item-modal" onclick="if(event.target===this) raCloseAddItemModal()">
+		<div class="ra-modal">
+			<div class="ra-modal-header">
+				<h3 class="ra-modal-title">Add New Item to RA Bill</h3>
+				<button type="button" class="ra-modal-close" onclick="raCloseAddItemModal()" aria-label="Close modal">
+					<svg width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<line x1="18" y1="6" x2="6" y2="18"></line>
+						<line x1="6" y1="6" x2="18" y2="18"></line>
+					</svg>
+				</button>
+			</div>
+
+			<form id="ra-add-item-form" onsubmit="raSubmitAddItem(event)">
+				<div class="ra-form-grid">
+					<!-- Item Code and Description -->
+					<div class="ra-form-group ra-col-span-4">
+						<label class="ra-form-label" for="ra-input-code">Item Code / Sl.No</label>
+						<input type="text" class="ra-form-input" id="ra-input-code" placeholder="e.g. 6"/>
+					</div>
+					<div class="ra-form-group ra-col-span-8">
+						<label class="ra-form-label" for="ra-input-desc">Description <span style="color: #dc2626;">*</span></label>
+						<input type="text" class="ra-form-input" id="ra-input-desc" placeholder="e.g. Media filter feed pumps" required/>
+					</div>
+
+					<!-- UOM Dropdown and Unit Rate -->
+					<div class="ra-form-group ra-col-span-6">
+						<label class="ra-form-label" for="ra-input-uom">Unit of Measurement (UOM)</label>
+						<select class="ra-form-select" id="ra-input-uom">
+							<option value="Nos">Nos</option>
+							<option value="Set">Set</option>
+							<option value="MT">MT</option>
+							<option value="Kg">Kg</option>
+							<option value="Mtr">Mtr</option>
+							<option value="Sq.Mtr">Sq.Mtr</option>
+							<option value="Cu.Mtr">Cu.Mtr</option>
+							<option value="L.S">L.S</option>
+						</select>
+					</div>
+					<div class="ra-form-group ra-col-span-6">
+						<label class="ra-form-label" for="ra-input-rate">Unit Rate (₹) <span style="color: #dc2626;">*</span></label>
+						<input type="number" step="0.01" class="ra-form-input" id="ra-input-rate" placeholder="0.00" required/>
+					</div>
+
+					<!-- PO Approved Quantity and Quantity in This Bill -->
+					<div class="ra-form-group ra-col-span-6">
+						<label class="ra-form-label" for="ra-input-approved">PO Approved Qty <span style="color: #dc2626;">*</span></label>
+						<input type="number" step="any" class="ra-form-input" id="ra-input-approved" placeholder="0" required/>
+					</div>
+					<div class="ra-form-group ra-col-span-6">
+						<label class="ra-form-label" for="ra-input-qty" style="color: #0f172a; font-weight: 700;">Qty in This Bill</label>
+						<input type="number" step="any" class="ra-form-input" id="ra-input-qty" value="0" min="0" required/>
+					</div>
+				</div>
+
+				<div class="ra-modal-footer">
+					<button type="button" class="ra-btn ra-btn-cancel" onclick="raCloseAddItemModal()">Cancel</button>
+					<button type="submit" class="ra-btn ra-btn-submit" id="ra-modal-submit-btn">Add to Bill</button>
+				</div>
+			</form>
 		</div>
 	</div>
 
@@ -544,6 +819,7 @@ window.raMarkDirty = function (input) {
 var pid = input.getAttribute('data-paragraph-id');
 var original = parseFloat(input.getAttribute('data-original')) || 0;
 var current = parseFloat(input.value) || 0;
+var approved = parseFloat(input.getAttribute('data-approved')) || 0;
 var row = input.closest('tr');
 var rate = parseFloat(row.getAttribute('data-rate')) || 0;
 
@@ -556,16 +832,35 @@ input.classList.remove('dirty');
 delete dirtyFields[pid];
 }
 
-// Live preview: update cumulative_qty, current_amount, cumulative_amount in-row
+// Live preview: update cumulative_qty, balance_qty, current_amount, cumulative_amount, balance_amount in-row
 var prevQty = parseFloat((row.querySelector('[data-col="prev_qty"]').textContent || '0').replace(/,/g, ''));
 var cumQty = prevQty + current;
+var balQty = approved - cumQty;
 var curAmt = current * rate;
 var cumAmt = cumQty * rate;
-var prevAmt = prevQty * rate;
+var balAmt = balQty * rate;
 
 row.querySelector('[data-col="cumulative_qty"]').textContent = formatNumber(cumQty, 0);
+row.querySelector('[data-col="balance_qty"]').textContent = formatNumber(balQty, 0);
 row.querySelector('[data-col="current_amount"]').textContent = formatNumber(curAmt, 2);
 row.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(cumAmt, 2);
+row.querySelector('[data-col="balance_amount"]').textContent = formatNumber(balAmt, 2);
+
+// Real-time validation visual cue & warning message
+var warningDiv = row.querySelector('.ra-qty-warning');
+if (cumQty > approved) {
+input.classList.add('over-claimed');
+if (warningDiv) {
+warningDiv.style.display = 'block';
+}
+// Show toast notification
+showToast('Warning: Quantity exceeds approved BOQ limit.', 'error');
+} else {
+input.classList.remove('over-claimed');
+if (warningDiv) {
+warningDiv.style.display = 'none';
+}
+}
 
 // Recalculate footer totals
 recalcTotals();
@@ -587,22 +882,23 @@ var table = document.getElementById('ra-abstract-table');
 if (! table) 
 return;
 
-
-
 var rows = table.querySelectorAll('tbody tr[data-paragraph-id]');
 var totalPrev = 0,
 totalThis = 0,
-totalUpto = 0;
+totalUpto = 0,
+totalBalance = 0;
 
 rows.forEach(function (row) {
 totalPrev += parseCellNum(row.querySelector('[data-col="prev_amount"]'));
 totalThis += parseCellNum(row.querySelector('[data-col="current_amount"]'));
 totalUpto += parseCellNum(row.querySelector('[data-col="cumulative_amount"]'));
+totalBalance += parseCellNum(row.querySelector('[data-col="balance_amount"]'));
 });
 
 setTotalCell('prev_amount', totalPrev);
 setTotalCell('this_bill_amount', totalThis);
 setTotalCell('upto_date_amount', totalUpto);
+setTotalCell('balance_amount', totalBalance);
 }
 
 function parseCellNum(cell) {
@@ -670,16 +966,31 @@ var tr = document.querySelector('tr[data-paragraph-id="' + row.paragraph_id + '"
 if (! tr) 
 return;
 
-
+var approved = parseFloat(tr.querySelector('.ra-qty-input').getAttribute('data-approved')) || 0;
+var balQty = approved - row.cumulative_qty;
+var rate = parseFloat(tr.getAttribute('data-rate')) || 0;
+var balAmt = balQty * rate;
 
 tr.querySelector('[data-col="prev_qty"]').textContent = formatNumber(row.prev_qty, 0);
 tr.querySelector('[data-col="cumulative_qty"]').textContent = formatNumber(row.cumulative_qty, 0);
+tr.querySelector('[data-col="balance_qty"]').textContent = formatNumber(balQty, 0);
 tr.querySelector('[data-col="prev_amount"]').textContent = formatNumber(row.prev_amount, 2);
 tr.querySelector('[data-col="current_amount"]').textContent = formatNumber(row.current_amount, 2);
 tr.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(row.cumulative_amount, 2);
+tr.querySelector('[data-col="balance_amount"]').textContent = formatNumber(balAmt, 2);
+
+// Update validation class & warning style
+var warningDiv = tr.querySelector('.ra-qty-warning');
+var input = tr.querySelector('.ra-qty-input');
+if (row.validation_status === 'over_claimed') {
+if (input) input.classList.add('over-claimed');
+if (warningDiv) warningDiv.style.display = 'block';
+} else {
+if (input) input.classList.remove('over-claimed');
+if (warningDiv) warningDiv.style.display = 'none';
+}
 
 // Update input original value and mark as saved
-var input = tr.querySelector('.ra-qty-input');
 if (input) {
 input.setAttribute('data-original', row.current_qty);
 input.classList.remove('dirty');
@@ -696,6 +1007,8 @@ setTotalCell('prev_amount', data.totals.total_prev_amount);
 setTotalCell('this_bill_amount', data.totals.total_this_bill_amount);
 setTotalCell('upto_date_amount', data.totals.total_upto_date_amount);
 setTotalCell('po_amount', data.totals.total_po_amount);
+var totalBalance = data.totals.total_po_amount - data.totals.total_upto_date_amount;
+setTotalCell('balance_amount', totalBalance);
 }
 
 dirtyFields = {};
@@ -722,5 +1035,129 @@ setTimeout(function () {
 toast.classList.remove('show');
 }, 3000);
 }
+
+window.raOpenAddItemModal = function () {
+  document.getElementById('ra-add-item-modal').classList.add('show');
+};
+
+window.raCloseAddItemModal = function () {
+  document.getElementById('ra-add-item-modal').classList.remove('show');
+  document.getElementById('ra-add-item-form').reset();
+};
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+window.raSubmitAddItem = function (event) {
+  event.preventDefault();
+  
+  var currentQty = parseFloat(document.getElementById('ra-input-qty').value) || 0;
+  var code = document.getElementById('ra-input-code').value;
+  var desc = document.getElementById('ra-input-desc').value;
+  var uom = document.getElementById('ra-input-uom').value;
+  var rate = parseFloat(document.getElementById('ra-input-rate').value) || 0;
+  var approved = parseFloat(document.getElementById('ra-input-approved').value) || 0;
+  
+  if (!desc) {
+    showToast('Please enter a description.', 'error');
+    return;
+  }
+  
+  var payload = {
+    current_qty: currentQty,
+    item_code: code,
+    description: desc,
+    uom: uom,
+    rate: rate,
+    approved_qty: approved
+  };
+  
+  var container = document.getElementById('ra-excel-container');
+  var nid = container.getAttribute('data-nid');
+  var url = '/admin/ra-bills/' + nid + '/add-item';
+  
+  var submitBtn = document.getElementById('ra-modal-submit-btn');
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Adding...';
+  
+  fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(function (response) {
+    return response.json();
+  })
+  .then(function (data) {
+    if (data.success) {
+      var item = data.item;
+      
+      // Append row to table
+      var tr = document.createElement('tr');
+      tr.setAttribute('data-paragraph-id', item.paragraph_id);
+      tr.setAttribute('data-rate', item.rate);
+      
+      var index = document.querySelectorAll('#ra-abstract-table tbody tr[data-paragraph-id]').length + 1;
+      
+      tr.innerHTML = 
+        '<td class="align-center text-bold">' + index + '</td>' +
+        '<td class="align-left desc-cell">' + escapeHtml(item.description) + '</td>' +
+        '<td class="align-center">' + escapeHtml(item.uom) + '</td>' +
+        '<td class="align-right">' + formatNumber(item.approved_qty, 0) + '</td>' +
+        '<td class="align-right">' + formatNumber(item.rate, 2) + '</td>' +
+        '<td class="align-right">' + formatNumber(item.po_amount, 0) + '</td>' +
+        '<td class="align-right" data-col="prev_qty">' + formatNumber(item.prev_qty, 0) + '</td>' +
+        '<td class="align-center highlight-cell" data-col="current_qty">' +
+          '<input type="number" class="ra-qty-input ' + (item.validation_status === 'over_claimed' ? 'over-claimed' : '') + '" value="' + item.current_qty + '" data-original="' + item.current_qty + '" data-approved="' + item.approved_qty + '" data-paragraph-id="' + item.paragraph_id + '" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for ' + escapeHtml(item.description) + '"/>' +
+          '<div class="ra-qty-warning" style="' + (item.validation_status !== 'over_claimed' ? 'display: none;' : '') + ' color: #dc2626; font-size: 10px; font-weight: bold; margin-top: 4px;">Quantity exceeds approved limit.</div>' +
+        '</td>' +
+        '<td class="align-right" data-col="cumulative_qty">' + formatNumber(item.cumulative_qty, 0) + '</td>' +
+        '<td class="align-right" data-col="balance_qty">' + formatNumber(item.balance_qty, 0) + '</td>' +
+        '<td class="align-right" data-col="prev_amount">' + formatNumber(item.prev_amount, 2) + '</td>' +
+        '<td class="align-right highlight-cell" data-col="current_amount">' + formatNumber(item.current_amount, 2) + '</td>' +
+        '<td class="align-right" data-col="cumulative_amount">' + formatNumber(item.cumulative_amount, 2) + '</td>' +
+        '<td class="align-right" data-col="balance_amount">' + formatNumber(item.balance_amount, 2) + '</td>';
+      
+      var tbody = document.querySelector('#ra-abstract-table tbody');
+      var emptyRow = tbody.querySelector('tr td[colspan]');
+      if (emptyRow && emptyRow.closest('tr')) {
+        emptyRow.closest('tr').remove();
+      }
+      tbody.appendChild(tr);
+      
+      // Update totals
+      if (data.totals) {
+        setTotalCell('prev_amount', data.totals.total_prev_amount);
+        setTotalCell('this_bill_amount', data.totals.total_this_bill_amount);
+        setTotalCell('upto_date_amount', data.totals.total_upto_date_amount);
+        setTotalCell('po_amount', data.totals.total_po_amount);
+        var totalBalance = data.totals.total_po_amount - data.totals.total_upto_date_amount;
+        setTotalCell('balance_amount', totalBalance);
+      }
+      
+      raCloseAddItemModal();
+      showToast('Item added successfully!', 'success');
+    } else {
+      showToast('Error: ' + (data.error || 'Unknown error'), 'error');
+    }
+  })
+  .catch(function (err) {
+    showToast('Network error: ' + err.message, 'error');
+  })
+  .finally(function () {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Add to Bill';
+  });
+};
 })();
 </script>

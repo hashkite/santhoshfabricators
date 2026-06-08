@@ -188,6 +188,53 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
     }
   }
 
+  // 1.5. Support manual creation: if field_ra_bill_items is empty and project is set, populate it from BOQ items
+  if ($node->hasField('field_ra_bill_items') && $node->get('field_ra_bill_items')->isEmpty()) {
+    $project_id = !$node->get('field_project')->isEmpty() ? $node->get('field_project')->target_id : NULL;
+    if ($project_id) {
+      $boq_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('type', 'boq_item')
+        ->condition('field_project', $project_id);
+      $boq_ids = $boq_query->execute();
+      
+      if (!empty($boq_ids)) {
+        /** @var \Drupal\ra_bill_manager\Validation\BOQValidator $boq_validator */
+        $boq_validator = \Drupal::service('ra_bill_manager.boq_validator');
+        /** @var \Drupal\ra_bill_manager\Paragraph\ParagraphManager $paragraph_creator */
+        $paragraph_creator = \Drupal::service('ra_bill_manager.paragraph_creator');
+
+        $paragraphs = [];
+        foreach ($boq_ids as $boq_id) {
+          $boq_item = \Drupal::entityTypeManager()->getStorage('node')->load($boq_id);
+          if ($boq_item) {
+            $item_code = $boq_item->get('field_item_code')->value ?? '';
+            $description = $boq_item->get('field_item_description')->value ?? '';
+            $uom = !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
+            $po_qty = floatval($boq_item->get('field_approved_quantity')->value ?? 0.0);
+            $rate = floatval($boq_item->get('field_unit_rate')->value ?? 0.0);
+
+            $item_data = [
+              'item_code' => $item_code,
+              'description' => $description,
+              'uom' => $uom,
+              'po_qty' => $po_qty,
+              'rate' => $rate,
+              'current_qty' => 0.0,
+            ];
+
+            $paragraphs[] = $paragraph_creator->createBillItem(
+              $node->isNew() ? NULL : $node->id(),
+              $project_id,
+              $item_data
+            );
+          }
+        }
+        $node->set('field_ra_bill_items', $paragraphs);
+      }
+    }
+  }
+
   // 2. Perform validations, cumulative tracking, and sum totals for ALL items
   // (Both automatically imported and manually added/edited items)
   if ($node->hasField('field_ra_bill_items') && !$node->get('field_ra_bill_items')->isEmpty()) {
@@ -425,6 +472,8 @@ function ra_bill_manager_theme($existing, $type, $theme, $path) {
         'export_url' => '',
         'create_invoice_url' => '',
         'update_url' => '',
+        'next_bill_url' => '',
+        'add_item_url' => '',
         'ra_bill_nid' => '',
       ],
     ],
@@ -545,6 +594,8 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
         $prev_amount = $prev_qty * $unit_rate;
         $current_amount = $current_qty * $unit_rate;
         $cumulative_amount = $cumulative_qty * $unit_rate;
+        $balance_qty = $approved_qty - $cumulative_qty;
+        $balance_amount = $balance_qty * $unit_rate;
 
         $total_po_amount += $po_amount;
         $total_prev_amount += $prev_amount;
@@ -553,8 +604,8 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
 
         $items[] = [
           'paragraph_id' => $item->id(),
-          'item_code' => $item->get('field_item_code')->value ?? '',
-          'description' => $item->get('field_item_description')->value ?? '',
+          'item_code' => $boq_item ? ($boq_item->get('field_item_code')->value ?? '') : ($item->get('field_item_code')->value ?? ''),
+          'description' => $boq_item ? ($boq_item->get('field_item_description')->value ?? '') : ($item->get('field_item_description')->value ?? ''),
           'uom' => $uom,
           'rate' => $unit_rate,
           'approved_qty' => $approved_qty,
@@ -562,9 +613,12 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
           'prev_qty' => $prev_qty,
           'current_qty' => $current_qty,
           'cumulative_qty' => $cumulative_qty,
+          'balance_qty' => $balance_qty,
           'prev_amount' => $prev_amount,
           'current_amount' => $current_amount,
           'cumulative_amount' => $cumulative_amount,
+          'balance_amount' => $balance_amount,
+          'validation_status' => $item->get('field_validation_status')->value ?? 'valid',
         ];
       }
     }
@@ -574,6 +628,7 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
     $metadata['total_prev_amount'] = $total_prev_amount;
     $metadata['total_this_bill_amount'] = $total_this_bill_amount;
     $metadata['total_upto_date_amount'] = $total_upto_date_amount;
+    $metadata['total_balance_amount'] = $total_po_amount - $total_upto_date_amount;
 
     $build['ra_bill_excel_view'] = [
       '#theme' => 'ra_bill_excel_view',
@@ -582,9 +637,226 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
       '#export_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.export_excel_single', ['node' => $node->id()])->toString(),
       '#create_invoice_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.create_invoice', ['node' => $node->id()])->toString(),
       '#update_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.update_quantities', ['node' => $node->id()])->toString(),
+      '#next_bill_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.next_bill', ['node' => $node->id()])->toString(),
+      '#add_item_url' => \Drupal\Core\Url::fromRoute('ra_bill_manager.add_item', ['node' => $node->id()])->toString(),
       '#ra_bill_nid' => $node->id(),
       '#weight' => -10,
     ];
   }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_insert() for node entities.
+ */
+function ra_bill_manager_node_insert(NodeInterface $node) {
+  if ($node->bundle() === 'ra_bill') {
+    $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
+    if ($po_id) {
+      ra_bill_manager_recalculate_po_bills($po_id);
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_update() for node entities.
+ */
+function ra_bill_manager_node_update(NodeInterface $node) {
+  if ($node->bundle() === 'ra_bill') {
+    $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
+    if ($po_id) {
+      ra_bill_manager_recalculate_po_bills($po_id);
+    }
+  }
+  elseif ($node->bundle() === 'boq_item') {
+    // If a BOQ Item is updated, sync its description and code to all referencing paragraphs
+    $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
+    $p_ids = $paragraph_storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('type', 'ra_bill_item')
+      ->condition('field_boq_item', $node->id())
+      ->execute();
+
+    if (!empty($p_ids)) {
+      $paragraphs = $paragraph_storage->loadMultiple($p_ids);
+      $po_ids_to_recalculate = [];
+      $description = $node->get('field_item_description')->value ?? '';
+      $item_code = $node->get('field_item_code')->value ?? '';
+
+      foreach ($paragraphs as $paragraph) {
+        $changed = FALSE;
+        if (($paragraph->get('field_item_description')->value ?? '') !== $description) {
+          $paragraph->set('field_item_description', $description);
+          $changed = TRUE;
+        }
+        if (($paragraph->get('field_item_code')->value ?? '') !== $item_code) {
+          $paragraph->set('field_item_code', $item_code);
+          $changed = TRUE;
+        }
+        if ($changed) {
+          $paragraph->save();
+        }
+
+        // Find parent RA Bill to queue for recalculation
+        $parent = $paragraph->getParentEntity();
+        if ($parent && $parent->bundle() === 'ra_bill') {
+          $po_id = !$parent->get('field_purchase_order')->isEmpty() ? $parent->get('field_purchase_order')->target_id : NULL;
+          if ($po_id) {
+            $po_ids_to_recalculate[$po_id] = $po_id;
+          }
+        }
+      }
+
+      // Trigger recalculation for all affected purchase orders
+      foreach ($po_ids_to_recalculate as $po_id) {
+        ra_bill_manager_recalculate_po_bills($po_id);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_delete() for node entities.
+ */
+function ra_bill_manager_node_delete(NodeInterface $node) {
+  if ($node->bundle() === 'ra_bill') {
+    $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
+    if ($po_id) {
+      ra_bill_manager_recalculate_po_bills($po_id);
+    }
+  }
+}
+
+/**
+ * Utility function to recalculate all RA bills sequentially for a Purchase Order.
+ */
+function ra_bill_manager_recalculate_po_bills($po_id) {
+  // Prevent recursion
+  static $recalculating = [];
+  if (isset($recalculating[$po_id])) {
+    return;
+  }
+  $recalculating[$po_id] = TRUE;
+
+  $node_storage = \Drupal::entityTypeManager()->getStorage('node');
+  $bill_ids = $node_storage->getQuery()
+    ->accessCheck(FALSE)
+    ->condition('type', 'ra_bill')
+    ->condition('field_purchase_order', $po_id)
+    ->execute();
+
+  if (empty($bill_ids)) {
+    unset($recalculating[$po_id]);
+    return;
+  }
+
+  $bills = $node_storage->loadMultiple($bill_ids);
+  
+  // Sort bills by ra_bill_number ascending.
+  usort($bills, function($a, $b) {
+    $num_a = intval($a->get('field_ra_bill_number')->value ?? 0);
+    $num_b = intval($b->get('field_ra_bill_number')->value ?? 0);
+    if ($num_a === $num_b) {
+      return intval($a->id()) <=> intval($b->id());
+    }
+    return $num_a <=> $num_b;
+  });
+
+  // Track running sum of current quantities by BOQ item ID
+  $running_totals = [];
+
+  foreach ($bills as $bill) {
+    $calculated_basic = 0.0;
+    $has_over_claimed = FALSE;
+    $items_updated = FALSE;
+
+    if ($bill->hasField('field_ra_bill_items') && !$bill->get('field_ra_bill_items')->isEmpty()) {
+      $paragraphs = $bill->get('field_ra_bill_items')->referencedEntities();
+      foreach ($paragraphs as $paragraph) {
+        if ($paragraph->bundle() !== 'ra_bill_item') {
+          continue;
+        }
+
+        $boq_item_id = !$paragraph->get('field_boq_item')->isEmpty() ? $paragraph->get('field_boq_item')->target_id : NULL;
+        if (!$boq_item_id) {
+          continue;
+        }
+
+        $prev_qty = $running_totals[$boq_item_id] ?? 0.0;
+        $current_qty = floatval($paragraph->get('field_current_qty')->value ?? 0.0);
+        $cumulative_qty = $prev_qty + $current_qty;
+
+        $boq_item = $paragraph->get('field_boq_item')->entity;
+        $desc_updated = FALSE;
+        if ($boq_item) {
+          $boq_desc = $boq_item->get('field_item_description')->value ?? '';
+          $boq_code = $boq_item->get('field_item_code')->value ?? '';
+          if (($paragraph->get('field_item_description')->value ?? '') !== $boq_desc) {
+            $paragraph->set('field_item_description', $boq_desc);
+            $desc_updated = TRUE;
+          }
+          if (($paragraph->get('field_item_code')->value ?? '') !== $boq_code) {
+            $paragraph->set('field_item_code', $boq_code);
+            $desc_updated = TRUE;
+          }
+        }
+
+        $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
+        $amount_claimed = $current_qty * $unit_rate;
+
+        // Check validation
+        $status = 'valid';
+        if ($boq_item) {
+          $approved_qty = floatval($boq_item->get('field_approved_quantity')->value ?? 0.0);
+          if ($cumulative_qty - $approved_qty > 0.0001) {
+            $status = 'over_claimed';
+          }
+        }
+
+        // Compare old values to prevent unnecessary updates and database writes
+        $old_prev = floatval($paragraph->get('field_previous_qty')->value ?? 0.0);
+        $old_cum = floatval($paragraph->get('field_cumulative_qty')->value ?? 0.0);
+        $old_status = $paragraph->get('field_validation_status')->value ?? '';
+
+        if ($old_prev !== $prev_qty || $old_cum !== $cumulative_qty || $old_status !== $status || $desc_updated) {
+          $paragraph->set('field_previous_qty', $prev_qty);
+          $paragraph->set('field_cumulative_qty', $cumulative_qty);
+          $paragraph->set('field_amount_claimed', $amount_claimed);
+          $paragraph->set('field_validation_status', $status);
+          $paragraph->save();
+          $items_updated = TRUE;
+        }
+
+        $calculated_basic += $amount_claimed;
+        if ($status === 'over_claimed') {
+          $has_over_claimed = TRUE;
+        }
+
+        // Update running total for this BOQ item
+        $running_totals[$boq_item_id] = $cumulative_qty;
+      }
+    }
+
+    // Update bill totals and validation status
+    $cgst = $calculated_basic * 0.09;
+    $sgst = $calculated_basic * 0.09;
+    $total = $calculated_basic + $cgst + $sgst;
+
+    $old_basic = floatval($bill->get('field_basic_amount')->value ?? 0.0);
+    $old_total = floatval($bill->get('field_total_amount')->value ?? 0.0);
+    $old_val_status = $bill->get('field_validation_status')->value ?? '';
+
+    $expected_val_status = $has_over_claimed ? 'need_review' : 'verified';
+
+    if ($old_basic !== $calculated_basic || $old_total !== $total || $old_val_status !== $expected_val_status || $items_updated) {
+      $bill->set('field_basic_amount', $calculated_basic);
+      $bill->set('field_cgst', $cgst);
+      $bill->set('field_sgst', $sgst);
+      $bill->set('field_total_amount', $total);
+      $bill->set('field_validation_status', $expected_val_status);
+      $bill->save();
+    }
+  }
+
+  unset($recalculating[$po_id]);
 }
 

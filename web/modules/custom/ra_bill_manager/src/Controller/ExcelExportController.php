@@ -272,8 +272,8 @@ class ExcelExportController extends ControllerBase {
           $approved_qty = $boq_item ? floatval($boq_item->get('field_approved_quantity')->value ?? 0.0) : 0.0;
           $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
 
-          $item_code = $item->get('field_item_code')->value ?? '';
-          $description = $item->get('field_item_description')->value ?? '';
+          $item_code = $boq_item ? ($boq_item->get('field_item_code')->value ?? '') : ($item->get('field_item_code')->value ?? '');
+          $description = $boq_item ? ($boq_item->get('field_item_description')->value ?? '') : ($item->get('field_item_description')->value ?? '');
           $uom = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
 
           $prev_qty = floatval($item->get('field_previous_qty')->value ?? 0.0);
@@ -459,13 +459,55 @@ class ExcelExportController extends ControllerBase {
     $project_node = !$bill->get('field_project')->isEmpty() ? $bill->get('field_project')->entity : NULL;
     $vendor_node = !$bill->get('field_vendor')->isEmpty() ? $bill->get('field_vendor')->entity : NULL;
     $po_node = !$bill->get('field_purchase_order')->isEmpty() ? $bill->get('field_purchase_order')->entity : NULL;
+    // Load invoice settings for seller/company details
+    $config = \Drupal::config('power_alpha_helper.invoice_settings');
+    $company_name = $config->get('company_name') ?: 'SANTHOSH FABRICATORS PVT. LTD.';
+    $company_gstin = $config->get('company_gstin') ?: '24AAQCS3102E1ZP';
+    $company_pan = $config->get('company_pan') ?: 'AAQCS3102E';
+    $company_address = $config->get('company_address') ?: 'PLOT NO 50/19, TIRUPATI PARK, SIKKA, SIKKA JAMNAGAR, Jamnagar, Gujarat, 361141';
 
     $project_name = $project_node ? $project_node->label() : '';
     $client_name = $project_node && $project_node->hasField('field_client') && !$project_node->get('field_client')->isEmpty()
       ? $project_node->get('field_client')->value
       : 'Aquatech Systems (Asia) Pvt. Ltd.';
 
-    $vendor_name = $vendor_node ? $vendor_node->label() : 'SANTHOSH FABRICATORS PVT. LTD.';
+    // Override from project site's executing office details if available
+    if ($project_node) {
+      if ($project_node->hasField('field_executing_office_gst_numbe') && !$project_node->get('field_executing_office_gst_numbe')->isEmpty()) {
+        $company_gstin = $project_node->get('field_executing_office_gst_numbe')->value;
+        $clean_gstin = preg_replace('/[^a-zA-Z0-9]/', '', $company_gstin);
+        if (strlen($clean_gstin) === 15) {
+          $company_pan = substr($clean_gstin, 2, 10);
+        }
+      }
+      if ($project_node->hasField('field_executing_office_name') && !$project_node->get('field_executing_office_name')->isEmpty()) {
+        $company_name = $project_node->get('field_executing_office_name')->value;
+      }
+      if ($project_node->hasField('field_executing_office_address') && !$project_node->get('field_executing_office_address')->isEmpty()) {
+        $addr = $project_node->get('field_executing_office_address')->first();
+        $addr_parts = [];
+        if ($addr->address_line1) {
+          $addr_parts[] = $addr->address_line1;
+        }
+        if ($addr->address_line2) {
+          $addr_parts[] = $addr->address_line2;
+        }
+        if ($addr->locality) {
+          $addr_parts[] = $addr->locality;
+        }
+        if ($addr->administrative_area) {
+          $addr_parts[] = $addr->administrative_area;
+        }
+        if ($addr->postal_code) {
+          $addr_parts[] = $addr->postal_code;
+        }
+        if (!empty($addr_parts)) {
+          $company_address = implode(', ', $addr_parts);
+        }
+      }
+    }
+
+    $vendor_name = $vendor_node ? $vendor_node->label() : $company_name;
     $vendor_gst = $vendor_node && $vendor_node->hasField('field_gst_number') && !$vendor_node->get('field_gst_number')->isEmpty()
       ? $vendor_node->get('field_gst_number')->value
       : '24AABCA1850C2ZE';
@@ -533,14 +575,14 @@ class ExcelExportController extends ControllerBase {
     $sheet1->setCellValue('F8', ': ' . $po_date);
 
     $sheet1->setCellValue('D9', 'GSTN NO.');
-    $sheet1->setCellValue('F9', ': 24AAQCS3102E1ZP');
+    $sheet1->setCellValue('F9', ': ' . $company_gstin);
 
     $sheet1->setCellValue('B10', 'GSTIN NO : ' . $vendor_gst);
     $sheet1->setCellValue('D10', 'SAC NO.');
     $sheet1->setCellValue('F10', ': 995442');
 
     $sheet1->setCellValue('D11', 'PAN NO.');
-    $sheet1->setCellValue('F11', ': AAQCS3102E');
+    $sheet1->setCellValue('F11', ': ' . $company_pan);
 
     $sheet1->setCellValue('D12', 'RA');
     $sheet1->setCellValue('F12', ': ' . sprintf('%02d', $ra_no));
@@ -723,7 +765,7 @@ class ExcelExportController extends ControllerBase {
         $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
         $uom = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
 
-        $description = $item->get('field_item_description')->value ?? '';
+        $description = $boq_item ? ($boq_item->get('field_item_description')->value ?? '') : ($item->get('field_item_description')->value ?? '');
         $prev_qty = floatval($item->get('field_previous_qty')->value ?? 0.0);
         $current_qty = floatval($item->get('field_current_qty')->value ?? 0.0);
 

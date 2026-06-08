@@ -15,7 +15,8 @@ use Drupal\Core\Entity\EntityInterface;
  *   - purchase_order → field_po_number     (PO-YYYY-NNNN)
  *   - invoice        → field_invoice_no    (INV-YYYY-NNNN)
  */
-function power_alpha_helper_entity_presave(EntityInterface $entity) {
+function power_alpha_helper_entity_presave(EntityInterface $entity)
+{
   if (!$entity instanceof \Drupal\node\NodeInterface) {
     return;
   }
@@ -81,7 +82,8 @@ function power_alpha_helper_entity_presave(EntityInterface $entity) {
  * @return int
  *   The next sequential number.
  */
-function _power_alpha_helper_get_next_id($bundle, $field_name, $prefix) {
+function _power_alpha_helper_get_next_id($bundle, $field_name, $prefix)
+{
   $database = \Drupal::database();
   $table = 'node__' . $field_name;
   $column = $field_name . '_value';
@@ -115,7 +117,8 @@ function _power_alpha_helper_get_next_id($bundle, $field_name, $prefix) {
  * @return int
  *   The next sequential number.
  */
-function _power_alpha_helper_get_next_id_from_title($bundle, $prefix) {
+function _power_alpha_helper_get_next_id_from_title($bundle, $prefix)
+{
   $database = \Drupal::database();
 
   $query = $database->select('node_field_data', 'n');
@@ -133,7 +136,8 @@ function _power_alpha_helper_get_next_id_from_title($bundle, $prefix) {
 /**
  * Implements hook_theme().
  */
-function power_alpha_helper_theme($existing, $type, $theme, $path) {
+function power_alpha_helper_theme($existing, $type, $theme, $path)
+{
   return [
     'dashboard_overview' => [
       'variables' => ['data' => NULL],
@@ -159,13 +163,6 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
     }
   }
 
-  // Purchase Order: hide PO number on create.
-  if ($form_id == 'node_purchase_order_form') {
-    if (isset($form['field_po_number'])) {
-      $form['field_po_number']['#access'] = FALSE;
-    }
-  }
-
   // Invoice: hide invoice number on create.
   if ($form_id == 'node_invoice_form') {
     if (isset($form['field_invoice_no'])) {
@@ -187,12 +184,6 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
       $form['title']['widget'][0]['value']['#attributes']['class'][] = 'form-item--readonly';
     }
   }
-  if ($form_id == 'node_purchase_order_edit_form' && isset($form['field_po_number'])) {
-    $form['field_po_number']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
-  }
-  if ($form_id == 'node_invoice_edit_form' && isset($form['field_invoice_no'])) {
-    $form['field_invoice_no']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
-  }
   if ($form_id == 'node_project_sites_edit_form' && isset($form['field_project_code'])) {
     $form['field_project_code']['widget'][0]['value']['#attributes']['readonly'] = 'readonly';
   }
@@ -203,7 +194,7 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
       // 1. Wrap the target fields in wrappers for AJAX replacement
       $form['field_amount_gst']['#prefix'] = '<div id="po-amount-gst-wrapper">';
       $form['field_amount_gst']['#suffix'] = '</div>';
-      
+
       if (isset($form['field_gst'])) {
         $form['field_gst']['#prefix'] = '<div id="po-gst-wrapper">';
         $form['field_gst']['#suffix'] = '</div>';
@@ -306,15 +297,15 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
             $user_input = $form_state->getUserInput();
 
             if (isset($user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'])) {
-               $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
+              $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
             } elseif (isset($subform['field_wages_payment']['widget'][0]['value']['#default_value'])) {
-               $wages = $subform['field_wages_payment']['widget'][0]['value']['#default_value'];
+              $wages = $subform['field_wages_payment']['widget'][0]['value']['#default_value'];
             }
 
             if (isset($user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'])) {
-               $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
+              $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
             } elseif (isset($subform['field_other_payment']['widget'][0]['value']['#default_value'])) {
-               $other = $subform['field_other_payment']['widget'][0]['value']['#default_value'];
+              $other = $subform['field_other_payment']['widget'][0]['value']['#default_value'];
             }
 
             $wages = (float) $wages;
@@ -325,12 +316,12 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
                 $pf = $wages * 0.24;
                 $subform['field_pf']['widget'][0]['value']['#value'] = number_format($pf, 2, '.', '');
               }
-              
+
               if (isset($subform['field_esi'])) {
                 $esi = $wages * 0.04;
                 $subform['field_esi']['widget'][0]['value']['#value'] = number_format($esi, 2, '.', '');
               }
-              
+
               if (isset($subform['field_total_amount'])) {
                 $total = $wages + $other;
                 $subform['field_total_amount']['widget'][0]['value']['#value'] = number_format($total, 2, '.', '');
@@ -369,7 +360,7 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
 
     // 4. Calculate total for the parent field_amount
     $user_input = $form_state->getUserInput();
-    
+
     // Sum salary
     $salary_total = 0;
     if (isset($form['field_salary_details']['widget'])) {
@@ -378,16 +369,16 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
           $wages = 0;
           $other = 0;
           if (isset($user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'])) {
-             $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
+            $wages = $user_input['field_salary_details'][$delta]['subform']['field_wages_payment'][0]['value'];
           } elseif (isset($form['field_salary_details']['widget'][$delta]['subform']['field_wages_payment']['widget'][0]['value']['#default_value'])) {
-             $wages = $form['field_salary_details']['widget'][$delta]['subform']['field_wages_payment']['widget'][0]['value']['#default_value'];
+            $wages = $form['field_salary_details']['widget'][$delta]['subform']['field_wages_payment']['widget'][0]['value']['#default_value'];
           }
           if (isset($user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'])) {
-             $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
+            $other = $user_input['field_salary_details'][$delta]['subform']['field_other_payment'][0]['value'];
           } elseif (isset($form['field_salary_details']['widget'][$delta]['subform']['field_other_payment']['widget'][0]['value']['#default_value'])) {
-             $other = $form['field_salary_details']['widget'][$delta]['subform']['field_other_payment']['widget'][0]['value']['#default_value'];
+            $other = $form['field_salary_details']['widget'][$delta]['subform']['field_other_payment']['widget'][0]['value']['#default_value'];
           }
-          $salary_total += (float)$wages + (float)$other;
+          $salary_total += (float) $wages + (float) $other;
         }
       }
     }
@@ -399,11 +390,11 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
         if (is_numeric($delta)) {
           $amt = 0;
           if (isset($user_input['field_inventory_details'][$delta]['subform']['field_amount'][0]['value'])) {
-             $amt = $user_input['field_inventory_details'][$delta]['subform']['field_amount'][0]['value'];
+            $amt = $user_input['field_inventory_details'][$delta]['subform']['field_amount'][0]['value'];
           } elseif (isset($form['field_inventory_details']['widget'][$delta]['subform']['field_amount']['widget'][0]['value']['#default_value'])) {
-             $amt = $form['field_inventory_details']['widget'][$delta]['subform']['field_amount']['widget'][0]['value']['#default_value'];
+            $amt = $form['field_inventory_details']['widget'][$delta]['subform']['field_amount']['widget'][0]['value']['#default_value'];
           }
-          $inventory_total += (float)$amt;
+          $inventory_total += (float) $amt;
         }
       }
     }
@@ -415,11 +406,11 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
         if (is_numeric($delta)) {
           $amt = 0;
           if (isset($user_input['field_room_rent_details'][$delta]['subform']['field_amounts'][0]['value'])) {
-             $amt = $user_input['field_room_rent_details'][$delta]['subform']['field_amounts'][0]['value'];
+            $amt = $user_input['field_room_rent_details'][$delta]['subform']['field_amounts'][0]['value'];
           } elseif (isset($form['field_room_rent_details']['widget'][$delta]['subform']['field_amounts']['widget'][0]['value']['#default_value'])) {
-             $amt = $form['field_room_rent_details']['widget'][$delta]['subform']['field_amounts']['widget'][0]['value']['#default_value'];
+            $amt = $form['field_room_rent_details']['widget'][$delta]['subform']['field_amounts']['widget'][0]['value']['#default_value'];
           }
-          $room_rent_total += (float)$amt;
+          $room_rent_total += (float) $amt;
         }
       }
     }
@@ -507,7 +498,7 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
 
             if ($row_has_val) {
               $has_items = TRUE;
-              $items_total += (int)$qty * (float)$rate;
+              $items_total += (int) $qty * (float) $rate;
             }
           }
         }
@@ -523,8 +514,7 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
           $formatted_gst = number_format($total_gst, 0, '.', '');
         }
         $form['field_basic_value_gst']['widget'][0]['value']['#value'] = $formatted_gst;
-      }
-      else {
+      } else {
         // Fallback: calculate GST based on manual basic value
         $basic_value = 0;
         if (isset($user_input['field_basic_value'][0]['value'])) {
@@ -634,15 +624,15 @@ function power_alpha_helper_expenses_ajax_callback(array &$form, FormStateInterf
 function power_alpha_helper_purchase_order_ajax_callback(array &$form, FormStateInterface $form_state)
 {
   $response = new AjaxResponse();
-  
+
   if (isset($form['field_amount_gst'])) {
     $response->addCommand(new ReplaceCommand('#po-amount-gst-wrapper', $form['field_amount_gst']));
   }
-  
+
   if (isset($form['field_gst'])) {
     $response->addCommand(new ReplaceCommand('#po-gst-wrapper', $form['field_gst']));
   }
-  
+
   return $response;
 }
 
@@ -652,18 +642,19 @@ function power_alpha_helper_purchase_order_ajax_callback(array &$form, FormState
 function power_alpha_helper_invoice_gst_ajax_callback(array &$form, FormStateInterface $form_state)
 {
   $response = new AjaxResponse();
-  
+
   if (isset($form['field_basic_value_gst'])) {
     $response->addCommand(new ReplaceCommand('#invoice-gst-wrapper', $form['field_basic_value_gst']));
   }
-  
+
   return $response;
 }
 
 /**
  * AJAX callback to return updated basic value and basic value + GST fields for invoices.
  */
-function power_alpha_helper_invoice_items_ajax_callback(array &$form, FormStateInterface $form_state) {
+function power_alpha_helper_invoice_items_ajax_callback(array &$form, FormStateInterface $form_state)
+{
   $response = new AjaxResponse();
 
   if (isset($form['field_basic_value'])) {

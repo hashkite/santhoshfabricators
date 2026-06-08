@@ -8,6 +8,9 @@ dependencies:
     - field.field.node.project_sites.field_allocated_budget
     - field.field.node.project_sites.field_client
     - field.field.node.project_sites.field_end_date
+    - field.field.node.project_sites.field_executing_office_address
+    - field.field.node.project_sites.field_executing_office_gst_numbe
+    - field.field.node.project_sites.field_executing_office_name
     - field.field.node.project_sites.field_image
     - field.field.node.project_sites.field_location
     - field.field.node.project_sites.field_po_number
@@ -54,6 +57,9 @@ hidden:
   field_allocated_budget: true
   field_client: true
   field_end_date: true
+  field_executing_office_address: true
+  field_executing_office_gst_numbe: true
+  field_executing_office_name: true
   field_location: true
   field_po_number: true
   field_project_code: true

@@ -1,0 +1,19 @@
+uuid: d971495c-1a09-4233-b16b-456beaabeab7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_executing_office_gst_numbe
+    - node.type.project_sites
+id: node.project_sites.field_executing_office_gst_numbe
+field_name: field_executing_office_gst_numbe
+entity_type: node
+bundle: project_sites
+label: 'Executing Office GST Number'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

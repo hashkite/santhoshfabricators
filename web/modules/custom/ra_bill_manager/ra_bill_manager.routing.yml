@@ -52,3 +52,28 @@ ra_bill_manager.update_quantities:
       node:
         type: 'entity:node'
 
+ra_bill_manager.next_bill:
+  path: '/admin/ra-bills/{node}/next'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\InlineEditController::createNextBill'
+    _title: 'Create Next RA Bill'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+
+ra_bill_manager.add_item:
+  path: '/admin/ra-bills/{node}/add-item'
+  defaults:
+    _controller: '\Drupal\ra_bill_manager\Controller\InlineEditController::addItem'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+

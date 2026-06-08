@@ -244,6 +244,42 @@ function power_alpha_preprocess_node(&$variables)
         if ($project_node->hasField('field_client') && !$project_node->get('field_client')->isEmpty()) {
           $project_client = $project_node->get('field_client')->value;
         }
+
+        // Override invoice executing office details from project site if available.
+        if ($project_node->hasField('field_executing_office_name') && !$project_node->get('field_executing_office_name')->isEmpty()) {
+          $variables['company_name'] = $project_node->get('field_executing_office_name')->value;
+        }
+        if ($project_node->hasField('field_executing_office_gst_numbe') && !$project_node->get('field_executing_office_gst_numbe')->isEmpty()) {
+          $gstin = $project_node->get('field_executing_office_gst_numbe')->value;
+          $variables['company_gstin'] = $gstin;
+          // Extract PAN from GSTIN if it matches standard 15-char format.
+          $clean_gstin = preg_replace('/[^a-zA-Z0-9]/', '', $gstin);
+          if (strlen($clean_gstin) === 15) {
+            $variables['company_pan'] = substr($clean_gstin, 2, 10);
+          }
+        }
+        if ($project_node->hasField('field_executing_office_address') && !$project_node->get('field_executing_office_address')->isEmpty()) {
+          $addr = $project_node->get('field_executing_office_address')->first();
+          $addr_parts = [];
+          if ($addr->address_line1) {
+            $addr_parts[] = $addr->address_line1;
+          }
+          if ($addr->address_line2) {
+            $addr_parts[] = $addr->address_line2;
+          }
+          if ($addr->locality) {
+            $addr_parts[] = $addr->locality;
+          }
+          if ($addr->administrative_area) {
+            $addr_parts[] = $addr->administrative_area;
+          }
+          if ($addr->postal_code) {
+            $addr_parts[] = $addr->postal_code;
+          }
+          if (!empty($addr_parts)) {
+            $variables['company_address'] = implode(', ', $addr_parts);
+          }
+        }
       }
     }
     $variables['project_code'] = $project_code;

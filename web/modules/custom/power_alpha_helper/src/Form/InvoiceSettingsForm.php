@@ -119,7 +119,7 @@ class InvoiceSettingsForm extends ConfigFormBase
     $form['buyer_defaults']['default_buyer_gstin'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Buyer GSTIN'),
-      '#default_value' => $config->get('default_buyer_gstin') ?: 'N/A',
+      '#default_value' => $config->get('default_buyer_gstin') ?: 'N/As',
     ];
 
     return parent::buildForm($form, $form_state);

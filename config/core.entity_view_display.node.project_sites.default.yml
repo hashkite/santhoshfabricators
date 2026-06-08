@@ -7,6 +7,9 @@ dependencies:
     - field.field.node.project_sites.field_allocated_budget
     - field.field.node.project_sites.field_client
     - field.field.node.project_sites.field_end_date
+    - field.field.node.project_sites.field_executing_office_address
+    - field.field.node.project_sites.field_executing_office_gst_numbe
+    - field.field.node.project_sites.field_executing_office_name
     - field.field.node.project_sites.field_image
     - field.field.node.project_sites.field_location
     - field.field.node.project_sites.field_po_number
@@ -59,6 +62,29 @@ content:
       format_type: olivero_medium
     third_party_settings: {  }
     weight: 5
+    region: content
+  field_executing_office_address:
+    type: address_default
+    label: above
+    settings: {  }
+    third_party_settings: {  }
+    weight: 12
+    region: content
+  field_executing_office_gst_numbe:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 13
+    region: content
+  field_executing_office_name:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 11
     region: content
   field_image:
     type: image

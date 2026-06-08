@@ -1,0 +1,38 @@
+uuid: 3fbac323-2b05-4649-a112-3456f1e0672c
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_executing_office_address
+    - node.type.project_sites
+  module:
+    - address
+id: node.project_sites.field_executing_office_address
+field_name: field_executing_office_address
+entity_type: node
+bundle: project_sites
+label: 'Executing Office Address'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  available_countries:
+    IN: IN
+  langcode_override: ''
+  field_overrides:
+    givenName:
+      override: hidden
+    additionalName:
+      override: hidden
+    familyName:
+      override: hidden
+    organization:
+      override: hidden
+    addressLine2:
+      override: hidden
+    addressLine3:
+      override: hidden
+  fields: {  }
+field_type: address

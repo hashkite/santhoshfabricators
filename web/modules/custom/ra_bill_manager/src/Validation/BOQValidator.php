@@ -144,7 +144,54 @@ class BOQValidator {
       ->condition('field_boq_item', $boq_item_id);
 
     if ($current_bill_id) {
-      $query->condition('parent_id', $current_bill_id, '<>');
+      $current_bill = $this->entityTypeManager->getStorage('node')->load($current_bill_id);
+      if ($current_bill && $current_bill->bundle() === 'ra_bill') {
+        $po_id = !$current_bill->get('field_purchase_order')->isEmpty() ? $current_bill->get('field_purchase_order')->target_id : NULL;
+        $project_id = !$current_bill->get('field_project')->isEmpty() ? $current_bill->get('field_project')->target_id : NULL;
+        $current_ra_num = intval($current_bill->get('field_ra_bill_number')->value ?? 0);
+        
+        $bill_query = $this->entityTypeManager->getStorage('node')->getQuery()
+          ->accessCheck(FALSE)
+          ->condition('type', 'ra_bill');
+          
+        if ($po_id) {
+          $bill_query->condition('field_purchase_order', $po_id);
+        }
+        elseif ($project_id) {
+          $bill_query->condition('field_project', $project_id);
+        }
+        else {
+          // If no PO or Project, we cannot group, fallback to original logic
+          $bill_query->condition('nid', $current_bill_id, '<>');
+        }
+        
+        $bill_ids = $bill_query->execute();
+        
+        if (!empty($bill_ids)) {
+          $bills = $this->entityTypeManager->getStorage('node')->loadMultiple($bill_ids);
+          $valid_parent_ids = [];
+          foreach ($bills as $bill) {
+            $ra_num = intval($bill->get('field_ra_bill_number')->value ?? 0);
+            // Only include bills with a lower RA number
+            if ($ra_num < $current_ra_num) {
+              $valid_parent_ids[] = $bill->id();
+            }
+          }
+          if (!empty($valid_parent_ids)) {
+            $query->condition('parent_id', $valid_parent_ids, 'IN');
+          }
+          else {
+            // No preceding bills found, previous quantity must be 0
+            return 0.0;
+          }
+        }
+        else {
+          return 0.0;
+        }
+      }
+      else {
+        $query->condition('parent_id', $current_bill_id, '<>');
+      }
     }
 
     $p_ids = $query->execute();
@@ -155,7 +202,10 @@ class BOQValidator {
     $previous_qty = 0.0;
     $paragraphs = $paragraph_storage->loadMultiple($p_ids);
     foreach ($paragraphs as $paragraph) {
-      $previous_qty += floatval($paragraph->get('field_current_qty')->value ?? 0.0);
+      $parent = $paragraph->getParentEntity();
+      if ($parent && $parent->bundle() === 'ra_bill') {
+        $previous_qty += floatval($paragraph->get('field_current_qty')->value ?? 0.0);
+      }
     }
 
     return $previous_qty;

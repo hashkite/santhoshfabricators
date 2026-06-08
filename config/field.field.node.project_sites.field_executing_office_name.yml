@@ -1,0 +1,19 @@
+uuid: f9e0033d-fbd9-4134-932b-bc8ff5032334
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_executing_office_name
+    - node.type.project_sites
+id: node.project_sites.field_executing_office_name
+field_name: field_executing_office_name
+entity_type: node
+bundle: project_sites
+label: 'Executing Office name'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string
