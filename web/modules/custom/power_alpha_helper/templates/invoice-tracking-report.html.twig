@@ -1,0 +1,705 @@
+{#
+/**
+ * @file
+ * Invoice Payment Tracking Dashboard template.
+ */
+#}
+<div
+	class="admin-dashboard invoice-tracking-dashboard">
+
+	{# ── DASHBOARD HEADER ── #}
+	<div class="dashboard-overview-header">
+		<div class="dashboard-overview-header__left">
+			<p class="dashboard-overview-subtitle">Track payments, monitoring collections, overdue items, and outstanding client balances.</p>
+		</div>
+		<div class="dashboard-overview-header__right">
+			<a href="/admin/invoices/tracking?export=csv&search={{ filters.search }}&status={{ filters.status }}&due_date={{ filters.due_date }}&project={{ filters.project }}&invoice_no={{ filters.invoice_no }}&po_no={{ filters.po_no }}&month={{ filters.month }}" class="btn-csv-download btn-detail btn-detail--primary">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+					<polyline points="7 10 12 15 17 10"/>
+					<line x1="12" y1="15" x2="12" y2="3"/>
+				</svg>
+				Download CSV
+			</a>
+		</div>
+	</div>
+
+	{# ── KPI STAT CARDS ROW ── #}
+	<div class="kpi-cards-row">
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">TOTAL INVOICED</span>
+				<div class="kpi-card__icon kpi-card__icon--blue">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value">{{ kpis.total_invoiced }}</span>
+			</div>
+		</div>
+
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">TOTAL COLLECTED</span>
+				<div class="kpi-card__icon kpi-card__icon--green">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value" style="color: #16a34a;">{{ kpis.total_collected }}</span>
+			</div>
+		</div>
+
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">TOTAL OUTSTANDING</span>
+				<div class="kpi-card__icon kpi-card__icon--amber">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value" style="color: #2563eb;">{{ kpis.total_outstanding }}</span>
+			</div>
+		</div>
+
+		<div class="kpi-card">
+			<div class="kpi-card__header">
+				<span class="kpi-card__label">OVERDUE INVOICES</span>
+				<div class="kpi-card__icon kpi-card__icon--purple">
+					<svg width="20" height="20" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+				</div>
+			</div>
+			<div class="kpi-card__body">
+				<span class="kpi-card__value" style="color: #dc2626;">{{ kpis.overdue_count }}</span>
+			</div>
+		</div>
+	</div>
+
+	{# ── FILTERS BAR ── #}
+	<div class="tracking-filters-widget">
+		<form method="get" action="/admin/invoices/tracking" class="tracking-filters-form">
+			<div class="tracking-filters-grid">
+
+				<div class="tracking-filter-group">
+					<label for="project" class="tracking-filter-label">Project Site</label>
+					<select name="project" id="project" class="tracking-filter-control">
+						<option value="">- All Projects -</option>
+						{% for id, title in projects_list %}
+							<option value="{{ id }}" {% if filters.project == id %} selected {% endif %}>{{ title }}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<div class="tracking-filter-group">
+					<label for="invoice_no" class="tracking-filter-label">Invoice No.</label>
+					<input type="text" name="invoice_no" id="invoice_no" class="tracking-filter-control" placeholder="Search Invoice No." value="{{ filters.invoice_no }}">
+				</div>
+
+				<div class="tracking-filter-group">
+					<label for="po_no" class="tracking-filter-label">PO Number</label>
+					<input type="text" name="po_no" id="po_no" class="tracking-filter-control" placeholder="Search PO Number" value="{{ filters.po_no }}">
+				</div>
+
+				<div class="tracking-filter-group">
+					<label for="month" class="tracking-filter-label">Month</label>
+					<select name="month" id="month" class="tracking-filter-control">
+						<option value="">- All Months -</option>
+						{% for opt in month_options %}
+							<option value="{{ opt.value }}" {% if filters.month == opt.value %} selected {% endif %}>{{ opt.label }}</option>
+						{% endfor %}
+					</select>
+				</div>
+
+				<div class="tracking-filter-group">
+					<label for="status" class="tracking-filter-label">Payment Status</label>
+					<select name="status" id="status" class="tracking-filter-control">
+						<option value="">- All Statuses -</option>
+						<option value="pending" {% if filters.status == 'pending' %} selected {% endif %}>Pending</option>
+						<option value="partial" {% if filters.status == 'partial' %} selected {% endif %}>Partial</option>
+						<option value="paid" {% if filters.status == 'paid' %} selected {% endif %}>Paid</option>
+						<option value="overdue" {% if filters.status == 'overdue' %} selected {% endif %}>Overdue</option>
+					</select>
+				</div>
+
+				<div class="tracking-filter-group">
+					<label for="due_date" class="tracking-filter-label">Due Date Period</label>
+					<select name="due_date" id="due_date" class="tracking-filter-control">
+						<option value="">- All Dues -</option>
+						<option value="overdue" {% if filters.due_date == 'overdue' %} selected {% endif %}>Overdue Payments</option>
+						<option value="this_week" {% if filters.due_date == 'this_week' %} selected {% endif %}>Due Within 7 Days</option>
+						<option value="this_month" {% if filters.due_date == 'this_month' %} selected {% endif %}>Due Within 30 Days</option>
+					</select>
+				</div>
+
+				<div class="tracking-filter-group">
+					<label for="search" class="tracking-filter-label">Quick Search (All fields)</label>
+					<input type="text" name="search" id="search" class="tracking-filter-control" placeholder="Search Client, Invoice, PO" value="{{ filters.search }}">
+				</div>
+
+				<div class="tracking-filter-actions">
+					<button type="submit" class="btn-apply-filters btn-detail btn-detail--primary">
+						<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+						Apply Filters
+					</button>
+					<a href="/admin/invoices/tracking" class="btn-reset-filters btn-detail btn-detail--outline">Reset</a>
+				</div>
+
+			</div>
+		</form>
+	</div>
+
+	{# ── REPORT TABLE WIDGET ── #}
+	<div class="dashboard-widget">
+		<div class="dashboard-widget__header">
+			<h2 class="dashboard-widget__title" style="margin: 0; font-size: 1.1rem;">Invoices Overview</h2>
+		</div>
+		<div class="dashboard-widget__body dashboard-widget__body--table" style="overflow-x: auto;">
+			{% if rows is not empty %}
+				<table class="activity-table tracking-report-table" style="min-width: 1200px;">
+					<thead>
+						<tr>
+							<th>INVOICE NO</th>
+							<th>CLIENT / PROJECT</th>
+							<th>PO NUMBER</th>
+							<th style="text-align: center;">RA BILL</th>
+							<th>DATE</th>
+							<th style="text-align: right;">BASIC VALUE</th>
+							<th style="text-align: right;">GST(18%)</th>
+							<th style="text-align: right;">TOTAL VALUE</th>
+							<th style="text-align: right;">TDS(2%)</th>
+							<th style="text-align: right;">NET RECEIVABLE</th>
+							<th style="text-align: right;">TOTAL PAID</th>
+							<th style="text-align: right;">RETENTION & BAL</th>
+							<th style="text-align: center;">DUE DATE</th>
+							<th style="text-align: center;">STATUS</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for row in rows %}
+							<tr>
+								<td style="white-space: nowrap;">
+									<a href="/node/{{ row.id }}" class="activity-entity-link" style="font-weight: 700; color: #2563eb; text-decoration: none;">{{ row.invoice_no }}</a>
+								</td>
+								<td>
+									<div style="font-weight: 600; color: #1e293b;">{{ row.client }}</div>
+									<div style="font-size: 0.75rem; color: #64748b; white-space: nowrap;">
+										Project: 
+										{% if row.project_id %}
+											<a href="/node/{{ row.project_id }}" style="color: #2563eb; text-decoration: none; font-weight: 600;">{{ row.project }}</a>
+										{% else %}
+											{{ row.project ?: '-' }}
+										{% endif %}
+									</div>
+								</td>
+								<td style="white-space: nowrap;">
+									{% if row.po_id %}
+										<a href="/node/{{ row.po_id }}" style="color: #2563eb; text-decoration: none; font-weight: 600; font-size: 0.85rem;">{{ row.po_no }}</a>
+									{% else %}
+										<span style="color: #475569; font-weight: 550; font-size: 0.85rem;">{{ row.po_no }}</span>
+									{% endif %}
+								</td>
+								<td style="text-align: center; white-space: nowrap;">
+									<span class="ra-badge">
+										{{ row.ra_num }}
+									</span>
+								</td>
+								<td style="color: #475569; font-size: 0.85rem; white-space: nowrap;">{{ row.date }}</td>
+								<td class="col-monospaced col-basic" style="text-align: right; white-space: nowrap;">{{ row.basic }}</td>
+								<td class="col-monospaced col-gst" style="text-align: right; white-space: nowrap;">{{ row.gst }}</td>
+								<td class="col-monospaced col-total" style="text-align: right; white-space: nowrap;">{{ row.total }}</td>
+								<td class="col-monospaced col-tds" style="text-align: right; white-space: nowrap;">
+									{{ row.tds }}
+									<div style="font-size: 0.65rem; margin-top: 2px; text-align: right; font-family: 'Plus Jakarta Sans', sans-serif;">
+										{% if row.tds_paid %}
+											<span style="color: #16a34a; font-weight: 700;">● Paid</span>
+										{% else %}
+											<span style="color: #dc2626; font-weight: 700;">● Unpaid</span>
+										{% endif %}
+									</div>
+								</td>
+								<td class="col-monospaced col-expected" style="text-align: right; white-space: nowrap;">{{ row.expected }}</td>
+								<td class="col-monospaced col-paid" style="text-align: right; white-space: nowrap;">{{ row.paid }}</td>
+								<td class="col-monospaced" style="text-align: right; white-space: nowrap;">
+									<div class="col-balance" style="font-weight: 800; color: #2563eb;">{{ row.balance }}</div>
+									<div class="col-retention" style="font-size: 0.72rem; margin-top: 2px; color: #d97706; font-family: 'Plus Jakarta Sans', sans-serif;">Ret: {{ row.retention }}</div>
+								</td>
+								<td style="text-align: center; font-size: 0.85rem; font-weight: 600; white-space: nowrap; {% if row.is_overdue %}color: #dc2626; font-weight: 700;{% else %}color: #475569;{% endif %}">
+									{{ row.due_date }}
+								</td>
+								<td style="text-align: center; white-space: nowrap;">
+									<span class="payment-status-badge payment-status-badge--{{ row.status }}">
+										{{ row.status_label }}
+									</span>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			{% else %}
+				<div style="padding: 3rem; text-align: center; color: #64748b; font-style: italic;">
+					No invoices match the specified filter criteria.
+				</div>
+			{% endif %}
+		</div>
+	</div>
+
+</div>
+
+<style>
+	/* Font import for a professional, premium visual experience */
+	@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+	.invoice-tracking-dashboard {
+		font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+		color: #1e293b;
+		max-width: 1400px;
+		margin: 0 auto;
+		padding: 0; /* Remove padding to merge with system layout margins */
+	}
+
+	/* Header Enhancements */
+	.invoice-tracking-dashboard .dashboard-overview-header {
+		border-bottom: 2px solid #f1f5f9;
+		padding-bottom: 1.5rem;
+		margin-bottom: 2.5rem;
+		display: flex !important;
+		justify-content: space-between !important;
+		align-items: center !important;
+		flex-wrap: wrap !important;
+		gap: 1rem !important;
+		box-sizing: border-box !important;
+	}
+	.invoice-tracking-dashboard .dashboard-overview-header__left {
+		flex: 1 !important;
+		min-width: 280px !important;
+	}
+	.invoice-tracking-dashboard .dashboard-overview-subtitle {
+		font-size: 0.95rem;
+		color: #64748b;
+		margin: 0;
+		font-weight: 500;
+	}
+
+	/* Download CSV button styling */
+	.invoice-tracking-dashboard .btn-csv-download {
+		background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+		color: #ffffff !important;
+		font-family: 'Outfit', sans-serif;
+		font-weight: 700 !important;
+		padding: 0.75rem 1.5rem !important;
+		border-radius: 8px !important;
+		box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2) !important;
+		transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		border: none !important;
+		display: inline-flex !important;
+		align-items: center !important;
+		gap: 0.5rem !important;
+		text-decoration: none !important;
+	}
+	.invoice-tracking-dashboard .btn-csv-download:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3) !important;
+		background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+	}
+	.invoice-tracking-dashboard .btn-csv-download:active {
+		transform: translateY(0);
+	}
+
+	/* Stat Cards Enhancements */
+	.invoice-tracking-dashboard .kpi-cards-row {
+		display: grid !important;
+		grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+		gap: 1.5rem !important;
+		margin-bottom: 2.5rem !important;
+	}
+	.invoice-tracking-dashboard .kpi-card {
+		background: #ffffff !important;
+		border: 1px solid #e2e8f0 !important;
+		border-radius: 16px !important;
+		padding: 1.5rem !important;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.02) !important;
+		transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+		position: relative !important;
+		overflow: hidden !important;
+		box-sizing: border-box !important;
+	}
+	.invoice-tracking-dashboard .kpi-card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 4px;
+		background: transparent;
+	}
+	.invoice-tracking-dashboard .kpi-card:hover {
+		transform: translateY(-4px) !important;
+		box-shadow: 0 12px 20px -8px rgba(0, 0, 0, 0.1) !important;
+		border-color: #cbd5e1 !important;
+	}
+
+	/* Card custom top borders */
+	.invoice-tracking-dashboard .kpi-card:nth-child(1)::before {
+		background: linear-gradient(90deg, #3b82f6, #60a5fa);
+	}
+	.invoice-tracking-dashboard .kpi-card:nth-child(2)::before {
+		background: linear-gradient(90deg, #10b981, #34d399);
+	}
+	.invoice-tracking-dashboard .kpi-card:nth-child(3)::before {
+		background: linear-gradient(90deg, #f59e0b, #fbbf24);
+	}
+	.invoice-tracking-dashboard .kpi-card:nth-child(4)::before {
+		background: linear-gradient(90deg, #ef4444, #f87171);
+	}
+
+	.invoice-tracking-dashboard .kpi-card__header {
+		display: flex !important;
+		justify-content: space-between !important;
+		align-items: center !important;
+		margin-bottom: 1rem !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__label {
+		font-size: 0.75rem !important;
+		font-weight: 800 !important;
+		color: #64748b !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.05em !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__icon {
+		width: 42px !important;
+		height: 42px !important;
+		border-radius: 12px !important;
+		display: flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		transition: all 0.2s ease !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__icon--blue {
+		background-color: #eff6ff !important;
+		color: #2563eb !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__icon--green {
+		background-color: #ecfdf5 !important;
+		color: #059669 !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__icon--amber {
+		background-color: #fffbeb !important;
+		color: #d97706 !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__icon--purple {
+		background-color: #fef2f2 !important;
+		color: #dc2626 !important;
+	}
+	.invoice-tracking-dashboard .kpi-card__value {
+		font-family: 'Outfit', sans-serif !important;
+		font-size: 2rem !important;
+		font-weight: 800 !important;
+		line-height: 1 !important;
+	}
+
+	/* Isolated Filters Bar Styling to bypass admin theme overrides */
+	.invoice-tracking-dashboard .tracking-filters-widget {
+		background: #ffffff !important;
+		border: 1px solid #e2e8f0 !important;
+		border-radius: 16px !important;
+		padding: 1.5rem !important;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+		margin-bottom: 2.5rem !important;
+		display: block !important;
+		width: 100% !important;
+		box-sizing: border-box !important;
+	}
+
+	.invoice-tracking-dashboard .tracking-filters-form {
+		display: block !important;
+		width: 100% !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	.invoice-tracking-dashboard .tracking-filters-grid {
+		display: grid !important;
+		grid-template-columns: repeat(4, 1fr) !important;
+		gap: 1.25rem !important;
+		align-items: end !important;
+		width: 100% !important;
+		box-sizing: border-box !important;
+	}
+
+	@media(max-width: 1024px) {
+		.invoice-tracking-dashboard .tracking-filters-grid {
+			grid-template-columns: repeat(2, 1fr) !important;
+		}
+	}
+
+	@media(max-width: 640px) {
+		.invoice-tracking-dashboard .tracking-filters-grid {
+			grid-template-columns: 1fr !important;
+		}
+	}
+
+	.invoice-tracking-dashboard .tracking-filter-group {
+		display: flex !important;
+		flex-direction: column !important;
+		align-items: flex-start !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		width: 100% !important;
+		box-sizing: border-box !important;
+		float: none !important;
+		position: static !important;
+	}
+
+	.invoice-tracking-dashboard .tracking-filter-label {
+		display: block !important;
+		font-size: 0.75rem !important;
+		font-weight: 700 !important;
+		color: #475569 !important;
+		margin-top: 0 !important;
+		margin-bottom: 0.5rem !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.025em !important;
+		float: none !important;
+		width: auto !important;
+		text-align: left !important;
+	}
+
+	.invoice-tracking-dashboard .tracking-filter-control {
+		display: block !important;
+		width: 100% !important;
+		height: 42px !important;
+		box-sizing: border-box !important;
+		border: 1px solid #cbd5e1 !important;
+		border-radius: 8px !important;
+		padding: 0.625rem 0.875rem !important;
+		font-family: 'Plus Jakarta Sans', sans-serif !important;
+		font-size: 0.875rem !important;
+		color: #0f172a !important;
+		background-color: #f8fafc !important;
+		transition: all 0.15s ease-in-out !important;
+		float: none !important;
+		margin: 0 !important;
+	}
+
+	.invoice-tracking-dashboard .tracking-filter-control:focus {
+		border-color: #3b82f6 !important;
+		background-color: #ffffff !important;
+		box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+		outline: none !important;
+	}
+
+	.invoice-tracking-dashboard .tracking-filter-actions {
+		display: flex !important;
+		gap: 0.5rem !important;
+		height: 42px !important;
+		align-items: center !important;
+		width: 100% !important;
+		box-sizing: border-box !important;
+		float: none !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+
+	/* Filter buttons */
+	.invoice-tracking-dashboard .btn-apply-filters {
+		background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+		color: #ffffff !important;
+		font-family: 'Outfit', sans-serif !important;
+		font-weight: 700 !important;
+		border-radius: 8px !important;
+		height: 42px !important;
+		flex: 1 !important;
+		box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15) !important;
+		transition: all 0.2s ease !important;
+		border: none !important;
+		display: inline-flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		cursor: pointer !important;
+		text-decoration: none !important;
+	}
+	.invoice-tracking-dashboard .btn-apply-filters:hover {
+		transform: translateY(-1px) !important;
+		box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25) !important;
+		background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%) !important;
+	}
+	.invoice-tracking-dashboard .btn-reset-filters {
+		background-color: #ffffff !important;
+		color: #475569 !important;
+		font-family: 'Outfit', sans-serif !important;
+		font-weight: 700 !important;
+		border: 1px solid #cbd5e1 !important;
+		border-radius: 8px !important;
+		height: 42px !important;
+		flex: 1 !important;
+		transition: all 0.2s ease !important;
+		display: inline-flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		margin: 0 !important;
+		padding: 0 !important;
+		cursor: pointer !important;
+		text-decoration: none !important;
+	}
+	.invoice-tracking-dashboard .btn-reset-filters:hover {
+		background-color: #f1f5f9 !important;
+		border-color: #94a3b8 !important;
+		color: #1e293b !important;
+	}
+
+	/* Table Card Widget */
+	.invoice-tracking-dashboard .dashboard-widget {
+		background: #ffffff !important;
+		border: 1px solid #e2e8f0 !important;
+		border-radius: 16px !important;
+		box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+		overflow: hidden !important;
+		margin-bottom: 3rem !important;
+	}
+	.invoice-tracking-dashboard .dashboard-widget__header {
+		padding: 1.5rem !important;
+		border-bottom: 1px solid #f1f5f9 !important;
+		background: #f8fafc !important;
+	}
+	.invoice-tracking-dashboard .dashboard-widget__title {
+		font-family: 'Outfit', sans-serif !important;
+		font-size: 1.25rem !important;
+		font-weight: 800 !important;
+		color: #0f172a !important;
+		margin: 0 !important;
+	}
+	.invoice-tracking-dashboard .dashboard-widget__body--table {
+		padding: 0 !important;
+	}
+
+	/* Table style */
+	.invoice-tracking-dashboard .tracking-report-table {
+		width: 100% !important;
+		border-collapse: collapse !important;
+		margin: 0 !important;
+	}
+	.invoice-tracking-dashboard .tracking-report-table th {
+		background-color: #f8fafc !important;
+		color: #475569 !important;
+		font-size: 0.72rem !important;
+		font-weight: 800 !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.05em !important;
+		padding: 0.75rem 0.625rem !important;
+		border-bottom: 2px solid #e2e8f0 !important;
+		white-space: nowrap !important;
+	}
+	.invoice-tracking-dashboard .tracking-report-table td {
+		padding: 0.75rem 0.625rem !important;
+		border-bottom: 1px solid #f1f5f9 !important;
+		font-size: 0.825rem !important;
+		vertical-align: middle !important;
+	}
+	.invoice-tracking-dashboard .tracking-report-table tr:last-child td {
+		border-bottom: none !important;
+	}
+	.invoice-tracking-dashboard .tracking-report-table tr {
+		transition: background-color 0.15s ease !important;
+	}
+	.invoice-tracking-dashboard .tracking-report-table tr:nth-child(even) {
+		background-color: #f8fafc !important;
+	}
+	.invoice-tracking-dashboard .tracking-report-table tr:hover {
+		background-color: #f1f5f9 !important;
+	}
+
+	/* Tabular columns typography */
+	.invoice-tracking-dashboard .col-monospaced {
+		font-variant-numeric: tabular-nums !important;
+		font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+		font-weight: 600 !important;
+	}
+	.invoice-tracking-dashboard .col-basic {
+		color: #475569 !important;
+	}
+	.invoice-tracking-dashboard .col-gst {
+		color: #64748b !important;
+	}
+	.invoice-tracking-dashboard .col-tds {
+		color: #e11d48 !important;
+	}
+	.invoice-tracking-dashboard .col-retention {
+		color: #d97706 !important;
+	}
+	.invoice-tracking-dashboard .col-total {
+		color: #0f172a !important;
+		font-weight: 700 !important;
+	}
+	.invoice-tracking-dashboard .col-paid {
+		color: #16a34a !important;
+		font-weight: 700 !important;
+	}
+	.invoice-tracking-dashboard .col-expected {
+		color: #475569 !important;
+		font-weight: 700 !important;
+	}
+	.invoice-tracking-dashboard .col-balance {
+		color: #2563eb !important;
+		font-weight: 800 !important;
+	}
+
+	/* Status Badges */
+	.invoice-tracking-dashboard .payment-status-badge {
+		display: inline-flex !important;
+		align-items: center !important;
+		justify-content: center !important;
+		padding: 0.35rem 0.85rem !important;
+		font-size: 0.72rem !important;
+		font-weight: 800 !important;
+		border-radius: 9999px !important;
+		text-transform: uppercase !important;
+		letter-spacing: 0.05em !important;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+	}
+	.invoice-tracking-dashboard .payment-status-badge--pending {
+		background-color: #f1f5f9 !important;
+		color: #475569 !important;
+		border: 1px solid #cbd5e1 !important;
+	}
+	.invoice-tracking-dashboard .payment-status-badge--partial {
+		background-color: #eff6ff !important;
+		color: #1d4ed8 !important;
+		border: 1px solid #bfdbfe !important;
+	}
+	.invoice-tracking-dashboard .payment-status-badge--paid {
+		background-color: #ecfdf5 !important;
+		color: #047857 !important;
+		border: 1px solid #a7f3d0 !important;
+	}
+	.invoice-tracking-dashboard .payment-status-badge--overdue {
+		background-color: #fff5f5 !important;
+		color: #e11d48 !important;
+		border: 1px solid #fecdd3 !important;
+		animation: pulse 2s infinite !important;
+	}
+
+	/* RA Badge styling */
+	.invoice-tracking-dashboard .ra-badge {
+		background-color: #f8fafc !important;
+		color: #475569 !important;
+		font-weight: 700 !important;
+		font-size: 0.75rem !important;
+		padding: 0.25rem 0.625rem !important;
+		border-radius: 6px !important;
+		border: 1px solid #cbd5e1 !important;
+		display: inline-block !important;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+	}
+
+	@keyframes pulse {
+		0,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: .7;
+		}
+	}
+</style>

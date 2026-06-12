@@ -21,18 +21,13 @@ function power_alpha_helper_entity_presave(EntityInterface $entity)
     return;
   }
 
-  // Only generate on new node creation.
-  if (!$entity->isNew()) {
-    return;
-  }
-
   $bundle = $entity->getType();
   $year = date('Y');
 
   switch ($bundle) {
     case 'project_sites':
       // PRJ-2026-0001
-      if ($entity->hasField('field_project_code') && empty($entity->get('field_project_code')->value)) {
+      if ($entity->isNew() && $entity->hasField('field_project_code') && empty($entity->get('field_project_code')->value)) {
         $next_id = _power_alpha_helper_get_next_id('project_sites', 'field_project_code', 'PRJ-' . $year . '-');
         $entity->set('field_project_code', 'PRJ-' . $year . '-' . str_pad($next_id, 4, '0', STR_PAD_LEFT));
       }
@@ -40,15 +35,17 @@ function power_alpha_helper_entity_presave(EntityInterface $entity)
 
     case 'expenses':
       // EXP-2026-0001 — set as the node title
-      $prefix = 'EXP-' . $year . '-';
-      $next_id = _power_alpha_helper_get_next_id_from_title('expenses', $prefix);
-      $auto_title = $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT);
-      $entity->setTitle($auto_title);
+      if ($entity->isNew()) {
+        $prefix = 'EXP-' . $year . '-';
+        $next_id = _power_alpha_helper_get_next_id_from_title('expenses', $prefix);
+        $auto_title = $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT);
+        $entity->setTitle($auto_title);
+      }
       break;
 
     case 'purchase_order':
       // PO-2026-0001
-      if ($entity->hasField('field_po_number') && empty($entity->get('field_po_number')->value)) {
+      if ($entity->isNew() && $entity->hasField('field_po_number') && empty($entity->get('field_po_number')->value)) {
         $prefix = 'PO-' . $year . '-';
         $next_id = _power_alpha_helper_get_next_id('purchase_order', 'field_po_number', $prefix);
         $entity->set('field_po_number', $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT));
@@ -57,11 +54,69 @@ function power_alpha_helper_entity_presave(EntityInterface $entity)
 
     case 'invoice':
       // INV-2026-0001
-      if ($entity->hasField('field_invoice_no') && empty($entity->get('field_invoice_no')->value)) {
+      if ($entity->isNew() && $entity->hasField('field_invoice_no') && empty($entity->get('field_invoice_no')->value)) {
         $prefix = 'INV-' . $year . '-';
         $next_id = _power_alpha_helper_get_next_id('invoice', 'field_invoice_no', $prefix);
         $entity->set('field_invoice_no', $prefix . str_pad($next_id, 4, '0', STR_PAD_LEFT));
       }
+
+      // Cleanup removed payment history paragraphs to avoid orphans.
+      if (!empty($entity->original) && $entity->hasField('field_payment_history')) {
+        $original_ids = [];
+        foreach ($entity->original->get('field_payment_history') as $item) {
+          if (!empty($item->target_id)) {
+            $original_ids[] = $item->target_id;
+          }
+        }
+        $current_ids = [];
+        foreach ($entity->get('field_payment_history') as $item) {
+          if (!empty($item->target_id)) {
+            $current_ids[] = $item->target_id;
+          }
+        }
+        $deleted_ids = array_diff($original_ids, $current_ids);
+        if (!empty($deleted_ids)) {
+          $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
+          $paragraphs_to_delete = $paragraph_storage->loadMultiple($deleted_ids);
+          foreach ($paragraphs_to_delete as $p) {
+            $p->delete();
+          }
+        }
+      }
+
+      // Recalculate total paid from payment history paragraphs.
+      $total_paid = 0.0;
+      if ($entity->hasField('field_payment_history')) {
+        foreach ($entity->get('field_payment_history') as $item) {
+          $p = $item->entity;
+          if ($p && $p->bundle() === 'payment_history' && $p->hasField('field_amount')) {
+            $total_paid += (float) ($p->get('field_amount')->value ?? 0);
+          }
+        }
+      }
+      $entity->set('field_paid_amount', number_format($total_paid, 2, '.', ''));
+
+      // Recalculate and update payment status
+      $total_receivable = (float) ($entity->get('field_basic_value_gst')->value ?? 0);
+      $tds = $entity->hasField('field_tds') ? (float) ($entity->get('field_tds')->value ?? 0) : 0.0;
+      $retention = $entity->hasField('field_retention') ? (float) ($entity->get('field_retention')->value ?? 0) : 0.0;
+      $expected_payment = $total_receivable - $tds - $retention;
+      $remaining_balance = max(0.0, $expected_payment - $total_paid);
+
+      $due_date = $entity->get('field_payment_due_date')->value;
+      $status = 'pending';
+      if ($total_paid <= 0.01) {
+        if (!empty($due_date) && strtotime($due_date) < time()) {
+          $status = 'overdue';
+        } else {
+          $status = 'pending';
+        }
+      } elseif ($remaining_balance > 0.01) {
+        $status = 'partial';
+      } else {
+        $status = 'paid';
+      }
+      $entity->set('field_payment_status', $status);
       break;
   }
 }
@@ -142,6 +197,16 @@ function power_alpha_helper_theme($existing, $type, $theme, $path)
     'dashboard_overview' => [
       'variables' => ['data' => NULL],
       'template' => 'dashboard-overview',
+    ],
+    'invoice_tracking_report' => [
+      'variables' => [
+        'rows' => NULL,
+        'kpis' => NULL,
+        'filters' => NULL,
+        'projects_list' => NULL,
+        'month_options' => NULL,
+      ],
+      'template' => 'invoice-tracking-report',
     ],
   ];
 }
@@ -666,4 +731,48 @@ function power_alpha_helper_invoice_items_ajax_callback(array &$form, FormStateI
   }
 
   return $response;
+}
+
+/**
+ * Implements hook_node_view().
+ */
+function power_alpha_helper_node_view(array &$build, \Drupal\Core\Entity\EntityInterface $entity, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode)
+{
+  if ($entity->bundle() === 'invoice' && $view_mode === 'full') {
+    // Check if overdue
+    $due_date = $entity->get('field_payment_due_date')->value;
+    $status = $entity->get('field_payment_status')->value ?: 'pending';
+    if ($status !== 'paid' && !empty($due_date) && strtotime($due_date) < time()) {
+      \Drupal::messenger()->addWarning(t('Warning: Invoice @no is overdue! Due date was @date.', [
+        '@no' => $entity->get('field_invoice_no')->value ?: $entity->label(),
+        '@date' => date('d.m.Y', strtotime($due_date)),
+      ]));
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ *
+ * Clean up referencing paragraphs of type payment_history when an invoice node is deleted.
+ */
+function power_alpha_helper_entity_delete(EntityInterface $entity)
+{
+  if ($entity instanceof \Drupal\node\NodeInterface && $entity->getType() === 'invoice') {
+    if ($entity->hasField('field_payment_history') && !$entity->get('field_payment_history')->isEmpty()) {
+      $pids = [];
+      foreach ($entity->get('field_payment_history') as $item) {
+        if (!empty($item->target_id)) {
+          $pids[] = $item->target_id;
+        }
+      }
+      if (!empty($pids)) {
+        $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
+        $paragraphs_to_delete = $paragraph_storage->loadMultiple($pids);
+        foreach ($paragraphs_to_delete as $p) {
+          $p->delete();
+        }
+      }
+    }
+  }
 }

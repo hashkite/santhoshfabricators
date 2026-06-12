@@ -188,6 +188,34 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
     }
   }
 
+  // 1.2. Automatically calculate RA number associated with PO starting from 1.
+  // Always override for new nodes — RA number is per-PO sequential, not global.
+  if ($node->isNew()) {
+    $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
+    if ($po_id) {
+      $existing_nids = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+        ->accessCheck(FALSE)
+        ->condition('type', 'ra_bill')
+        ->condition('field_purchase_order', $po_id)
+        ->execute();
+
+      if (empty($existing_nids)) {
+        $node->set('field_ra_bill_number', 1);
+      }
+      else {
+        $existing_nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($existing_nids);
+        $max_num = 0;
+        foreach ($existing_nodes as $existing_node) {
+          $num = intval($existing_node->get('field_ra_bill_number')->value ?? 0);
+          if ($num > $max_num) {
+            $max_num = $num;
+          }
+        }
+        $node->set('field_ra_bill_number', $max_num + 1);
+      }
+    }
+  }
+
   // 1.5. Support manual creation: if field_ra_bill_items is empty and project is set, populate it from BOQ items
   if ($node->hasField('field_ra_bill_items') && $node->get('field_ra_bill_items')->isEmpty()) {
     $project_id = !$node->get('field_project')->isEmpty() ? $node->get('field_project')->target_id : NULL;
@@ -859,4 +887,103 @@ function ra_bill_manager_recalculate_po_bills($po_id) {
 
   unset($recalculating[$po_id]);
 }
+
+/**
+ * Implements hook_preprocess_views_view_field().
+ */
+function ra_bill_manager_preprocess_views_view_field(&$variables) {
+  $view = $variables['view'];
+  $field = $variables['field'];
+  if ($view->id() === 'ra_bills' && $field->field === 'field_ra_bill_number') {
+    $value = $variables['output']->__toString();
+    $clean_value = trim(strip_tags($value));
+    if (!empty($clean_value) && is_numeric($clean_value) && strpos($clean_value, 'RA-') !== 0) {
+      $variables['output'] = \Drupal\Core\Render\Markup::create('RA-' . $clean_value);
+    }
+  }
+
+  if ($view->id() === 'invoice') {
+    $row = $variables['row'];
+    $node = $row->_entity;
+    if ($node) {
+      switch ($field->field) {
+        case 'field_basic_value':
+          $val = (float) ($node->get('field_basic_value')->value ?? 0);
+          $variables['output'] = \Drupal\Core\Render\Markup::create(_ra_bill_manager_format_currency($val));
+          break;
+        case 'field_basic_value_gst':
+          $val = (float) ($node->get('field_basic_value_gst')->value ?? 0);
+          $variables['output'] = \Drupal\Core\Render\Markup::create(_ra_bill_manager_format_currency($val));
+          break;
+        case 'field_tds':
+          $val = (float) ($node->get('field_tds')->value ?? 0);
+          $variables['output'] = \Drupal\Core\Render\Markup::create(_ra_bill_manager_format_currency($val));
+          break;
+        case 'field_retention':
+          $val = (float) ($node->get('field_retention')->value ?? 0);
+          $variables['output'] = \Drupal\Core\Render\Markup::create(_ra_bill_manager_format_currency($val));
+          break;
+        case 'field_paid_amount':
+          $val = (float) ($node->get('field_paid_amount')->value ?? 0);
+          $variables['output'] = \Drupal\Core\Render\Markup::create(_ra_bill_manager_format_currency($val));
+          break;
+        case 'nothing':
+          $total = (float) ($node->get('field_basic_value_gst')->value ?? 0);
+          $tds = (float) ($node->hasField('field_tds') ? ($node->get('field_tds')->value ?? 0) : 0);
+          $retention = (float) ($node->hasField('field_retention') ? ($node->get('field_retention')->value ?? 0) : 0);
+          $paid = (float) ($node->get('field_paid_amount')->value ?? 0);
+          $remaining = max(0.0, $total - $tds - $retention - $paid);
+          $variables['output'] = \Drupal\Core\Render\Markup::create(_ra_bill_manager_format_currency($remaining));
+          break;
+        case 'field_payment_status':
+          $status = $node->get('field_payment_status')->value ?: 'pending';
+          $due_date = $node->get('field_payment_due_date')->value;
+          if ($status !== 'paid' && !empty($due_date) && strtotime($due_date) < time()) {
+            $status = 'overdue';
+          }
+          $status_label = ucfirst($status);
+          $badge = '<span class="payment-status-badge payment-status-badge--' . $status . '">' . $status_label . '</span>';
+          $variables['output'] = \Drupal\Core\Render\Markup::create($badge);
+          break;
+      }
+    }
+  }
+}
+
+/**
+ * Format currency in Indian numbering system format.
+ */
+function _ra_bill_manager_format_currency($number) {
+  $number = (float) $number;
+  if ($number == 0) {
+    return '₹0.00';
+  }
+  
+  $decimal = "";
+  if (strpos((string) $number, '.') !== FALSE) {
+    list($num_part, $dec_part) = explode('.', sprintf("%.2f", $number));
+    $decimal = "." . $dec_part;
+  } else {
+    $decimal = ".00";
+    $num_part = (string) $number;
+  }
+
+  $number_val = (int) $num_part;
+  $number_str = (string) $number_val;
+  $length = strlen($number_str);
+
+  if ($length <= 3) {
+    return '₹' . $number_str . $decimal;
+  }
+
+  $last_three = substr($number_str, -3);
+  $remaining = substr($number_str, 0, -3);
+  $remaining_reversed = strrev($remaining);
+
+  $chunks = str_split($remaining_reversed, 2);
+  $chunks_imploded = implode(',', $chunks);
+  $formatted = strrev($chunks_imploded) . ',' . $last_three;
+  return '₹' . $formatted . $decimal;
+}
+
 

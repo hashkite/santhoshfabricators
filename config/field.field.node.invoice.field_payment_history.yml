@@ -1,0 +1,31 @@
+uuid: 0171fbc9-600a-493f-a497-66143b19bd4f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_payment_history
+    - node.type.invoice
+    - paragraphs.paragraphs_type.payment_history
+  module:
+    - entity_reference_revisions
+id: node.invoice.field_payment_history
+field_name: field_payment_history
+entity_type: node
+bundle: invoice
+label: 'Payment History Logs'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:paragraph'
+  handler_settings:
+    target_bundles:
+      payment_history: payment_history
+    negate: 0
+    target_bundles_drag_drop:
+      payment_history:
+        weight: 2
+        enabled: true
+field_type: entity_reference_revisions

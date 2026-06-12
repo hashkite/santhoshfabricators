@@ -135,13 +135,14 @@ class InvoiceGenerationController extends ControllerBase
     ];
 
     // 3. Create the Invoice Node
-    $invoice_title = 'Invoice for RA Bill ' . ($ra_formatted ? '#' . $ra_formatted : ($bill_no ?: '#' . $node->id()));
+    $invoice_title = 'Invoice for RA Bill ' . ($ra_no ? 'RA-' . $ra_no : ($bill_no ?: '#' . $node->id()));
 
     $invoice = Node::create([
       'type' => 'invoice',
       'title' => $invoice_title,
       'field_project' => $project_id,
       'field_purchase_order' => $po_id,
+      'field_ra_bill' => $node->id(),
       'field_invoice_date' => $bill_date_val,
       'field_financial_year' => $fy,
       'field_invoice_no' => $temp_inv_no,
@@ -166,7 +167,7 @@ class InvoiceGenerationController extends ControllerBase
       }
 
       $this->messenger()->addStatus($this->t('Draft invoice generated successfully from RA Bill @ra. Please review the @count line items and input the exact invoice number before publishing.', [
-        '@ra' => $ra_no ? '#' . $ra_no : '#' . $node->id(),
+        '@ra' => $ra_no ? 'RA-' . $ra_no : '#' . $node->id(),
         '@count' => count($invoice_items),
       ]));
       // Redirect to the node edit form

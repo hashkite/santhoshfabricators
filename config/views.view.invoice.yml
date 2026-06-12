@@ -8,7 +8,14 @@ dependencies:
     - field.storage.node.field_financial_year
     - field.storage.node.field_invoice_date
     - field.storage.node.field_invoice_no
+    - field.storage.node.field_paid_amount
+    - field.storage.node.field_payment_status
     - field.storage.node.field_purchase_order
+    - field.storage.node.field_ra_bill
+    - field.storage.node.field_ra_bill_number
+    - field.storage.node.field_remarks
+    - field.storage.node.field_retention
+    - field.storage.node.field_tds
     - node.type.invoice
   module:
     - datetime
@@ -30,6 +37,48 @@ display:
     display_options:
       title: Invoices
       fields:
+        field_ra_bill_number:
+          id: field_ra_bill_number
+          table: node__field_ra_bill_number
+          field: field_ra_bill_number
+          relationship: field_ra_bill
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: field_ra_bill_number
+          plugin_id: field
+          label: 'RA No'
+          exclude: false
+          alter:
+            alter_text: true
+            text: 'RA-{{ field_ra_bill_number }}'
+            make_link: false
+          element_type: ''
+          element_class: ''
+          element_label_type: ''
+          element_label_class: ''
+          element_wrapper_type: ''
+          element_wrapper_class: ''
+          element_default_classes: true
+          empty: '-'
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: false
+          click_sort_column: value
+          type: number_integer
+          settings:
+            thousand_separator: ''
+            prefix_suffix: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
         field_invoice_no:
           id: field_invoice_no
           table: node__field_invoice_no
@@ -204,6 +253,155 @@ display:
           multi_type: separator
           separator: ', '
           field_api_classes: false
+        field_tds:
+          id: field_tds
+          table: node__field_tds
+          field: field_tds
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: field_tds
+          plugin_id: field
+          label: TDS
+          exclude: false
+          alter:
+            alter_text: false
+          element_default_classes: true
+          empty: ₹0.00
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        field_retention:
+          id: field_retention
+          table: node__field_retention
+          field: field_retention
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: field_retention
+          plugin_id: field
+          label: Retention
+          exclude: false
+          alter:
+            alter_text: false
+          element_default_classes: true
+          empty: ₹0.00
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        field_paid_amount:
+          id: field_paid_amount
+          table: node__field_paid_amount
+          field: field_paid_amount
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: field_paid_amount
+          plugin_id: field
+          label: 'Paid Amount'
+          exclude: false
+          alter:
+            alter_text: false
+          element_default_classes: true
+          empty: ₹0.00
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: string
+          settings:
+            link_to_entity: false
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
+        nothing:
+          id: nothing
+          table: views
+          field: nothing
+          relationship: none
+          group_type: group
+          admin_label: 'Remaining Dues'
+          plugin_id: custom
+          label: 'Remaining Dues'
+          exclude: false
+          alter:
+            alter_text: true
+            text: ''
+          element_default_classes: true
+          empty: ''
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+        field_payment_status:
+          id: field_payment_status
+          table: node__field_payment_status
+          field: field_payment_status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          entity_type: node
+          entity_field: field_payment_status
+          plugin_id: field
+          label: Status
+          exclude: false
+          alter:
+            alter_text: false
+          element_default_classes: true
+          empty: '-'
+          hide_empty: false
+          empty_zero: false
+          hide_alter_empty: true
+          click_sort_column: value
+          type: list_default
+          settings: {  }
+          group_column: value
+          group_columns: {  }
+          group_rows: true
+          delta_limit: 0
+          delta_offset: 0
+          delta_reversed: false
+          delta_first_last: false
+          multi_type: separator
+          separator: ', '
+          field_api_classes: false
       pager:
         type: none
         options:
@@ -324,13 +522,26 @@ display:
           row_class: ''
           default_row_class: true
           columns:
+            field_ra_bill_number: field_ra_bill_number
             field_invoice_no: field_invoice_no
             field_financial_year: field_financial_year
             field_invoice_date: field_invoice_date
             field_basic_value: field_basic_value
             field_basic_value_gst: field_basic_value_gst
+            field_tds: field_tds
+            field_retention: field_retention
+            field_paid_amount: field_paid_amount
+            nothing: nothing
+            field_payment_status: field_payment_status
           default: field_invoice_date
           info:
+            field_ra_bill_number:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
             field_invoice_no:
               sortable: true
               default_sort_order: asc
@@ -366,6 +577,41 @@ display:
               separator: ''
               empty_column: false
               responsive: ''
+            field_tds:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            field_retention:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            field_paid_amount:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            nothing:
+              sortable: false
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
+            field_payment_status:
+              sortable: true
+              default_sort_order: asc
+              align: ''
+              separator: ''
+              empty_column: false
+              responsive: ''
           override: true
           sticky: false
           summary: ''
@@ -382,6 +628,18 @@ display:
           distinct: false
           replica: false
           query_tags: {  }
+      relationships:
+        field_ra_bill:
+          id: field_ra_bill
+          table: node__field_ra_bill
+          field: field_ra_bill
+          relationship: none
+          group_type: group
+          admin_label: 'RA Bill'
+          entity_type: node
+          entity_field: field_ra_bill
+          plugin_id: standard
+          required: false
       css_class: view-invoices-table
       use_ajax: false
       group_by: false

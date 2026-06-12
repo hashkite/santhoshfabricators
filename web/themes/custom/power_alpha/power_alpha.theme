@@ -194,14 +194,32 @@ function power_alpha_preprocess_node(&$variables)
     $variables['company_gstin'] = $config->get('company_gstin') ?: '24AAQCS3102E1ZP';
     $variables['company_pan'] = $config->get('company_pan') ?: 'AAQCS3102E';
     $variables['company_sac'] = $config->get('company_sac') ?: '995442';
-    // Dynamically retrieve RA Bill number from invoice node title if possible,
-    // fallback to config.
-    $company_ra = $config->get('company_ra') ?: '10';
-    $node_title = $node->label();
-    if (preg_match('/RA Bill\s*#?(\d+)/', $node_title, $matches)) {
-      $company_ra = $matches[1];
+    // Dynamically retrieve RA Bill number from linked RA Bill entity,
+    // fallback to title parsing, then config.
+    $ra_display = '';
+    $ra_bill_node = NULL;
+    if ($node->hasField('field_ra_bill') && !$node->get('field_ra_bill')->isEmpty()) {
+      $ra_bill_node = $node->get('field_ra_bill')->entity;
+      if ($ra_bill_node && $ra_bill_node->hasField('field_ra_bill_number') && !$ra_bill_node->get('field_ra_bill_number')->isEmpty()) {
+        $ra_display = 'RA-' . intval($ra_bill_node->get('field_ra_bill_number')->value);
+      }
     }
-    $variables['company_ra'] = is_numeric($company_ra) ? sprintf('%02d', intval($company_ra)) : $company_ra;
+    // Fallback: parse from invoice title
+    if (empty($ra_display)) {
+      $node_title = $node->label();
+      if (preg_match('/RA-(\d+)/', $node_title, $matches)) {
+        $ra_display = 'RA-' . intval($matches[1]);
+      } elseif (preg_match('/RA Bill\s*#?(\d+)/', $node_title, $matches)) {
+        $ra_display = 'RA-' . intval($matches[1]);
+      }
+    }
+    // Final fallback: config
+    if (empty($ra_display)) {
+      $company_ra = $config->get('company_ra') ?: '10';
+      $ra_display = is_numeric($company_ra) ? sprintf('%02d', intval($company_ra)) : $company_ra;
+    }
+    $variables['company_ra'] = $ra_display;
+    $variables['ra_bill_node'] = $ra_bill_node;
 
     // Resolve Custom Logo URL if available
     $logo_url = '';
@@ -420,6 +438,86 @@ function power_alpha_preprocess_node(&$variables)
 
     // In Words
     $variables['total_in_words'] = power_alpha_helper_num_to_words_indian($total_val);
+
+    // ── PAYMENT TRACKING DETAILS ──
+    $paid_raw = $node->hasField('field_paid_amount') && !$node->get('field_paid_amount')->isEmpty()
+      ? (float) $node->get('field_paid_amount')->value : 0.0;
+    $tds_raw = $node->hasField('field_tds') && !$node->get('field_tds')->isEmpty()
+      ? (float) $node->get('field_tds')->value : 0.0;
+    $retention_raw = $node->hasField('field_retention') && !$node->get('field_retention')->isEmpty()
+      ? (float) $node->get('field_retention')->value : 0.0;
+    $expected_payment_raw = $total_val - $tds_raw - $retention_raw;
+    $remaining_raw = max(0.0, $expected_payment_raw - $paid_raw);
+    
+    $variables['tds_amount_formatted'] = power_alpha_format_indian_currency($tds_raw);
+    $variables['tds_amount_raw'] = $tds_raw;
+    $variables['tds_paid'] = $node->hasField('field_tds_paid') && !$node->get('field_tds_paid')->isEmpty()
+      ? (bool) $node->get('field_tds_paid')->value : FALSE;
+    $variables['basic_value_raw'] = $basic_value;
+    $variables['retention_amount_formatted'] = power_alpha_format_indian_currency($retention_raw);
+    $variables['retention_amount_raw'] = $retention_raw;
+    $variables['expected_payment_formatted'] = power_alpha_format_indian_currency($expected_payment_raw);
+    $variables['expected_payment_raw'] = $expected_payment_raw;
+    $variables['remarks'] = $node->hasField('field_remarks') ? $node->get('field_remarks')->value : '';
+    
+    $due_date_raw = $node->hasField('field_payment_due_date') && !$node->get('field_payment_due_date')->isEmpty()
+      ? $node->get('field_payment_due_date')->value : '';
+    
+    $payment_status = $node->hasField('field_payment_status') && !$node->get('field_payment_status')->isEmpty()
+      ? $node->get('field_payment_status')->value : 'pending';
+    
+    // Auto-detect overdue status based on current date
+    $is_overdue = false;
+    $due_time = 0;
+    if (!empty($due_date_raw)) {
+      $due_time = strtotime($due_date_raw);
+      if ($due_time < time() && $payment_status !== 'paid') {
+        $is_overdue = true;
+        $payment_status = 'overdue';
+      }
+    }
+    
+    // Parse payment logs history from Paragraph entities
+    $history_paragraphs = [];
+    if ($node->hasField('field_payment_history') && !$node->get('field_payment_history')->isEmpty()) {
+      $history_paragraphs = $node->get('field_payment_history')->referencedEntities();
+    }
+    
+    // Format logs details for render
+    $formatted_logs = [];
+    foreach ($history_paragraphs as $p) {
+      if ($p->bundle() === 'payment_history') {
+        $date_val = $p->get('field_date')->value;
+        $date_formatted = !empty($date_val)
+          ? \Drupal::service('date.formatter')->format(strtotime($date_val), 'custom', 'd.m.Y')
+          : '-';
+        
+        $amt_val = (float) ($p->get('field_amount')->value ?? 0);
+        $formatted_logs[] = [
+          'id' => $p->id(),
+          'date' => $date_formatted,
+          'date_raw' => $date_val,
+          'amount' => power_alpha_format_indian_currency($amt_val),
+          'amount_raw' => $amt_val,
+          'notes' => $p->get('field_description')->value ?? '',
+          'recorded_by' => $p->get('field_recorded_by')->value ?? 'System',
+        ];
+      }
+    }
+    
+    $variables['payment_status'] = $payment_status;
+    $variables['payment_status_label'] = ucfirst($payment_status);
+    $variables['paid_amount_formatted'] = power_alpha_format_indian_currency($paid_raw);
+    $variables['remaining_balance_formatted'] = power_alpha_format_indian_currency($remaining_raw);
+    $variables['remaining_balance_raw'] = $remaining_raw;
+    
+    $variables['due_date_formatted'] = !empty($due_date_raw)
+      ? \Drupal::service('date.formatter')->format($due_time, 'custom', 'd F, Y') : '-';
+    $variables['is_overdue'] = $is_overdue;
+    $variables['payment_history'] = $formatted_logs;
+    
+    // Action URL for quick payment updates
+    $variables['update_payment_url'] = \Drupal\Core\Url::fromRoute('power_alpha_helper.update_payment', ['node' => $node->id()])->toString();
   }
 
   if ($node->getType() == 'purchase_order' && $variables['view_mode'] == 'full') {

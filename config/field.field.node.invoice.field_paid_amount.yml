@@ -1,0 +1,21 @@
+uuid: f3b2aef0-6652-40d0-9450-f270609691bb
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_paid_amount
+    - node.type.invoice
+id: node.invoice.field_paid_amount
+field_name: field_paid_amount
+entity_type: node
+bundle: invoice
+label: 'Paid Amount'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: '0.00'
+default_value_callback: ''
+settings: {  }
+field_type: string

@@ -1,0 +1,21 @@
+uuid: 547a0a44-21ec-4cdd-9573-f1b677dcc1f7
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_tds
+    - node.type.invoice
+id: node.invoice.field_tds
+field_name: field_tds
+entity_type: node
+bundle: invoice
+label: 'TDS Amount'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: '0.00'
+default_value_callback: ''
+settings: {  }
+field_type: string

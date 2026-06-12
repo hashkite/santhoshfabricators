@@ -4,8 +4,8 @@
  * Premium purchase order detail page template.
  */
 #}
-<div class="entity-detail-page entity-detail--po">
-
+<div
+	class="entity-detail-page entity-detail--po">
 
 
 	{# ── HEADER ── #}
@@ -26,7 +26,7 @@
 		{% if logged_in %}
 			<div class="entity-detail-header__actions">
 				<a href="{{ path('entity.node.edit_form', {'node': node.id}) }}" class="btn-detail btn-detail--outline">
-					<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+					<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
 						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
 					</svg>
@@ -37,16 +37,18 @@
 	</div>
 
 	{# ── TWO-COLUMN GRID ── #}
-	<div class="po-grid-container">
-		
+	<div
+		class="po-grid-container">
+
 		{# ── LEFT/MAIN COLUMN ── #}
-		<div class="po-grid-main">
-			
+		<div
+			class="po-grid-main">
+
 			{# Vendor & Project Card #}
 			<div class="entity-section-card">
 				<div class="entity-section-card__header">
 					<h2 class="entity-section-card__title">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+						<svg width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 							<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
 							<circle cx="12" cy="7" r="4"/>
 						</svg>
@@ -91,69 +93,11 @@
 					</div>
 				</div>
 			</div>
-
-			{# Invoices List Section #}
-			<div class="entity-section-card">
-				<div class="entity-section-card__header">
-					<h2 class="entity-section-card__title">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-							<line x1="16" y1="2" x2="16" y2="6"/>
-							<line x1="8" y1="2" x2="8" y2="6"/>
-							<line x1="3" y1="10" x2="21" y2="10"/>
-						</svg>
-						Linked Invoices
-					</h2>
-				</div>
-				<div class="entity-section-card__body">
-					{{ invoice_block }}
-					{% if logged_in %}
-						<div class="tab-panel__footer" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
-							<a href="/node/add/invoice?field_purchase_order={{ node.id }}&field_project={{ node.field_project.target_id }}" class="btn-detail btn-detail--primary">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-									<line x1="12" y1="5" x2="12" y2="19"/>
-									<line x1="5" y1="12" x2="19" y2="12"/>
-								</svg>
-								Create New Invoice
-							</a>
-						</div>
-					{% endif %}
-				</div>
-			</div>
-
-			{# Associated RA Bills Section #}
-			<div class="entity-section-card">
-				<div class="entity-section-card__header">
-					<h2 class="entity-section-card__title">
-						<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-							<polyline points="14 2 14 8 20 8"></polyline>
-							<line x1="16" y1="13" x2="8" y2="13"></line>
-							<line x1="16" y1="17" x2="8" y2="17"></line>
-							<polyline points="10 9 9 9 8 9"></polyline>
-						</svg>
-						Associated RA Bills
-					</h2>
-				</div>
-				<div class="entity-section-card__body">
-					{{ ra_bills_block }}
-					
-					{% if logged_in and ra_import_form %}
-						<div class="ra-import-form-section" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
-							<h3 class="entity-section-card__title" style="font-size: 0.875rem; margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.5px; color: #1e293b;">
-								<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; color: #3b82f6; vertical-align: middle;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-								Import RA Bill from Excel
-							</h3>
-							{{ ra_import_form }}
-						</div>
-					{% endif %}
-				</div>
-			</div>
-
 		</div>
 
 		{# ── RIGHT/SIDEBAR COLUMN ── #}
-		<div class="po-grid-sidebar">
+		<div
+			class="po-grid-sidebar">
 
 			{# Financial tracking dashboard #}
 			{% if po_dashboard %}
@@ -162,7 +106,7 @@
 						<h3 class="po-sidebar-card__title">Financial Summary</h3>
 					</div>
 					<div class="po-sidebar-card__body">
-						
+
 						<div class="po-financial-flow">
 							<div class="po-flow-item">
 								<span class="po-flow-label">Basic Value</span>
@@ -201,10 +145,10 @@
 									<span class="sub-stat-val font-semibold {% if po_dashboard.is_exceeded %}val--exceeded{% endif %}">{{ po_dashboard.remaining }}</span>
 								</div>
 							</div>
-							
+
 							{% if po_dashboard.is_exceeded %}
 								<div class="po-limit-alert">
-									<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+									<svg width="14" height="14" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 										<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/>
 										<line x1="12" y1="9" x2="12" y2="13"/>
 										<line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -227,7 +171,7 @@
 					<div class="po-sidebar-card__body">
 						<div class="file-download-wrapper">
 							<div class="file-icon-box">
-								<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+								<svg width="24" height="24" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 									<path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/>
 									<polyline points="14 2 14 8 20 8"/>
 								</svg>
@@ -257,21 +201,89 @@
 
 		</div>
 
+		{# ── LEFT/MAIN COLUMN ── #}
+		<div
+			class="po-grid-main">
+			{# Invoices List Section #}
+			<div class="entity-section-card">
+				<div class="entity-section-card__header">
+					<h2 class="entity-section-card__title">
+						<svg width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+							<line x1="16" y1="2" x2="16" y2="6"/>
+							<line x1="8" y1="2" x2="8" y2="6"/>
+							<line x1="3" y1="10" x2="21" y2="10"/>
+						</svg>
+						Linked Invoices
+					</h2>
+				</div>
+				<div class="entity-section-card__body">
+					{{ invoice_block }}
+					{% if logged_in %}
+						<div class="tab-panel__footer" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+							<a href="/node/add/invoice?field_purchase_order={{ node.id }}&field_project={{ node.field_project.target_id }}" class="btn-detail btn-detail--primary">
+								<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<line x1="12" y1="5" x2="12" y2="19"/>
+									<line x1="5" y1="12" x2="19" y2="12"/>
+								</svg>
+								Create New Invoice
+							</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+			{# Associated RA Bills Section #}
+			<div class="entity-section-card">
+				<div class="entity-section-card__header">
+					<h2 class="entity-section-card__title">
+						<svg width="18" height="18" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+							<polyline points="14 2 14 8 20 8"></polyline>
+							<line x1="16" y1="13" x2="8" y2="13"></line>
+							<line x1="16" y1="17" x2="8" y2="17"></line>
+							<polyline points="10 9 9 9 8 9"></polyline>
+						</svg>
+						Associated RA Bills
+					</h2>
+				</div>
+				<div class="entity-section-card__body">
+					{{ ra_bills_block }}
+
+					{% if logged_in and ra_import_form %}
+						<div class="ra-import-form-section" style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e2e8f0;">
+							<h3 class="entity-section-card__title" style="font-size: 0.875rem; margin-bottom: 1.25rem; text-transform: uppercase; letter-spacing: 0.5px; color: #1e293b;">
+								<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 8px; color: #3b82f6; vertical-align: middle;">
+									<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+									<polyline points="17 8 12 3 7 8"></polyline>
+									<line x1="12" y1="3" x2="12" y2="15"></line>
+								</svg>
+								Import RA Bill from Excel
+							</h3>
+							{{ ra_import_form }}
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+		</div>
+
 	</div>
 
 	{# ── BACK LINK ── #}
 	<div class="entity-back-link">
 		{% if node.field_project.entity %}
 			<a href="{{ path('entity.node.canonical', {'node': node.field_project.target_id}) }}" class="btn-detail btn-detail--outline">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<line x1="19" y1="12" x2="5" y2="12"/>
 					<polyline points="12 19 5 12 12 5"/>
 				</svg>
-				Back to {{ node.field_project.entity.label }}
+				Back to
+				{{ node.field_project.entity.label }}
 			</a>
 		{% else %}
 			<a href="/projects" class="btn-detail btn-detail--outline">
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+				<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<line x1="19" y1="12" x2="5" y2="12"/>
 					<polyline points="12 19 5 12 12 5"/>
 				</svg>

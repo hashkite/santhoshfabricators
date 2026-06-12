@@ -10,10 +10,20 @@ dependencies:
     - field.field.node.invoice.field_invoice_date
     - field.field.node.invoice.field_invoice_items
     - field.field.node.invoice.field_invoice_no
+    - field.field.node.invoice.field_paid_amount
+    - field.field.node.invoice.field_payment_due_date
+    - field.field.node.invoice.field_payment_history
+    - field.field.node.invoice.field_payment_status
     - field.field.node.invoice.field_project
     - field.field.node.invoice.field_purchase_order
+    - field.field.node.invoice.field_ra_bill
+    - field.field.node.invoice.field_remarks
+    - field.field.node.invoice.field_retention
+    - field.field.node.invoice.field_tds
+    - field.field.node.invoice.field_tds_paid
     - node.type.invoice
   module:
+    - content_moderation
     - datetime
     - paragraphs
     - path
@@ -94,6 +104,45 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  field_paid_amount:
+    type: string_textfield
+    weight: 16
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_payment_due_date:
+    type: datetime_default
+    weight: 17
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  field_payment_history:
+    type: paragraphs
+    weight: 19
+    region: content
+    settings:
+      title: 'Payment Log'
+      title_plural: 'Payment Logs'
+      edit_mode: open
+      closed_mode: summary
+      autocollapse: none
+      closed_mode_threshold: 0
+      add_mode: dropdown
+      form_display_mode: default
+      default_paragraph_type: ''
+      features:
+        add_above: '0'
+        collapse_edit_all: collapse_edit_all
+        duplicate: duplicate
+    third_party_settings: {  }
+  field_payment_status:
+    type: options_select
+    weight: 18
+    region: content
+    settings: {  }
+    third_party_settings: {  }
   field_project:
     type: entity_reference_autocomplete
     weight: 12
@@ -113,6 +162,43 @@ content:
       match_limit: 10
       size: 60
       placeholder: ''
+    third_party_settings: {  }
+  field_remarks:
+    type: string_textfield
+    weight: 22
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_retention:
+    type: string_textfield
+    weight: 21
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_tds:
+    type: string_textfield
+    weight: 20
+    region: content
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  field_tds_paid:
+    type: boolean_checkbox
+    weight: 101
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
+    region: content
+    settings: {  }
     third_party_settings: {  }
   path:
     type: path
@@ -159,4 +245,5 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
-hidden: {  }
+hidden:
+  field_ra_bill: true

@@ -1,0 +1,27 @@
+uuid: 7279da26-c939-4dd6-8e63-19126b96a33e
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_ra_bill
+    - node.type.invoice
+id: node.invoice.field_ra_bill
+field_name: field_ra_bill
+entity_type: node
+bundle: invoice
+label: 'RA Bill'
+description: 'The RA Bill from which this invoice was generated.'
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  handler: 'default:node'
+  handler_settings:
+    target_bundles:
+      ra_bill: ra_bill
+    sort:
+      field: _none
+    auto_create: false
+    auto_create_bundle: ''
+field_type: entity_reference

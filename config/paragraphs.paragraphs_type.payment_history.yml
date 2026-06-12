@@ -1,0 +1,10 @@
+uuid: 1f64a4df-9e55-4cd9-8012-34b2b37aaa09
+langcode: en
+status: true
+dependencies: {  }
+id: payment_history
+label: 'Payment History Log'
+icon_uuid: null
+icon_default: null
+description: 'Logs of payments received.'
+behavior_plugins: {  }

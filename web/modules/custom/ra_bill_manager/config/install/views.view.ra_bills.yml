@@ -49,6 +49,9 @@ display:
           field: field_ra_bill_number
           plugin_id: field
           label: 'RA Bill No.'
+          alter:
+            alter_text: true
+            text: 'RA-{{ field_ra_bill_number }}'
         field_bill_number:
           id: field_bill_number
           table: node__field_bill_number

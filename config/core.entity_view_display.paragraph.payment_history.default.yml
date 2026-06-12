@@ -1,0 +1,53 @@
+uuid: 0be49cd4-fbc1-481e-823d-7169f6a4ee34
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.paragraph.payment_history.field_date
+    - field.field.paragraph.payment_history.field_amount
+    - field.field.paragraph.payment_history.field_description
+    - field.field.paragraph.payment_history.field_recorded_by
+    - paragraphs.paragraphs_type.payment_history
+  module:
+    - datetime
+id: paragraph.payment_history.default
+targetEntityType: paragraph
+bundle: payment_history
+mode: default
+content:
+  field_amount:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 1
+    region: content
+  field_date:
+    type: datetime_default
+    label: above
+    settings:
+      timezone_override: ''
+      format_type: html_date
+    third_party_settings: {  }
+    weight: 0
+    region: content
+  field_description:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
+    region: content
+  field_recorded_by:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 3
+    region: content
+hidden:
+  created: true
+  status: true

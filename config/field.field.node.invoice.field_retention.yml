@@ -1,0 +1,21 @@
+uuid: 47c564f0-caac-4a88-8574-95b34531c12f
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_retention
+    - node.type.invoice
+id: node.invoice.field_retention
+field_name: field_retention
+entity_type: node
+bundle: invoice
+label: 'Retention Amount'
+description: ''
+required: false
+translatable: false
+default_value:
+  -
+    value: '0.00'
+default_value_callback: ''
+settings: {  }
+field_type: string

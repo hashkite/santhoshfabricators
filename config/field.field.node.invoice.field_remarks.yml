@@ -1,0 +1,19 @@
+uuid: d2130ed0-3bfb-418f-9ce2-945234309ca6
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_remarks
+    - node.type.invoice
+id: node.invoice.field_remarks
+field_name: field_remarks
+entity_type: node
+bundle: invoice
+label: 'Payment Remarks'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

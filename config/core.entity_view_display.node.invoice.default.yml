@@ -8,17 +8,26 @@ dependencies:
     - field.field.node.invoice.field_basic_value_gst
     - field.field.node.invoice.field_financial_year
     - field.field.node.invoice.field_invoice_date
-    - field.field.node.invoice.field_invoice_no
     - field.field.node.invoice.field_invoice_items
+    - field.field.node.invoice.field_invoice_no
+    - field.field.node.invoice.field_paid_amount
+    - field.field.node.invoice.field_payment_due_date
+    - field.field.node.invoice.field_payment_history
+    - field.field.node.invoice.field_payment_status
     - field.field.node.invoice.field_project
     - field.field.node.invoice.field_purchase_order
+    - field.field.node.invoice.field_ra_bill
+    - field.field.node.invoice.field_remarks
+    - field.field.node.invoice.field_retention
+    - field.field.node.invoice.field_tds
+    - field.field.node.invoice.field_tds_paid
     - node.type.invoice
   module:
     - datetime
+    - entity_reference_revisions
     - options
     - text
     - user
-    - entity_reference_revisions
 id: node.invoice.default
 targetEntityType: node
 bundle: invoice
@@ -96,9 +105,27 @@ content:
     third_party_settings: {  }
     weight: 8
     region: content
+  field_tds_paid:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 10
+    region: content
   links:
     settings: {  }
     third_party_settings: {  }
     weight: 0
     region: content
-hidden: {  }
+hidden:
+  field_paid_amount: true
+  field_payment_due_date: true
+  field_payment_history: true
+  field_payment_status: true
+  field_ra_bill: true
+  field_remarks: true
+  field_retention: true
+  field_tds: true

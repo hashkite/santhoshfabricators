@@ -13,3 +13,55 @@ power_alpha_helper.invoice_settings:
     _title: 'Invoice Settings'
   requirements:
     _permission: 'administer site configuration'
+
+power_alpha_helper.update_payment:
+  path: '/admin/invoices/{node}/update-payment'
+  defaults:
+    _controller: '\Drupal\power_alpha_helper\Controller\PaymentController::updatePayment'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+
+power_alpha_helper.invoice_tracking:
+  path: '/admin/invoices/tracking'
+  defaults:
+    _controller: '\Drupal\power_alpha_helper\Controller\DashboardController::trackingReport'
+    _title: 'Invoice Payment Tracking Report'
+  requirements:
+    _permission: 'access content'
+
+power_alpha_helper.edit_payment:
+  path: '/admin/invoices/{node}/payment/{paragraph}/edit'
+  defaults:
+    _controller: '\Drupal\power_alpha_helper\Controller\PaymentController::editPayment'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+    paragraph: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+      paragraph:
+        type: 'entity:paragraph'
+
+power_alpha_helper.delete_payment:
+  path: '/admin/invoices/{node}/payment/{paragraph}/delete'
+  defaults:
+    _controller: '\Drupal\power_alpha_helper\Controller\PaymentController::deletePayment'
+  requirements:
+    _permission: 'access content'
+    node: \d+
+    paragraph: \d+
+  options:
+    parameters:
+      node:
+        type: 'entity:node'
+      paragraph:
+        type: 'entity:paragraph'
+
+

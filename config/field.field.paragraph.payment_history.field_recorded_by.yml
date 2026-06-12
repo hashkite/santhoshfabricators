@@ -1,0 +1,19 @@
+uuid: f727f3db-8ece-4065-87d3-40896f5c5b2b
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_recorded_by
+    - paragraphs.paragraphs_type.payment_history
+id: paragraph.payment_history.field_recorded_by
+field_name: field_recorded_by
+entity_type: paragraph
+bundle: payment_history
+label: 'Recorded By'
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

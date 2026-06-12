@@ -200,12 +200,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.25) 50%,
-      transparent 100%
-    );
+    background: linear-gradient(90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.25) 50%,
+        transparent 100%);
     animation: shimmer 2.5s infinite;
   }
 
@@ -224,8 +222,13 @@
 }
 
 @keyframes shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .po-progress__labels {
@@ -390,6 +393,7 @@
   gap: $space-6;
   align-items: flex-start;
   margin-bottom: $space-6;
+  flex-wrap: wrap;
 
   @include respond-to('lg') {
     flex-direction: column;
@@ -403,6 +407,10 @@
   display: flex;
   flex-direction: column;
   gap: $space-6;
+
+  &:last-child {
+    flex-basis: 100%;
+  }
 }
 
 .po-grid-sidebar {
@@ -411,8 +419,6 @@
   display: flex;
   flex-direction: column;
   gap: $space-6;
-  position: sticky;
-  top: 120px;
 
   @include respond-to('lg') {
     position: static;

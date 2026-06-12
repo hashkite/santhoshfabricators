@@ -1,0 +1,19 @@
+uuid: 12c9be26-cd5b-4c87-a337-7547a2c18428
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.paragraph.field_description
+    - paragraphs.paragraphs_type.payment_history
+id: paragraph.payment_history.field_description
+field_name: field_description
+entity_type: paragraph
+bundle: payment_history
+label: Notes/Remarks
+description: ''
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings: {  }
+field_type: string

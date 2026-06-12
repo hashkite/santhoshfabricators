@@ -45,8 +45,9 @@ class ExcelExportController extends ControllerBase {
     if (!$node || $node->bundle() !== 'ra_bill') {
       throw new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException();
     }
-    $ra_no = $node->get('field_ra_bill_number')->value ?? $node->id();
-    $filename = 'RA_Bill_' . $ra_no . '_Export_' . date('Ymd_His') . '.xlsx';
+    $ra_val = $node->get('field_ra_bill_number')->value;
+    $ra_display = $ra_val ? 'RA-' . $ra_val : $node->id();
+    $filename = 'RA_Bill_' . $ra_display . '_Export_' . date('Ymd_His') . '.xlsx';
     return $this->generateSingleWorkbook($node, $filename);
   }
 
@@ -172,7 +173,7 @@ class ExcelExportController extends ControllerBase {
       $wf_state = $bill->get('moderation_state')->value ?? 'draft';
       $workflow = ucfirst(str_replace('_', ' ', $wf_state));
 
-      $sheet1->setCellValue('A' . $row, $ra_no);
+      $sheet1->setCellValue('A' . $row, !empty($ra_no) ? 'RA-' . $ra_no : '');
       $sheet1->setCellValue('B' . $row, $bill_no);
       $sheet1->setCellValue('C' . $row, $vendor);
       $sheet1->setCellValue('D' . $row, $project);
@@ -284,7 +285,7 @@ class ExcelExportController extends ControllerBase {
           $val_state_val = $item->get('field_validation_status')->value;
           $val_state = $val_state_val === 'valid' ? 'Valid' : ($val_state_val === 'over_claimed' ? 'Over Claimed' : $val_state_val);
 
-          $sheet2->setCellValue('A' . $row2, $ra_no);
+          $sheet2->setCellValue('A' . $row2, !empty($ra_no) ? 'RA-' . $ra_no : '');
           $sheet2->setCellValue('B' . $row2, $bill_no);
           $sheet2->setCellValue('C' . $row2, $project);
           $sheet2->setCellValue('D' . $row2, $item_code);
@@ -585,7 +586,7 @@ class ExcelExportController extends ControllerBase {
     $sheet1->setCellValue('F11', ': ' . $company_pan);
 
     $sheet1->setCellValue('D12', 'RA');
-    $sheet1->setCellValue('F12', ': ' . sprintf('%02d', $ra_no));
+    $sheet1->setCellValue('F12', ': RA-' . $ra_no);
 
     foreach (['B5', 'B6', 'D5', 'D6', 'D7', 'D8', 'D9', 'B10', 'D10', 'D11', 'D12'] as $coord) {
       $sheet1->getStyle($coord)->getFont()->setBold(TRUE);
@@ -672,7 +673,7 @@ class ExcelExportController extends ControllerBase {
     $sheet2->setCellValue('A3', 'Project :');
     $sheet2->setCellValue('B3', $project_name);
     $sheet2->mergeCells('B3:F3');
-    $sheet2->setCellValue('G3', 'R.A. No. ' . sprintf('%02d', $ra_no));
+    $sheet2->setCellValue('G3', 'R.A. No. RA-' . $ra_no);
     $sheet2->mergeCells('G3:I3');
     $sheet2->setCellValue('J3', 'INVOICE Date :');
     $sheet2->setCellValue('K3', $bill_date);
