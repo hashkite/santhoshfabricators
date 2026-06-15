@@ -6237,40 +6237,4 @@ body.sidebar-is-open {
     page-break-inside: avoid;
   }
 }
-
-/* Payment status badges for table view and invoice details */
-.payment-status-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.725rem;
-  font-weight: 700;
-  border-radius: 9999px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  line-height: 1.2;
-}
-.payment-status-badge--pending {
-  background-color: #f3f4f6;
-  color: #4b5563;
-}
-.payment-status-badge--partial {
-  background-color: #eff6ff;
-  color: #2563eb;
-}
-.payment-status-badge--paid {
-  background-color: #dcfce7;
-  color: #16a34a;
-}
-.payment-status-badge--overdue {
-  background-color: #fee2e2;
-  color: #dc2626;
-  animation: pulse-badge 2s infinite;
-}
-@keyframes pulse-badge {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .7; }
-}
-
 /*# sourceMappingURL=style.css.map */
-

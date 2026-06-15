@@ -4,6 +4,13 @@ namespace Drupal\power_alpha_helper\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\node\Entity\Node;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Controller for the administrative dashboard overview page.
@@ -246,6 +253,7 @@ class DashboardController extends ControllerBase {
     $invoice_no_filter = $request->query->get('invoice_no', '');
     $po_no_filter = $request->query->get('po_no', '');
     $month_filter = $request->query->get('month', '');
+    $retention_filter = $request->query->get('retention', '');
 
     // Fetch all active project sites for selection dropdown
     $project_query = \Drupal::entityQuery('node')
@@ -310,6 +318,7 @@ class DashboardController extends ControllerBase {
     $total_invoiced = 0.0;
     $total_collected = 0.0;
     $total_outstanding = 0.0;
+    $total_retention = 0.0;
     $overdue_count = 0;
 
     $rows = [];
@@ -448,10 +457,24 @@ class DashboardController extends ControllerBase {
         }
       }
 
+      // Apply Retention Filter
+      if (!empty($retention_filter)) {
+        if ($retention_filter === 'yes') {
+          if ($retention <= 0.0) {
+            continue;
+          }
+        } elseif ($retention_filter === 'no') {
+          if ($retention > 0.0) {
+            continue;
+          }
+        }
+      }
+
       // Compute general KPI metrics on all matching search/filters
       $total_invoiced += $total;
       $total_collected += $paid;
       $total_outstanding += $balance;
+      $total_retention += $retention;
       if ($status === 'overdue') {
         $overdue_count++;
       }
@@ -502,20 +525,117 @@ class DashboardController extends ControllerBase {
       return $time_b <=> $time_a;
     });
 
-    // Handle CSV Export Request
+    // Handle Excel Export Request
     $export = $request->query->get('export', '');
-    if ($export === 'csv') {
-      $headers = [
-        'Content-Type' => 'text/csv; charset=utf-8',
-        'Content-Disposition' => 'attachment; filename="invoices_report_' . date('Y-m-d') . '.csv"',
+    if ($export === 'excel') {
+      $spreadsheet = new Spreadsheet();
+      $sheet = $spreadsheet->getActiveSheet();
+      $sheet->setTitle('Invoices Tracking');
+      $sheet->setShowGridlines(TRUE);
+
+      // Styles
+      $titleStyle = [
+        'font' => [
+          'bold' => TRUE,
+          'size' => 14,
+          'name' => 'Calibri',
+          'color' => ['rgb' => '1E293B'],
+        ],
+        'alignment' => [
+          'horizontal' => Alignment::HORIZONTAL_LEFT,
+          'vertical' => Alignment::VERTICAL_CENTER,
+        ],
       ];
-      
-      $handle = fopen('php://temp', 'r+');
-      // UTF-8 BOM for Excel compatibility
-      fwrite($handle, "\xEF\xBB\xBF");
-      
-      // Header row
-      fputcsv($handle, [
+
+      $headerStyle = [
+        'font' => [
+          'bold' => TRUE,
+          'color' => ['rgb' => 'FFFFFF'],
+          'size' => 10,
+          'name' => 'Calibri',
+        ],
+        'fill' => [
+          'fillType' => Fill::FILL_SOLID,
+          'startColor' => ['rgb' => '1E293B'], // Slate Blue
+        ],
+        'alignment' => [
+          'horizontal' => Alignment::HORIZONTAL_CENTER,
+          'vertical' => Alignment::VERTICAL_CENTER,
+          'wrapText' => TRUE,
+        ],
+        'borders' => [
+          'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['rgb' => 'CCCCCC'],
+          ],
+        ],
+      ];
+
+      $dataStyle = [
+        'font' => [
+          'size' => 10,
+          'name' => 'Calibri',
+        ],
+        'borders' => [
+          'allBorders' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['rgb' => 'E2E8F0'],
+          ],
+        ],
+      ];
+
+      $totalStyle = [
+        'font' => [
+          'bold' => TRUE,
+          'size' => 10,
+          'name' => 'Calibri',
+        ],
+        'fill' => [
+          'fillType' => Fill::FILL_SOLID,
+          'startColor' => ['rgb' => 'F1F5F9'],
+        ],
+        'borders' => [
+          'top' => [
+            'borderStyle' => Border::BORDER_THIN,
+            'color' => ['rgb' => '94A3B8'],
+          ],
+          'bottom' => [
+            'borderStyle' => Border::BORDER_DOUBLE,
+            'color' => ['rgb' => '94A3B8'],
+          ],
+        ],
+      ];
+
+      // Title Block
+      $sheet->setCellValue('A1', 'Invoice Payment Tracking Report');
+      $sheet->getStyle('A1')->applyFromArray($titleStyle);
+      $sheet->getRowDimension('1')->setRowHeight(35);
+      $sheet->mergeCells('A1:R1');
+
+      // Date Exported info
+      $sheet->setCellValue('A2', 'Exported On: ' . date('d.m.Y H:i:s'));
+      $sheet->getStyle('A2')->getFont()->setItalic(TRUE)->setSize(9);
+
+      // KPI stat block (mini dashboard at the top of excel)
+      $sheet->setCellValue('A4', 'TOTAL INVOICED');
+      $sheet->setCellValue('B4', $total_invoiced);
+      $sheet->setCellValue('D4', 'TOTAL COLLECTED');
+      $sheet->setCellValue('E4', $total_collected);
+      $sheet->setCellValue('G4', 'TOTAL OUTSTANDING');
+      $sheet->setCellValue('H4', $total_outstanding);
+      $sheet->setCellValue('J4', 'TOTAL RETENTION');
+      $sheet->setCellValue('K4', $total_retention);
+
+      foreach (['A4', 'D4', 'G4', 'J4'] as $kpiLabelCol) {
+        $sheet->getStyle($kpiLabelCol)->getFont()->setBold(TRUE)->setSize(9)->setColor(new \PhpOffice\PhpSpreadsheet\Style\Color('64748B'));
+      }
+      foreach (['B4', 'E4', 'H4', 'K4'] as $kpiValueCol) {
+        $sheet->getStyle($kpiValueCol)->getFont()->setBold(TRUE)->setSize(11);
+        $sheet->getStyle($kpiValueCol)->getNumberFormat()->setFormatCode('"₹"#,##0.00');
+      }
+
+      // Headers row at line 6
+      $headers = [
         'Invoice No',
         'Project',
         'Client',
@@ -523,53 +643,102 @@ class DashboardController extends ControllerBase {
         'RA Bill',
         'Financial Year',
         'Invoice Date',
-        'Basic Value (INR)',
-        'GST Value (INR)',
-        'Gross Value (INR)',
-        'TDS (INR)',
+        'Basic Value',
+        'GST (18%)',
+        'Gross Value',
+        'TDS (2%)',
         'TDS Paid',
-        'Retention (INR)',
-        'Net Receivable (INR)',
-        'Total Paid (INR)',
-        'Outstanding Balance (INR)',
+        'Retention',
+        'Net Receivable',
+        'Total Paid',
+        'Outstanding Balance',
         'Due Date',
         'Status',
-      ]);
+      ];
 
-      foreach ($rows as $row) {
-        fputcsv($handle, [
-          $row['invoice_no'],
-          $row['project'],
-          $row['client'],
-          $row['po_no'],
-          $row['ra_num'],
-          $row['fy'],
-          $row['date'],
-          number_format($row['basic_raw'], 2, '.', ''),
-          number_format($row['gst_raw'], 2, '.', ''),
-          number_format($row['total_raw'], 2, '.', ''),
-          number_format($row['tds_raw'], 2, '.', ''),
-          $row['tds_paid'] ? 'Yes' : 'No',
-          number_format($row['retention_raw'], 2, '.', ''),
-          number_format($row['expected_raw'], 2, '.', ''),
-          number_format($row['paid_raw'], 2, '.', ''),
-          number_format($row['balance_raw'], 2, '.', ''),
-          $row['due_date'],
-          $row['status_label'],
-        ]);
+      foreach ($headers as $colIdx => $headerText) {
+        $colLetter = Coordinate::stringFromColumnIndex($colIdx + 1);
+        $sheet->setCellValue($colLetter . '6', $headerText);
       }
-      
-      rewind($handle);
-      $csv_content = stream_get_contents($handle);
-      fclose($handle);
-      
-      return new \Symfony\Component\HttpFoundation\Response($csv_content, 200, $headers);
+      $sheet->getStyle('A6:R6')->applyFromArray($headerStyle);
+      $sheet->getRowDimension('6')->setRowHeight(28);
+
+      $excelRow = 7;
+      foreach ($rows as $row) {
+        $sheet->setCellValue('A' . $excelRow, $row['invoice_no']);
+        $sheet->setCellValue('B' . $excelRow, $row['project']);
+        $sheet->setCellValue('C' . $excelRow, $row['client']);
+        $sheet->setCellValue('D' . $excelRow, $row['po_no']);
+        $sheet->setCellValue('E' . $excelRow, $row['ra_num']);
+        $sheet->setCellValue('F' . $excelRow, $row['fy']);
+        $sheet->setCellValue('G' . $excelRow, $row['date']);
+        $sheet->setCellValue('H' . $excelRow, $row['basic_raw']);
+        $sheet->setCellValue('I' . $excelRow, $row['gst_raw']);
+        $sheet->setCellValue('J' . $excelRow, $row['total_raw']);
+        $sheet->setCellValue('K' . $excelRow, $row['tds_raw']);
+        $sheet->setCellValue('L' . $excelRow, $row['tds_paid'] ? 'Yes' : 'No');
+        $sheet->setCellValue('M' . $excelRow, $row['retention_raw']);
+        $sheet->setCellValue('N' . $excelRow, $row['expected_raw']);
+        $sheet->setCellValue('O' . $excelRow, $row['paid_raw']);
+        $sheet->setCellValue('P' . $excelRow, $row['balance_raw']);
+        $sheet->setCellValue('Q' . $excelRow, $row['due_date']);
+        $sheet->setCellValue('R' . $excelRow, $row['status_label']);
+
+        // Data styles
+        $sheet->getStyle("A$excelRow:R$excelRow")->applyFromArray($dataStyle);
+        $sheet->getStyle("H$excelRow:K$excelRow")->getNumberFormat()->setFormatCode('"₹"#,##0.00');
+        $sheet->getStyle("M$excelRow:P$excelRow")->getNumberFormat()->setFormatCode('"₹"#,##0.00');
+        $sheet->getStyle("A$excelRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("E$excelRow:G$excelRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("L$excelRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle("Q$excelRow:R$excelRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $excelRow++;
+      }
+
+      // Summary / Totals Row
+      $sheet->setCellValue('A' . $excelRow, 'Total');
+      $sheet->mergeCells("A$excelRow:G$excelRow");
+      $sheet->getStyle("A$excelRow:G$excelRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+      $sheet->setCellValue('H' . $excelRow, '=SUM(H7:H' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('I' . $excelRow, '=SUM(I7:I' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('J' . $excelRow, '=SUM(J7:J' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('K' . $excelRow, '=SUM(K7:K' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('M' . $excelRow, '=SUM(M7:M' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('N' . $excelRow, '=SUM(N7:N' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('O' . $excelRow, '=SUM(O7:O' . ($excelRow - 1) . ')');
+      $sheet->setCellValue('P' . $excelRow, '=SUM(P7:P' . ($excelRow - 1) . ')');
+
+      $sheet->getStyle("A$excelRow:R$excelRow")->applyFromArray($totalStyle);
+      $sheet->getStyle("H$excelRow:K$excelRow")->getNumberFormat()->setFormatCode('"₹"#,##0.00');
+      $sheet->getStyle("M$excelRow:P$excelRow")->getNumberFormat()->setFormatCode('"₹"#,##0.00');
+
+      // Auto-fit Columns
+      for ($col = 1; $col <= 18; $col++) {
+        $colLetter = Coordinate::stringFromColumnIndex($col);
+        $sheet->getColumnDimension($colLetter)->setAutoSize(TRUE);
+      }
+
+      $writer = new Xlsx($spreadsheet);
+      $response = new Response();
+      $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      $response->headers->set('Content-Disposition', 'attachment; filename="invoices_report_' . date('Y-m-d') . '.xlsx"');
+      $response->headers->set('Cache-Control', 'max-age=0');
+
+      ob_start();
+      $writer->save('php://output');
+      $content = ob_get_clean();
+      $response->setContent($content);
+
+      return $response;
     }
 
     $kpis = [
       'total_invoiced' => '₹' . $this->formatIndianCurrency($total_invoiced),
       'total_collected' => '₹' . $this->formatIndianCurrency($total_collected),
       'total_outstanding' => '₹' . $this->formatIndianCurrency($total_outstanding),
+      'total_retention' => '₹' . $this->formatIndianCurrency($total_retention),
       'overdue_count' => $overdue_count,
     ];
 
@@ -587,6 +756,7 @@ class DashboardController extends ControllerBase {
         'invoice_no' => $invoice_no_filter,
         'po_no' => $po_no_filter,
         'month' => $month_filter,
+        'retention' => $retention_filter,
       ],
       '#cache' => [
         'max-age' => 0,
