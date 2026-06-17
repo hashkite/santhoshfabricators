@@ -1,0 +1,18 @@
+uuid: 81eb5f4e-36bb-413d-b5e1-aa4058764b87
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_show_part_number
+field_name: field_show_part_number
+entity_type: node
+type: boolean
+settings: {  }
+module: core
+locked: false
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

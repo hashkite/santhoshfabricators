@@ -7,6 +7,7 @@ dependencies:
     - field.field.node.boq_item.field_approved_quantity
     - field.field.node.boq_item.field_item_code
     - field.field.node.boq_item.field_item_description
+    - field.field.node.boq_item.field_part_number
     - field.field.node.boq_item.field_project
     - field.field.node.boq_item.field_total_value
     - field.field.node.boq_item.field_unit
@@ -53,6 +54,14 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 103
+    region: content
+  field_part_number:
+    type: string
+    label: above
+    settings:
+      link_to_entity: false
+    third_party_settings: {  }
+    weight: 2
     region: content
   field_project:
     type: entity_reference_label

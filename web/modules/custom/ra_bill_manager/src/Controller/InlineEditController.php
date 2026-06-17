@@ -326,12 +326,13 @@ class InlineEditController extends ControllerBase {
     $uom = trim($content['uom'] ?? 'Nos');
     $rate = floatval($content['rate'] ?? 0.0);
     $approved_qty = floatval($content['approved_qty'] ?? 0.0);
+    $part_number = trim($content['part_number'] ?? '');
 
     if (empty($description)) {
       return new JsonResponse(['error' => 'Description is required.'], 400);
     }
 
-    $boq_item = $boq_validator->getOrCreateBOQItem($project_id, $item_code, $description, $uom, $approved_qty, $rate);
+    $boq_item = $boq_validator->getOrCreateBOQItem($project_id, $item_code, $description, $uom, $approved_qty, $rate, $part_number);
 
     // Check if this BOQ item is already in the RA Bill
     if ($node->hasField('field_ra_bill_items') && !$node->get('field_ra_bill_items')->isEmpty()) {
@@ -347,8 +348,10 @@ class InlineEditController extends ControllerBase {
     }
 
     // 2. Create the ra_bill_item paragraph
+    $part_number_val = $boq_item && $boq_item->hasField('field_part_number') && !$boq_item->get('field_part_number')->isEmpty() ? $boq_item->get('field_part_number')->value : $part_number;
     $item_data = [
       'item_code' => $boq_item->get('field_item_code')->value ?? '',
+      'part_number' => $part_number_val,
       'description' => $boq_item->get('field_item_description')->value ?? '',
       'uom' => $boq_item->get('field_unit')->value ?? 'Nos',
       'po_qty' => floatval($boq_item->get('field_approved_quantity')->value ?? 0.0),
@@ -414,6 +417,7 @@ class InlineEditController extends ControllerBase {
         'item' => [
           'paragraph_id' => $paragraph->id(),
           'item_code' => $item_data['item_code'],
+          'part_number' => $part_number_val,
           'description' => $item_data['description'],
           'uom' => $item_data['uom'],
           'rate' => $item_data['rate'],

@@ -169,6 +169,11 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
             $node->set('field_sgst', $parsed_data['metadata']['sgst']);
             $node->set('field_total_amount', $parsed_data['metadata']['total_amount']);
 
+            // Set the show part number toggle based on whether part number is detected in excel
+            if ($node->hasField('field_show_part_number')) {
+              $node->set('field_show_part_number', !empty($parsed_data['metadata']['has_part_number']) ? 1 : 0);
+            }
+
             // Parse and create paragraph items
             $paragraphs = [];
             foreach ($parsed_data['items'] as $item) {
@@ -321,16 +326,19 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
         }
       }
 
-      // If we didn't just parse from Excel, recalculate the node totals from the items
-      if (!$file_changed && $calculated_basic > 0) {
-        $cgst = $calculated_basic * 0.09;
-        $sgst = $calculated_basic * 0.09;
-        $total = $calculated_basic + $cgst + $sgst;
+      // If we didn't just parse from Excel, or if the parsed totals are empty/0, calculate/override from the items
+      $basic_amount_val = !$node->get('field_basic_amount')->isEmpty() ? floatval($node->get('field_basic_amount')->value) : 0.0;
+      if (!$file_changed || $basic_amount_val == 0) {
+        if ($calculated_basic > 0) {
+          $cgst = $calculated_basic * 0.09;
+          $sgst = $calculated_basic * 0.09;
+          $total = $calculated_basic + $cgst + $sgst;
 
-        $node->set('field_basic_amount', $calculated_basic);
-        $node->set('field_cgst', $cgst);
-        $node->set('field_sgst', $sgst);
-        $node->set('field_total_amount', $total);
+          $node->set('field_basic_amount', $calculated_basic);
+          $node->set('field_cgst', $cgst);
+          $node->set('field_sgst', $sgst);
+          $node->set('field_total_amount', $total);
+        }
       }
 
       // Set node validation status based on items
@@ -600,6 +608,9 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
     $total_prev_amount = 0.0;
     $total_this_bill_amount = 0.0;
     $total_upto_date_amount = 0.0;
+    $has_part_number = $node->hasField('field_show_part_number') && !$node->get('field_show_part_number')->isEmpty()
+      ? (bool) $node->get('field_show_part_number')->value
+      : FALSE;
 
     if ($node->hasField('field_ra_bill_items') && !$node->get('field_ra_bill_items')->isEmpty()) {
       $paragraphs = $node->get('field_ra_bill_items')->referencedEntities();
@@ -611,11 +622,17 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
         $boq_item = !$item->get('field_boq_item')->isEmpty() ? $item->get('field_boq_item')->entity : NULL;
         $approved_qty = $boq_item ? floatval($boq_item->get('field_approved_quantity')->value ?? 0.0) : 0.0;
         $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
-        $uom = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
+        $uom_key = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'nos';
+        $uom = $boq_item ? (options_allowed_values($boq_item->get('field_unit')->getFieldDefinition()->getFieldStorageDefinition(), $boq_item)[$uom_key] ?? ucfirst($uom_key)) : 'Nos';
 
         $prev_qty = floatval($item->get('field_previous_qty')->value ?? 0.0);
         $current_qty = floatval($item->get('field_current_qty')->value ?? 0.0);
         $cumulative_qty = floatval($item->get('field_cumulative_qty')->value ?? 0.0);
+        $part_number = $boq_item && $boq_item->hasField('field_part_number') && !$boq_item->get('field_part_number')->isEmpty() ? $boq_item->get('field_part_number')->value : '';
+
+        if ($node->hasField('field_show_part_number') && $node->get('field_show_part_number')->isEmpty() && !empty($part_number)) {
+          $has_part_number = TRUE;
+        }
 
         // Computed amount columns
         $po_amount = $approved_qty * $unit_rate;
@@ -633,6 +650,7 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
         $items[] = [
           'paragraph_id' => $item->id(),
           'item_code' => $boq_item ? ($boq_item->get('field_item_code')->value ?? '') : ($item->get('field_item_code')->value ?? ''),
+          'part_number' => $part_number,
           'description' => $boq_item ? ($boq_item->get('field_item_description')->value ?? '') : ($item->get('field_item_description')->value ?? ''),
           'uom' => $uom,
           'rate' => $unit_rate,
@@ -657,6 +675,7 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
     $metadata['total_this_bill_amount'] = $total_this_bill_amount;
     $metadata['total_upto_date_amount'] = $total_upto_date_amount;
     $metadata['total_balance_amount'] = $total_po_amount - $total_upto_date_amount;
+    $metadata['has_part_number'] = $has_part_number;
 
     $build['ra_bill_excel_view'] = [
       '#theme' => 'ra_bill_excel_view',

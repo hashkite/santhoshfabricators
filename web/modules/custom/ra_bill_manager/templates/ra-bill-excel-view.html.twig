@@ -323,6 +323,14 @@
 		line-height: 1.4 !important;
 	}
 
+	/* Part number column toggle */
+	.part-number-col {
+		display: none !important;
+	}
+	.show-part-number .part-number-col {
+		display: table-cell !important;
+	}
+
 	/* ── Editable Input Styles ── */
 	.ra-qty-input {
 		width: 70px !important;
@@ -468,6 +476,9 @@
 	.ra-col-span-6 {
 		grid-column: span 6 !important;
 	}
+	.ra-col-span-12 {
+		grid-column: span 12 !important;
+	}
 	.ra-form-group {
 		display: flex !important;
 		flex-direction: column !important;
@@ -561,10 +572,16 @@
 </style>
 
 <div
-	class="ra-excel-container" id="ra-excel-container" data-update-url="{{ update_url }}" data-nid="{{ ra_bill_nid }}">
+	class="ra-excel-container {% if metadata.has_part_number %}show-part-number{% endif %}" id="ra-excel-container" data-update-url="{{ update_url }}" data-nid="{{ ra_bill_nid }}">
 
 	{# ── ACTION BUTTONS ── #}
 	<div class="ra-header-actions">
+		<div class="ra-column-toggle-container" style="margin-right: auto;">
+			<label class="ra-form-label" style="display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; font-weight: 700; color: var(--pa-text, #263238);">
+				<input type="checkbox" id="toggle-part-number" onchange="raTogglePartNumber(this.checked)" style="width: 16px; height: 16px; cursor: pointer;" {% if metadata.has_part_number %}checked{% endif %}/>
+				Show Part Number Column
+			</label>
+		</div>
 		<button type="button" class="ra-btn ra-btn-save" id="ra-save-btn" disabled onclick="raSaveChanges()">
 			<svg width="16" height="16" viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -661,6 +678,7 @@
 					{# Header Row 1 - Group headers #}
 					<tr>
 						<th rowspan="2">SL.NO.</th>
+						<th rowspan="2" class="part-number-col">PART NUMBER</th>
 						<th rowspan="2" style="min-width: 180px;">DESCRIPTION</th>
 						<th rowspan="2">UOM</th>
 						<th rowspan="2">QTY</th>
@@ -685,6 +703,7 @@
 					{% for item in items %}
 						<tr data-paragraph-id="{{ item.paragraph_id }}" data-rate="{{ item.rate }}">
 							<td class="align-center text-bold">{{ loop.index }}</td>
+							<td class="align-left part-number-col">{{ item.part_number }}</td>
 							<td class="align-left desc-cell">{{ item.description }}</td>
 							<td class="align-center">{{ item.uom }}</td>
 							<td class="align-right">{{ item.approved_qty|number_format(0, '.', ',') }}</td>
@@ -711,7 +730,7 @@
 				{% if items %}
 					<tfoot>
 						<tr class="ra-totals-row">
-							<td colspan="5" class="align-right text-bold">Total</td>
+							<td colspan="{% if metadata.has_part_number %}6{% else %}5{% endif %}" class="align-right text-bold">Total</td>
 							<td class="align-right text-bold" data-total="po_amount">{{ metadata.total_po_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right"></td>
 							<td class="align-center highlight-cell"></td>
@@ -754,12 +773,18 @@
 
 			<form id="ra-add-item-form" onsubmit="raSubmitAddItem(event)">
 				<div class="ra-form-grid">
-					<!-- Item Code and Description -->
-					<div class="ra-form-group ra-col-span-4">
+					<!-- Item Code and Part Number -->
+					<div class="ra-form-group ra-col-span-6">
 						<label class="ra-form-label" for="ra-input-code">Item Code / Sl.No</label>
 						<input type="text" class="ra-form-input" id="ra-input-code" placeholder="e.g. 6"/>
 					</div>
-					<div class="ra-form-group ra-col-span-8">
+					<div class="ra-form-group ra-col-span-6">
+						<label class="ra-form-label" for="ra-input-part-number">Part Number</label>
+						<input type="text" class="ra-form-input" id="ra-input-part-number" placeholder="e.g. W518122006"/>
+					</div>
+
+					<!-- Description -->
+					<div class="ra-form-group ra-col-span-12">
 						<label class="ra-form-label" for="ra-input-desc">Description <span style="color: #dc2626;">*</span></label>
 						<input type="text" class="ra-form-input" id="ra-input-desc" placeholder="e.g. Media filter feed pumps" required/>
 					</div>
@@ -809,6 +834,40 @@
 <script>
 	(function () {
 'use strict';
+
+// On load, apply localStorage preference if set
+window.addEventListener('DOMContentLoaded', function() {
+	var container = document.getElementById('ra-excel-container');
+	var nid = container ? container.getAttribute('data-nid') : '';
+	if (nid) {
+		var pref = localStorage.getItem('ra_show_part_number_' + nid);
+		var cb = document.getElementById('toggle-part-number');
+		if (pref !== null && cb) {
+			var checked = pref === '1';
+			cb.checked = checked;
+			raTogglePartNumber(checked);
+		}
+	}
+});
+
+window.raTogglePartNumber = function(checked) {
+	var container = document.getElementById('ra-excel-container');
+	var nid = container ? container.getAttribute('data-nid') : '';
+	if (container) {
+		if (checked) {
+			container.classList.add('show-part-number');
+		} else {
+			container.classList.remove('show-part-number');
+		}
+	}
+	var totalLabelCell = document.querySelector('.ra-totals-row td:first-child');
+	if (totalLabelCell) {
+		totalLabelCell.setAttribute('colspan', checked ? '6' : '5');
+	}
+	if (container && nid) {
+		localStorage.setItem('ra_show_part_number_' + nid, checked ? '1' : '0');
+	}
+};
 
 var dirtyFields = {};
 
@@ -1060,6 +1119,7 @@ window.raSubmitAddItem = function (event) {
   
   var currentQty = parseFloat(document.getElementById('ra-input-qty').value) || 0;
   var code = document.getElementById('ra-input-code').value;
+  var partNumber = document.getElementById('ra-input-part-number').value;
   var desc = document.getElementById('ra-input-desc').value;
   var uom = document.getElementById('ra-input-uom').value;
   var rate = parseFloat(document.getElementById('ra-input-rate').value) || 0;
@@ -1073,6 +1133,7 @@ window.raSubmitAddItem = function (event) {
   var payload = {
     current_qty: currentQty,
     item_code: code,
+    part_number: partNumber,
     description: desc,
     uom: uom,
     rate: rate,
@@ -1111,6 +1172,7 @@ window.raSubmitAddItem = function (event) {
       
       tr.innerHTML = 
         '<td class="align-center text-bold">' + index + '</td>' +
+        '<td class="align-left part-number-col">' + escapeHtml(item.part_number || '') + '</td>' +
         '<td class="align-left desc-cell">' + escapeHtml(item.description) + '</td>' +
         '<td class="align-center">' + escapeHtml(item.uom) + '</td>' +
         '<td class="align-right">' + formatNumber(item.approved_qty, 0) + '</td>' +

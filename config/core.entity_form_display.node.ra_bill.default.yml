@@ -17,12 +17,15 @@ dependencies:
     - field.field.node.ra_bill.field_ra_bill_items
     - field.field.node.ra_bill.field_ra_bill_number
     - field.field.node.ra_bill.field_sgst
+    - field.field.node.ra_bill.field_show_part_number
     - field.field.node.ra_bill.field_total_amount
     - field.field.node.ra_bill.field_validation_status
     - field.field.node.ra_bill.field_vendor
     - field.field.node.ra_bill.field_workflow_status
     - node.type.ra_bill
+    - workflows.workflow.ra_bill_workflow
   module:
+    - content_moderation
     - datetime
     - file
     - paragraphs
@@ -145,6 +148,13 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+  field_show_part_number:
+    type: boolean_checkbox
+    weight: 20
+    region: content
+    settings:
+      display_label: true
+    third_party_settings: {  }
   field_total_amount:
     type: string_textfield
     weight: 128
@@ -162,6 +172,12 @@ content:
   field_workflow_status:
     type: options_select
     weight: 131
+    region: content
+    settings: {  }
+    third_party_settings: {  }
+  moderation_state:
+    type: moderation_state_default
+    weight: 100
     region: content
     settings: {  }
     third_party_settings: {  }

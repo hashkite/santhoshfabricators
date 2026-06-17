@@ -275,7 +275,8 @@ class ExcelExportController extends ControllerBase {
 
           $item_code = $boq_item ? ($boq_item->get('field_item_code')->value ?? '') : ($item->get('field_item_code')->value ?? '');
           $description = $boq_item ? ($boq_item->get('field_item_description')->value ?? '') : ($item->get('field_item_description')->value ?? '');
-          $uom = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
+          $uom_key = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'nos';
+          $uom = $boq_item ? (options_allowed_values($boq_item->get('field_unit')->getFieldDefinition()->getFieldStorageDefinition(), $boq_item)[$uom_key] ?? ucfirst($uom_key)) : 'Nos';
 
           $prev_qty = floatval($item->get('field_previous_qty')->value ?? 0.0);
           $current_qty = floatval($item->get('field_current_qty')->value ?? 0.0);
@@ -645,82 +646,171 @@ class ExcelExportController extends ControllerBase {
     $sheet2->setTitle('Abs');
     $sheet2->setShowGridlines(TRUE);
 
-    // ── Row 1: Vendor Name Banner (centered, spanning A-L) ──
+    // Check if part number needs to be exported
+    // Read show part number toggle value from field_show_part_number field
+    $has_part_number = $bill->hasField('field_show_part_number') && !$bill->get('field_show_part_number')->isEmpty()
+      ? (bool) $bill->get('field_show_part_number')->value
+      : FALSE;
+
+    // Fallback: if show_part_number is empty (not set), auto-detect based on items
+    if ($bill->hasField('field_show_part_number') && $bill->get('field_show_part_number')->isEmpty()) {
+      if ($bill->hasField('field_ra_bill_items') && !$bill->get('field_ra_bill_items')->isEmpty()) {
+        $paragraphs = $bill->get('field_ra_bill_items')->referencedEntities();
+        foreach ($paragraphs as $item) {
+          if ($item->bundle() === 'ra_bill_item') {
+            $boq_item = !$item->get('field_boq_item')->isEmpty() ? $item->get('field_boq_item')->entity : NULL;
+            if ($boq_item && $boq_item->hasField('field_part_number') && !$boq_item->get('field_part_number')->isEmpty()) {
+              $has_part_number = TRUE;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if ($has_part_number) {
+      $col_sl_no = 'A';
+      $col_part_number = 'B';
+      $col_desc = 'C';
+      $col_uom = 'D';
+      $col_qty = 'E';
+      $col_rate = 'F';
+      $col_amount = 'G';
+      $col_prev_qty = 'H';
+      $col_current_qty = 'I';
+      $col_cumulative_qty = 'J';
+      $col_prev_amount = 'K';
+      $col_current_amount = 'L';
+      $col_cumulative_amount = 'M';
+      $last_col_letter = 'M';
+    }
+    else {
+      $col_sl_no = 'A';
+      $col_part_number = NULL;
+      $col_desc = 'B';
+      $col_uom = 'C';
+      $col_qty = 'D';
+      $col_rate = 'E';
+      $col_amount = 'F';
+      $col_prev_qty = 'G';
+      $col_current_qty = 'H';
+      $col_cumulative_qty = 'I';
+      $col_prev_amount = 'J';
+      $col_current_amount = 'K';
+      $col_cumulative_amount = 'L';
+      $last_col_letter = 'L';
+    }
+
+    // ── Row 1: Vendor Name Banner (centered, spanning A-L or A-M) ──
     $sheet2->setCellValue('A1', $vendor_name);
-    $sheet2->mergeCells('A1:L1');
+    $sheet2->mergeCells('A1:' . $last_col_letter . '1');
     $sheet2->getStyle('A1')->applyFromArray($vendorBannerStyle);
     $sheet2->getRowDimension('1')->setRowHeight(22);
-    $sheet2->getStyle('A1:L1')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+    $sheet2->getStyle('A1:' . $last_col_letter . '1')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
 
     // ── Row 2: CLIENT | PO.NO | P.O DATE | INVOICE NO ──
-    $sheet2->setCellValue('A2', 'CLIENT:');
-    $sheet2->setCellValue('B2', $client_name);
-    $sheet2->mergeCells('B2:C2');
-    $sheet2->setCellValue('D2', 'PO.NO.' . $po_no);
-    $sheet2->mergeCells('D2:F2');
-    $sheet2->setCellValue('G2', 'P.O DATE: ' . $po_date);
-    $sheet2->mergeCells('G2:I2');
-    $sheet2->setCellValue('J2', 'INVOICE NO:');
-    $sheet2->setCellValue('K2', $temp_invoice_no);
-    $sheet2->mergeCells('K2:L2');
+    if ($has_part_number) {
+      $sheet2->setCellValue('A2', 'CLIENT:');
+      $sheet2->setCellValue('B2', $client_name);
+      $sheet2->mergeCells('B2:D2');
+      $sheet2->setCellValue('E2', 'PO.NO.' . $po_no);
+      $sheet2->mergeCells('E2:G2');
+      $sheet2->setCellValue('H2', 'P.O DATE: ' . $po_date);
+      $sheet2->mergeCells('H2:J2');
+      $sheet2->setCellValue('K2', 'INVOICE NO:');
+      $sheet2->setCellValue('L2', $temp_invoice_no);
+      $sheet2->mergeCells('L2:M2');
 
-    foreach (['A2', 'D2', 'G2', 'J2'] as $c) {
+      $sheet2->setCellValue('A3', 'Project :');
+      $sheet2->setCellValue('B3', $project_name);
+      $sheet2->mergeCells('B3:G3');
+      $sheet2->setCellValue('H3', 'R.A. No. RA-' . $ra_no);
+      $sheet2->mergeCells('H3:J3');
+      $sheet2->setCellValue('K3', 'INVOICE Date :');
+      $sheet2->setCellValue('L3', $bill_date);
+      $sheet2->mergeCells('L3:M3');
+    }
+    else {
+      $sheet2->setCellValue('A2', 'CLIENT:');
+      $sheet2->setCellValue('B2', $client_name);
+      $sheet2->mergeCells('B2:C2');
+      $sheet2->setCellValue('D2', 'PO.NO.' . $po_no);
+      $sheet2->mergeCells('D2:F2');
+      $sheet2->setCellValue('G2', 'P.O DATE: ' . $po_date);
+      $sheet2->mergeCells('G2:I2');
+      $sheet2->setCellValue('J2', 'INVOICE NO:');
+      $sheet2->setCellValue('K2', $temp_invoice_no);
+      $sheet2->mergeCells('K2:L2');
+
+      $sheet2->setCellValue('A3', 'Project :');
+      $sheet2->setCellValue('B3', $project_name);
+      $sheet2->mergeCells('B3:F3');
+      $sheet2->setCellValue('G3', 'R.A. No. RA-' . $ra_no);
+      $sheet2->mergeCells('G3:I3');
+      $sheet2->setCellValue('J3', 'INVOICE Date :');
+      $sheet2->setCellValue('K3', $bill_date);
+      $sheet2->mergeCells('K3:L3');
+    }
+
+    foreach (['A2', 'J2', 'A3', 'J3'] as $c) {
       $sheet2->getStyle($c)->applyFromArray($infoLabelStyle);
     }
-    $sheet2->getStyle('A2:L2')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
-
-    // ── Row 3: Project | R.A. No | INVOICE Date ──
-    $sheet2->setCellValue('A3', 'Project :');
-    $sheet2->setCellValue('B3', $project_name);
-    $sheet2->mergeCells('B3:F3');
-    $sheet2->setCellValue('G3', 'R.A. No. RA-' . $ra_no);
-    $sheet2->mergeCells('G3:I3');
-    $sheet2->setCellValue('J3', 'INVOICE Date :');
-    $sheet2->setCellValue('K3', $bill_date);
-    $sheet2->mergeCells('K3:L3');
-
-    foreach (['A3', 'G3', 'J3'] as $c) {
-      $sheet2->getStyle($c)->applyFromArray($infoLabelStyle);
+    if ($has_part_number) {
+      $sheet2->getStyle('E2')->applyFromArray($infoLabelStyle);
+      $sheet2->getStyle('H2')->applyFromArray($infoLabelStyle);
+      $sheet2->getStyle('H3')->applyFromArray($infoLabelStyle);
     }
-    $sheet2->getStyle('A3:L3')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+    else {
+      $sheet2->getStyle('D2')->applyFromArray($infoLabelStyle);
+      $sheet2->getStyle('G2')->applyFromArray($infoLabelStyle);
+      $sheet2->getStyle('G3')->applyFromArray($infoLabelStyle);
+    }
+    $sheet2->getStyle('A2:' . $last_col_letter . '2')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+    $sheet2->getStyle('A3:' . $last_col_letter . '3')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
 
     // ── Row 4: ABSTRAC label ──
     $sheet2->setCellValue('A4', 'ABSTRAC');
-    $sheet2->mergeCells('A4:L4');
+    $sheet2->mergeCells('A4:' . $last_col_letter . '4');
     $sheet2->getStyle('A4')->getFont()->setBold(TRUE)->setSize(11);
     $sheet2->getStyle('A4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-    $sheet2->getStyle('A4:L4')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
+    $sheet2->getStyle('A4:' . $last_col_letter . '4')->getBorders()->getBottom()->setBorderStyle(Border::BORDER_THIN);
 
     // ── Row 5-6: Two-level headers ──
     // Row 5: Main headers
-    $sheet2->setCellValue('A5', 'SL.NO.');
-    $sheet2->setCellValue('B5', 'DESCRIPTION');
-    $sheet2->setCellValue('C5', 'UOM');
-    $sheet2->setCellValue('D5', 'QTY');
-    $sheet2->setCellValue('E5', 'RATE');
-    $sheet2->setCellValue('F5', 'AMOUNT');
-    $sheet2->setCellValue('G5', 'QUANTITY');
-    $sheet2->mergeCells('G5:I5');
-    $sheet2->setCellValue('J5', 'AMOUNT');
-    $sheet2->mergeCells('J5:L5');
+    $sheet2->setCellValue($col_sl_no . '5', 'SL.NO.');
+    if ($has_part_number) {
+      $sheet2->setCellValue($col_part_number . '5', 'PART NUMBER');
+    }
+    $sheet2->setCellValue($col_desc . '5', 'DESCRIPTION');
+    $sheet2->setCellValue($col_uom . '5', 'UOM');
+    $sheet2->setCellValue($col_qty . '5', 'QTY');
+    $sheet2->setCellValue($col_rate . '5', 'RATE');
+    $sheet2->setCellValue($col_amount . '5', 'AMOUNT');
+    $sheet2->setCellValue($col_prev_qty . '5', 'QUANTITY');
+    $sheet2->mergeCells($col_prev_qty . '5:' . $col_cumulative_qty . '5');
+    $sheet2->setCellValue($col_prev_amount . '5', 'AMOUNT');
+    $sheet2->mergeCells($col_prev_amount . '5:' . $col_cumulative_amount . '5');
 
     // Row 6: Sub-headers
-    $sheet2->setCellValue('G6', 'UPTO PREV');
-    $sheet2->setCellValue('H6', 'IN THIS BILL');
-    $sheet2->setCellValue('I6', 'UPTO DATE');
-    $sheet2->setCellValue('J6', 'UPTO PREV');
-    $sheet2->setCellValue('K6', 'THIS BILL');
-    $sheet2->setCellValue('L6', 'UPTO DATE');
+    $sheet2->setCellValue($col_prev_qty . '6', 'UPTO PREV');
+    $sheet2->setCellValue($col_current_qty . '6', 'IN THIS BILL');
+    $sheet2->setCellValue($col_cumulative_qty . '6', 'UPTO DATE');
+    $sheet2->setCellValue($col_prev_amount . '6', 'UPTO PREV');
+    $sheet2->setCellValue($col_current_amount . '6', 'THIS BILL');
+    $sheet2->setCellValue($col_cumulative_amount . '6', 'UPTO DATE');
 
     // Merge vertically for non-split headers
-    $sheet2->mergeCells('A5:A6');
-    $sheet2->mergeCells('B5:B6');
-    $sheet2->mergeCells('C5:C6');
-    $sheet2->mergeCells('D5:D6');
-    $sheet2->mergeCells('E5:E6');
-    $sheet2->mergeCells('F5:F6');
+    $sheet2->mergeCells($col_sl_no . '5:' . $col_sl_no . '6');
+    if ($has_part_number) {
+      $sheet2->mergeCells($col_part_number . '5:' . $col_part_number . '6');
+    }
+    $sheet2->mergeCells($col_desc . '5:' . $col_desc . '6');
+    $sheet2->mergeCells($col_uom . '5:' . $col_uom . '6');
+    $sheet2->mergeCells($col_qty . '5:' . $col_qty . '6');
+    $sheet2->mergeCells($col_rate . '5:' . $col_rate . '6');
+    $sheet2->mergeCells($col_amount . '5:' . $col_amount . '6');
 
-    $sheet2->getStyle('A5:L6')->applyFromArray($headerStyle);
+    $sheet2->getStyle('A5:' . $last_col_letter . '6')->applyFromArray($headerStyle);
     $sheet2->getRowDimension('5')->setRowHeight(20);
     $sheet2->getRowDimension('6')->setRowHeight(20);
 
@@ -748,8 +838,8 @@ class ExcelExportController extends ControllerBase {
         ],
       ],
     ];
-    $sheet2->getStyle('H6')->applyFromArray($yellowHeaderStyle);
-    $sheet2->getStyle('K6')->applyFromArray($yellowHeaderStyle);
+    $sheet2->getStyle($col_current_qty . '6')->applyFromArray($yellowHeaderStyle);
+    $sheet2->getStyle($col_current_amount . '6')->applyFromArray($yellowHeaderStyle);
 
     // ── Populate Data Items starting at Row 7 ──
     $dataRow = 7;
@@ -764,43 +854,54 @@ class ExcelExportController extends ControllerBase {
         $boq_item = !$item->get('field_boq_item')->isEmpty() ? $item->get('field_boq_item')->entity : NULL;
         $approved_qty = $boq_item ? floatval($boq_item->get('field_approved_quantity')->value ?? 0.0) : 0.0;
         $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
-        $uom = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'Nos';
+        $uom_key = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'nos';
+        $uom = $boq_item ? (options_allowed_values($boq_item->get('field_unit')->getFieldDefinition()->getFieldStorageDefinition(), $boq_item)[$uom_key] ?? ucfirst($uom_key)) : 'Nos';
 
         $description = $boq_item ? ($boq_item->get('field_item_description')->value ?? '') : ($item->get('field_item_description')->value ?? '');
         $prev_qty = floatval($item->get('field_previous_qty')->value ?? 0.0);
         $current_qty = floatval($item->get('field_current_qty')->value ?? 0.0);
 
-        $sheet2->setCellValue('A' . $dataRow, $slNo);
-        $sheet2->setCellValue('B' . $dataRow, $description);
-        $sheet2->setCellValue('C' . $dataRow, $uom);
-        $sheet2->setCellValue('D' . $dataRow, $approved_qty);
-        $sheet2->setCellValue('E' . $dataRow, $unit_rate);
+        $sheet2->setCellValue($col_sl_no . $dataRow, $slNo);
+        if ($has_part_number) {
+          $part_number = $boq_item && $boq_item->hasField('field_part_number') && !$boq_item->get('field_part_number')->isEmpty()
+            ? $boq_item->get('field_part_number')->value
+            : '';
+          $sheet2->setCellValue($col_part_number . $dataRow, $part_number);
+        }
+        $sheet2->setCellValue($col_desc . $dataRow, $description);
+        $sheet2->setCellValue($col_uom . $dataRow, $uom);
+        $sheet2->setCellValue($col_qty . $dataRow, $approved_qty);
+        $sheet2->setCellValue($col_rate . $dataRow, $unit_rate);
         // AMOUNT = QTY × RATE
-        $sheet2->setCellValue('F' . $dataRow, '=D' . $dataRow . '*E' . $dataRow);
+        $sheet2->setCellValue($col_amount . $dataRow, '=' . $col_qty . $dataRow . '*' . $col_rate . $dataRow);
         // QUANTITY columns
-        $sheet2->setCellValue('G' . $dataRow, $prev_qty);
-        $sheet2->setCellValue('H' . $dataRow, $current_qty);
-        $sheet2->setCellValue('I' . $dataRow, '=G' . $dataRow . '+H' . $dataRow);
+        $sheet2->setCellValue($col_prev_qty . $dataRow, $prev_qty);
+        $sheet2->setCellValue($col_current_qty . $dataRow, $current_qty);
+        $sheet2->setCellValue($col_cumulative_qty . $dataRow, '=' . $col_prev_qty . $dataRow . '+' . $col_current_qty . $dataRow);
         // AMOUNT columns
-        $sheet2->setCellValue('J' . $dataRow, '=G' . $dataRow . '*E' . $dataRow);
-        $sheet2->setCellValue('K' . $dataRow, '=H' . $dataRow . '*E' . $dataRow);
-        $sheet2->setCellValue('L' . $dataRow, '=I' . $dataRow . '*E' . $dataRow);
+        $sheet2->setCellValue($col_prev_amount . $dataRow, '=' . $col_prev_qty . $dataRow . '*' . $col_rate . $dataRow);
+        $sheet2->setCellValue($col_current_amount . $dataRow, '=' . $col_current_qty . $dataRow . '*' . $col_rate . $dataRow);
+        $sheet2->setCellValue($col_cumulative_amount . $dataRow, '=' . $col_cumulative_qty . $dataRow . '*' . $col_rate . $dataRow);
 
         // Apply data styles
-        $sheet2->getStyle("A$dataRow:L$dataRow")->applyFromArray($dataStyle);
-        $sheet2->getStyle("E$dataRow:F$dataRow")->getNumberFormat()->setFormatCode('#,##0.00');
-        $sheet2->getStyle("J$dataRow:L$dataRow")->getNumberFormat()->setFormatCode('#,##0.00');
-        $sheet2->getStyle("D$dataRow")->getNumberFormat()->setFormatCode('#,##0');
-        $sheet2->getStyle("G$dataRow:I$dataRow")->getNumberFormat()->setFormatCode('#,##0');
+        $sheet2->getStyle("A$dataRow:" . $last_col_letter . $dataRow)->applyFromArray($dataStyle);
+        $sheet2->getStyle($col_rate . $dataRow . ':' . $col_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet2->getStyle($col_prev_amount . $dataRow . ':' . $col_cumulative_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
+        $sheet2->getStyle($col_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet2->getStyle($col_prev_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet2->getStyle($col_cumulative_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
 
         $sheet2->getStyle("A$dataRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-        $sheet2->getStyle("C$dataRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        if ($has_part_number) {
+          $sheet2->getStyle($col_part_number . $dataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        }
+        $sheet2->getStyle($col_uom . $dataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-        // Yellow highlight for "IN THIS BILL" (H) and "THIS BILL" (K) data cells
-        $sheet2->getStyle("H$dataRow")->applyFromArray($highlightStyle);
-        $sheet2->getStyle("H$dataRow")->getNumberFormat()->setFormatCode('#,##0');
-        $sheet2->getStyle("K$dataRow")->applyFromArray($highlightStyle);
-        $sheet2->getStyle("K$dataRow")->getNumberFormat()->setFormatCode('#,##0.00');
+        // Yellow highlight for "IN THIS BILL" and "THIS BILL" data cells
+        $sheet2->getStyle($col_current_qty . $dataRow)->applyFromArray($highlightStyle);
+        $sheet2->getStyle($col_current_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet2->getStyle($col_current_amount . $dataRow)->applyFromArray($highlightStyle);
+        $sheet2->getStyle($col_current_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
 
         $slNo++;
         $dataRow++;
@@ -812,25 +913,30 @@ class ExcelExportController extends ControllerBase {
     $lastDataRow = $dataRow - 1;
 
     $sheet2->setCellValue('A' . $dataRow, 'Total');
-    $sheet2->mergeCells("A$dataRow:E$dataRow");
-    $sheet2->getStyle("A$dataRow:E$dataRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+    $sheet2->mergeCells('A' . $dataRow . ':' . $col_rate . $dataRow);
+    $sheet2->getStyle('A' . $dataRow . ':' . $col_rate . $dataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-    $sheet2->setCellValue('F' . $dataRow, '=SUM(F' . $firstDataRow . ':F' . $lastDataRow . ')');
-    $sheet2->setCellValue('J' . $dataRow, '=SUM(J' . $firstDataRow . ':J' . $lastDataRow . ')');
-    $sheet2->setCellValue('K' . $dataRow, '=SUM(K' . $firstDataRow . ':K' . $lastDataRow . ')');
-    $sheet2->setCellValue('L' . $dataRow, '=SUM(L' . $firstDataRow . ':L' . $lastDataRow . ')');
+    $sheet2->setCellValue($col_amount . $dataRow, '=SUM(' . $col_amount . $firstDataRow . ':' . $col_amount . $lastDataRow . ')');
+    $sheet2->setCellValue($col_prev_amount . $dataRow, '=SUM(' . $col_prev_amount . $firstDataRow . ':' . $col_prev_amount . $lastDataRow . ')');
+    $sheet2->setCellValue($col_current_amount . $dataRow, '=SUM(' . $col_current_amount . $firstDataRow . ':' . $col_current_amount . $lastDataRow . ')');
+    $sheet2->setCellValue($col_cumulative_amount . $dataRow, '=SUM(' . $col_cumulative_amount . $firstDataRow . ':' . $col_cumulative_amount . $lastDataRow . ')');
 
-    $sheet2->getStyle("A$dataRow:L$dataRow")->applyFromArray($totalStyle);
-    $sheet2->getStyle("F$dataRow")->getNumberFormat()->setFormatCode('#,##0.00');
-    $sheet2->getStyle("J$dataRow:L$dataRow")->getNumberFormat()->setFormatCode('#,##0.00');
+    $sheet2->getStyle("A$dataRow:" . $last_col_letter . $dataRow)->applyFromArray($totalStyle);
+    $sheet2->getStyle($col_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
+    $sheet2->getStyle($col_prev_amount . $dataRow . ':' . $col_cumulative_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
 
-    // ── Link Invoice sheet G14 to Abs totals "THIS BILL" (Col K) ──
-    $sheet1->setCellValue('G14', '=Abs!K' . $dataRow);
+    // ── Link Invoice sheet G14 to Abs totals "THIS BILL" ──
+    $sheet1->setCellValue('G14', '=Abs!' . $col_current_amount . $dataRow);
 
     // ── Auto-fit columns ──
     $sheet2->getColumnDimension('A')->setWidth(8);
-    $sheet2->getColumnDimension('B')->setAutoSize(TRUE);
-    for ($col = 3; $col <= 12; $col++) {
+    if ($has_part_number) {
+      $sheet2->getColumnDimension('B')->setAutoSize(TRUE);
+    }
+    $sheet2->getColumnDimension($col_desc)->setAutoSize(TRUE);
+    $start_autofit_col = $has_part_number ? 4 : 3;
+    $total_cols = $has_part_number ? 13 : 12;
+    for ($col = $start_autofit_col; $col <= $total_cols; $col++) {
       $colLetter = Coordinate::stringFromColumnIndex($col);
       $sheet2->getColumnDimension($colLetter)->setAutoSize(TRUE);
     }

@@ -42,10 +42,20 @@ class BOQValidator {
    * @return \Drupal\node\NodeInterface
    *   The BOQ Item node.
    */
-  public function getOrCreateBOQItem($project_id, $item_code, $description, $uom = 'Nos', $approved_qty = 0.0, $rate = 0.0) {
+   public function getOrCreateBOQItem($project_id, $item_code, $description, $uom = 'Nos', $approved_qty = 0.0, $rate = 0.0, $part_number = '') {
     $node_storage = $this->entityTypeManager->getStorage('node');
     $description = trim($description);
     $item_code = trim($item_code);
+    $uom = $this->normalizeUom($uom);
+
+    // Helper to populate part number on existing node if empty
+    $update_part_no = function($node) use ($part_number) {
+      if ($node && !empty($part_number) && $node->hasField('field_part_number') && $node->get('field_part_number')->isEmpty()) {
+        $node->set('field_part_number', $part_number);
+        $node->save();
+      }
+      return $node;
+    };
 
     // 1. Try to match by BOTH Code and Description (perfect match)
     if (!empty($item_code) && !empty($description)) {
@@ -57,7 +67,7 @@ class BOQValidator {
         ->condition('field_item_description', $description);
       $ids = $query->execute();
       if (!empty($ids)) {
-        return $node_storage->load(reset($ids));
+        return $update_part_no($node_storage->load(reset($ids)));
       }
     }
 
@@ -76,7 +86,7 @@ class BOQValidator {
             $node_desc = trim($node->get('field_item_description')->value ?? '');
             // Accept if descriptions are similar or database description is empty
             if (empty($node_desc) || strcasecmp($node_desc, $description) === 0 || stripos($node_desc, $description) !== FALSE || stripos($description, $node_desc) !== FALSE) {
-              return $node;
+              return $update_part_no($node);
             }
           }
         }
@@ -98,7 +108,7 @@ class BOQValidator {
             $node_code = trim($node->get('field_item_code')->value ?? '');
             // Accept if codes match, or database code is empty, or Excel code is empty
             if (empty($node_code) || empty($item_code) || $node_code === $item_code) {
-              return $node;
+              return $update_part_no($node);
             }
           }
         }
@@ -112,6 +122,7 @@ class BOQValidator {
       'title' => $title,
       'field_project' => $project_id,
       'field_item_code' => $item_code,
+      'field_part_number' => $part_number,
       'field_item_description' => $description,
       'field_unit' => $uom,
       'field_approved_quantity' => $approved_qty,
@@ -239,6 +250,38 @@ class BOQValidator {
       'approved_qty' => $approved_qty,
       'cumulative_qty' => $cumulative_qty,
     ];
+  }
+
+  /**
+   * Normalizes UOM values to match Drupal field_unit allowed values keys.
+   */
+  public function normalizeUom($uom) {
+    $uom = strtolower(trim($uom));
+    $map = [
+      'nos' => 'nos',
+      'no' => 'nos',
+      'no.' => 'nos',
+      'kg' => 'kg',
+      'kgs' => 'kg',
+      'ton' => 'ton',
+      'tons' => 'ton',
+      'mt' => 'ton',
+      'meter' => 'meter',
+      'mtr' => 'meter',
+      'meters' => 'meter',
+      'sqm' => 'sqm',
+      'sq.mtr' => 'sqm',
+      'sq.m' => 'sqm',
+      'cum' => 'cum',
+      'cu.mtr' => 'cum',
+      'cu.m' => 'cum',
+      'inch_dia' => 'inch_dia',
+      'inch' => 'inch_dia',
+      'lot' => 'lot',
+      'l.s' => 'lot',
+      'set' => 'lot',
+    ];
+    return $map[$uom] ?? 'nos';
   }
 
 }

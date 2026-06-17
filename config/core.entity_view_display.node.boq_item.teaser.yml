@@ -8,6 +8,7 @@ dependencies:
     - field.field.node.boq_item.field_approved_quantity
     - field.field.node.boq_item.field_item_code
     - field.field.node.boq_item.field_item_description
+    - field.field.node.boq_item.field_part_number
     - field.field.node.boq_item.field_project
     - field.field.node.boq_item.field_total_value
     - field.field.node.boq_item.field_unit
@@ -38,6 +39,7 @@ hidden:
   field_approved_quantity: true
   field_item_code: true
   field_item_description: true
+  field_part_number: true
   field_project: true
   field_total_value: true
   field_unit: true

@@ -63,6 +63,7 @@ class ParagraphManager {
    */
   public function createBillItem($ra_bill_id, $project_id, array $item_data) {
     $item_code = $item_data['item_code'] ?? '';
+    $part_number = $item_data['part_number'] ?? '';
     $description = $item_data['description'] ?? '';
     $uom = $item_data['uom'] ?? 'Nos';
     $po_qty = floatval($item_data['po_qty'] ?? 0.0);
@@ -70,7 +71,7 @@ class ParagraphManager {
     $current_qty = floatval($item_data['current_qty'] ?? 0.0);
 
     // Get or create matching BOQ item
-    $boq_item = $this->boqValidator->getOrCreateBOQItem($project_id, $item_code, $description, $uom, $po_qty, $rate);
+    $boq_item = $this->boqValidator->getOrCreateBOQItem($project_id, $item_code, $description, $uom, $po_qty, $rate, $part_number);
 
     // Calculate previous quantity from other bills
     $prev_qty = $this->boqValidator->getPreviousQuantity($boq_item->id(), $ra_bill_id);

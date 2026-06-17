@@ -17,6 +17,7 @@ dependencies:
     - field.field.node.ra_bill.field_ra_bill_items
     - field.field.node.ra_bill.field_ra_bill_number
     - field.field.node.ra_bill.field_sgst
+    - field.field.node.ra_bill.field_show_part_number
     - field.field.node.ra_bill.field_total_amount
     - field.field.node.ra_bill.field_validation_status
     - field.field.node.ra_bill.field_vendor
@@ -40,6 +41,11 @@ content:
     settings: {  }
     third_party_settings: {  }
     weight: 101
+    region: content
+  content_moderation_control:
+    settings: {  }
+    third_party_settings: {  }
+    weight: -20
     region: content
   field_basic_amount:
     type: string
@@ -130,6 +136,16 @@ content:
       link_to_entity: false
     third_party_settings: {  }
     weight: 107
+    region: content
+  field_show_part_number:
+    type: boolean
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    weight: 20
     region: content
   field_total_amount:
     type: string

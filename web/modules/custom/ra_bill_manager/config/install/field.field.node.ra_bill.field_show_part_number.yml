@@ -1,0 +1,23 @@
+uuid: 8f5abaaf-34aa-449c-b858-e3036d589dcc
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_show_part_number
+    - node.type.ra_bill
+id: node.ra_bill.field_show_part_number
+field_name: field_show_part_number
+entity_type: node
+bundle: ra_bill
+label: 'Show Part Number in Excel/View'
+description: 'If checked, the Part Number column will be shown in the web view and exported to Excel.'
+required: false
+translatable: true
+default_value:
+  -
+    value: 1
+default_value_callback: ''
+settings:
+  on_label: 'On'
+  off_label: 'Off'
+field_type: boolean
