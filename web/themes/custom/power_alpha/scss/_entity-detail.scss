@@ -899,6 +899,24 @@
       font-weight: 700;
     }
 
+    .details-meta-col {
+      padding: 0px;
+
+      .meta-inner-list {
+        padding: 0px;
+
+        .meta-inner-item {
+          border-bottom: 1px solid #000000 !important;
+          padding: 0px 16px;
+          line-height: 20px;
+
+          &:last-child {
+            border-bottom: none !important;
+          }
+        }
+      }
+    }
+
     .meta-inner-table {
       width: 100%;
       border-collapse: collapse;
@@ -915,11 +933,17 @@
       th {
         font-weight: 700;
         text-align: left;
-        width: 115px;
+        white-space: nowrap;
+        padding-right: $space-1;
       }
 
       td {
         font-weight: 600;
+        padding-right: $space-3;
+
+        &:last-child {
+          padding-right: 0;
+        }
       }
     }
   }
@@ -1127,6 +1151,7 @@
 }
 
 .view-ra-bills {
+
   // Column alignments
   .views-field-field-basic-amount,
   .views-field-field-cgst,
@@ -1134,23 +1159,23 @@
   .views-field-field-total-amount {
     text-align: right;
     font-weight: 600;
-    
+
     &::before {
       content: "₹";
       margin-right: 2px;
       color: $color-neutral-600;
     }
   }
-  
+
   .views-field-field-total-amount {
     font-weight: 700;
     color: $color-primary;
   }
-  
+
   .views-field-field-validation-status {
     text-align: center;
   }
-  
+
   // Badge styling inside views
   .ra-badge {
     display: inline-block;
@@ -1160,12 +1185,13 @@
     font-weight: 600;
     text-align: center;
     width: fit-content;
-    
+
     &-verified {
       background-color: #d1fae5;
       color: #065f46;
       border: 1px solid rgba(6, 95, 70, 0.15);
     }
+
     &-review {
       background-color: #fee2e2;
       color: #991b1b;
@@ -1176,10 +1202,10 @@
   // Action column alignment
   .views-field-nothing {
     white-space: nowrap;
-    
+
     .btn-detail {
       margin-right: 4px;
-      
+
       &:last-child {
         margin-right: 0;
       }
@@ -1220,7 +1246,7 @@
       display: flex;
       flex-direction: column;
       gap: $space-3;
-      
+
       .form-element {
         border: 1px solid $color-neutral-300;
         padding: $space-3;
@@ -1241,7 +1267,7 @@
         font-size: $font-size-sm;
         cursor: pointer;
       }
-      
+
       .form-item__description {
         font-size: 0.725rem !important;
         color: $color-neutral-500 !important;
@@ -1253,7 +1279,7 @@
       margin-top: $space-2;
       display: flex;
       justify-content: flex-start;
-      
+
       input[type="submit"].button {
         background: $gradient-primary !important;
         color: $color-white !important;

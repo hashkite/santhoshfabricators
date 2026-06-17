@@ -317,7 +317,7 @@ function power_alpha_preprocess_node(&$variables)
           ? $po->get('field_po_number')->value : $po->label();
 
         if ($po->hasField('field_po_date') && !$po->get('field_po_date')->isEmpty()) {
-          $work_order_date = \Drupal::service('date.formatter')->format(strtotime($po->get('field_po_date')->value), 'custom', 'j F, Y');
+          $work_order_date = \Drupal::service('date.formatter')->format(strtotime($po->get('field_po_date')->value), 'custom', 'd.m.Y');
         }
 
         if ($po->hasField('field_company_name') && !$po->get('field_company_name')->isEmpty()) {

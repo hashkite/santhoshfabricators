@@ -3970,6 +3970,20 @@ body.sidebar-is-open {
 .indian-tax-invoice .invoice-details-grid-table .buyer-gstin-row {
   font-weight: 700;
 }
+.indian-tax-invoice .invoice-details-grid-table .details-meta-col {
+  padding: 0px;
+}
+.indian-tax-invoice .invoice-details-grid-table .details-meta-col .meta-inner-list {
+  padding: 0px;
+}
+.indian-tax-invoice .invoice-details-grid-table .details-meta-col .meta-inner-list .meta-inner-item {
+  border-bottom: 1px solid #000000 !important;
+  padding: 0px 16px;
+  line-height: 20px;
+}
+.indian-tax-invoice .invoice-details-grid-table .details-meta-col .meta-inner-list .meta-inner-item:last-child {
+  border-bottom: none !important;
+}
 .indian-tax-invoice .invoice-details-grid-table .meta-inner-table {
   width: 100%;
   border-collapse: collapse;
@@ -3985,10 +3999,15 @@ body.sidebar-is-open {
 .indian-tax-invoice .invoice-details-grid-table .meta-inner-table th {
   font-weight: 700;
   text-align: left;
-  width: 115px;
+  white-space: nowrap;
+  padding-right: 0.25rem;
 }
 .indian-tax-invoice .invoice-details-grid-table .meta-inner-table td {
   font-weight: 600;
+  padding-right: 0.75rem;
+}
+.indian-tax-invoice .invoice-details-grid-table .meta-inner-table td:last-child {
+  padding-right: 0;
 }
 .indian-tax-invoice .invoice-items-formatted-table {
   width: 100%;
