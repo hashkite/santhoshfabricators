@@ -406,6 +406,54 @@ function power_alpha_preprocess_node(&$variables)
     $variables['invoice_items'] = $items;
     $variables['basic_value_formatted'] = power_alpha_format_indian_currency($basic_value);
 
+    // Prepare detailed products list from the linked RA Bill
+    $detailed_items = [];
+    if ($ra_bill_node && $ra_bill_node->hasField('field_ra_bill_items') && !$ra_bill_node->get('field_ra_bill_items')->isEmpty()) {
+      $detailed_index = 1;
+      foreach ($ra_bill_node->get('field_ra_bill_items')->referencedEntities() as $ra_item) {
+        if ($ra_item->bundle() !== 'ra_bill_item') {
+          continue;
+        }
+
+        $qty = floatval($ra_item->get('field_current_qty')->value ?? 0.0);
+        // Only show items with current qty > 0 in this bill
+        if ($qty <= 0.0) {
+          continue;
+        }
+
+        $boq_item = !$ra_item->get('field_boq_item')->isEmpty() ? $ra_item->get('field_boq_item')->entity : NULL;
+        $desc = $ra_item->hasField('field_item_description') && !$ra_item->get('field_item_description')->isEmpty()
+          ? $ra_item->get('field_item_description')->value : '';
+        if (empty($desc) && $boq_item) {
+          $desc = $boq_item->get('field_item_description')->value ?? '';
+        }
+
+        $uom_key = $boq_item && !$boq_item->get('field_unit')->isEmpty() ? $boq_item->get('field_unit')->value : 'nos';
+        $uom = 'Nos';
+        if ($boq_item) {
+          if (function_exists('options_allowed_values')) {
+            $allowed_values = options_allowed_values($boq_item->get('field_unit')->getFieldDefinition()->getFieldStorageDefinition(), $boq_item);
+            $uom = $allowed_values[$uom_key] ?? ucfirst($uom_key);
+          } else {
+            $uom = ucfirst($uom_key);
+          }
+        }
+
+        $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
+        $amount = $qty * $unit_rate;
+
+        $detailed_items[] = [
+          'sr_no' => $detailed_index++,
+          'description' => $desc,
+          'uom' => $uom,
+          'qty' => $qty,
+          'rate' => power_alpha_format_indian_currency($unit_rate),
+          'amount' => power_alpha_format_indian_currency($amount),
+        ];
+      }
+    }
+    $variables['detailed_items'] = $detailed_items;
+
     // GST split calculation based on state prefixes (first 2 digits of GSTIN)
     $seller_state = substr(preg_replace('/[^a-zA-Z0-9]/', '', $variables['company_gstin']), 0, 2);
     $buyer_state = substr(preg_replace('/[^a-zA-Z0-9]/', '', $buyer_gstin), 0, 2);
