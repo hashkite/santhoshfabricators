@@ -100,7 +100,8 @@
 		color: white !important;
 		box-shadow: 0 4px 8px rgba(79, 70, 229, 0.25);
 	}
-	.ra-qty-input.over-claimed {
+	.ra-qty-input.over-claimed,
+	.ra-amt-input.over-claimed {
 		border-color: #dc2626 !important;
 		background: #fee2e2 !important;
 		color: #dc2626 !important;
@@ -332,35 +333,47 @@
 	}
 
 	/* ── Editable Input Styles ── */
-	.ra-qty-input {
-		width: 70px !important;
+	.ra-qty-input,
+	.ra-amt-input {
 		padding: 4px 6px !important;
 		border: 1px solid var(--pa-border, rgba(0, 145, 234, 0.12)) !important;
 		border-radius: var(--pa-radius-sm, 8px) !important;
 		background: var(--pa-surface, #fff) !important;
 		font-size: 12px !important;
 		font-weight: 700 !important;
-		text-align: center !important;
 		color: var(--pa-text, #263238) !important;
 		transition: border-color var(--pa-transition, 0.25s), box-shadow var(--pa-transition, 0.25s), background-color var(--pa-transition, 0.25s) !important;
 		-moz-appearance: textfield !important;
 	}
+	.ra-qty-input {
+		width: 80px !important;
+		text-align: center !important;
+	}
+	.ra-amt-input {
+		width: 120px !important;
+		text-align: right !important;
+	}
 	.ra-qty-input::-webkit-outer-spin-button,
-	.ra-qty-input::-webkit-inner-spin-button {
+	.ra-qty-input::-webkit-inner-spin-button,
+	.ra-amt-input::-webkit-outer-spin-button,
+	.ra-amt-input::-webkit-inner-spin-button {
 		-webkit-appearance: none !important;
 		margin: 0 !important;
 	}
-	.ra-qty-input:focus {
+	.ra-qty-input:focus,
+	.ra-amt-input:focus {
 		outline: none !important;
 		border-color: var(--pa-primary-dark, #0277BD) !important;
 		box-shadow: 0 0 0 3px rgba(2, 119, 189, 0.25) !important;
 		background: var(--pa-surface, #fff) !important;
 	}
-	.ra-qty-input.dirty {
+	.ra-qty-input.dirty,
+	.ra-amt-input.dirty {
 		border-color: #f59e0b !important;
 		background: #fffde7 !important;
 	}
-	.ra-qty-input.saved {
+	.ra-qty-input.saved,
+	.ra-amt-input.saved {
 		border-color: #10b981 !important;
 		background: #ecfdf5 !important;
 	}
@@ -491,7 +504,8 @@
 		color: #475569;
 		margin-bottom: 6px;
 	}
-	.ra-form-input, .ra-form-select {
+	.ra-form-input,
+	.ra-form-select {
 		width: 100% !important;
 		box-sizing: border-box !important;
 		border: 1.5px solid #cbd5e1 !important;
@@ -509,7 +523,7 @@
 		appearance: none;
 		-webkit-appearance: none;
 		-moz-appearance: none;
-		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+		background-image: url("data:image/svg+xml;charset=utf-8, %3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%23475569' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
 		background-position: right 12px center;
 		background-repeat: no-repeat;
 		background-size: 18px;
@@ -520,7 +534,8 @@
 		color: #94a3b8;
 		font-weight: 450;
 	}
-	.ra-form-input:focus, .ra-form-select:focus {
+	.ra-form-input:focus,
+	.ra-form-select:focus {
 		outline: none;
 		border-color: #0277bd !important;
 		box-shadow: 0 0 0 4px rgba(2, 119, 189, 0.15) !important;
@@ -578,7 +593,7 @@
 	<div class="ra-header-actions">
 		<div class="ra-column-toggle-container" style="margin-right: auto;">
 			<label class="ra-form-label" style="display: flex; align-items: center; gap: 8px; margin: 0; cursor: pointer; font-weight: 700; color: var(--pa-text, #263238);">
-				<input type="checkbox" id="toggle-part-number" onchange="raTogglePartNumber(this.checked)" style="width: 16px; height: 16px; cursor: pointer;" {% if metadata.has_part_number %}checked{% endif %}/>
+				<input type="checkbox" id="toggle-part-number" onchange="raTogglePartNumber(this.checked)" style="width: 16px; height: 16px; cursor: pointer;" {% if metadata.has_part_number %} checked {% endif %}/>
 				Show Part Number Column
 			</label>
 		</div>
@@ -706,18 +721,20 @@
 							<td class="align-left part-number-col">{{ item.part_number }}</td>
 							<td class="align-left desc-cell">{{ item.description }}</td>
 							<td class="align-center">{{ item.uom }}</td>
-							<td class="align-right">{{ item.approved_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-right">{{ item.approved_qty_formatted }}</td>
 							<td class="align-right">{{ item.rate|number_format(2, '.', ',') }}</td>
 							<td class="align-right">{{ item.po_amount|number_format(0, '.', ',') }}</td>
-							<td class="align-right" data-col="prev_qty">{{ item.prev_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-right" data-col="prev_qty">{{ item.prev_qty_formatted }}</td>
 							<td class="align-center highlight-cell" data-col="current_qty">
-								<input type="number" class="ra-qty-input {% if item.validation_status == 'over_claimed' %}over-claimed{% endif %}" value="{{ item.current_qty }}" data-original="{{ item.current_qty }}" data-approved="{{ item.approved_qty }}" data-paragraph-id="{{ item.paragraph_id }}" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for {{ item.description|escape('html_attr') }}"/>
+								<input type="number" class="ra-qty-input {% if item.validation_status == 'over_claimed' %}over-claimed{% endif %}" value="{{ item.current_qty_formatted }}" data-original="{{ item.current_qty_formatted }}" data-approved="{{ item.approved_qty }}" data-paragraph-id="{{ item.paragraph_id }}" data-field="current_qty" min="0" step="any" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for {{ item.description|escape('html_attr') }}"/>
 								<div class="ra-qty-warning" style="{% if item.validation_status != 'over_claimed' %}display: none;{% endif %} color: #dc2626; font-size: 10px; font-weight: bold; margin-top: 4px;">Quantity exceeds approved limit.</div>
 							</td>
-							<td class="align-right" data-col="cumulative_qty">{{ item.cumulative_qty|number_format(0, '.', ',') }}</td>
-							<td class="align-right" data-col="balance_qty">{{ item.balance_qty|number_format(0, '.', ',') }}</td>
+							<td class="align-right" data-col="cumulative_qty">{{ item.cumulative_qty_formatted }}</td>
+							<td class="align-right" data-col="balance_qty">{{ item.balance_qty_formatted }}</td>
 							<td class="align-right" data-col="prev_amount">{{ item.prev_amount|number_format(2, '.', ',') }}</td>
-							<td class="align-right highlight-cell" data-col="current_amount">{{ item.current_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right highlight-cell" data-col="current_amount">
+								<input type="number" class="ra-amt-input {% if item.validation_status == 'over_claimed' %}over-claimed{% endif %}" value="{{ item.current_amount|number_format(2, '.', '')|replace({'.00': ''}) }}" data-original="{{ item.current_amount|number_format(2, '.', '')|replace({'.00': ''}) }}" data-approved="{{ item.approved_qty }}" data-paragraph-id="{{ item.paragraph_id }}" data-field="current_amount" min="0" step="0.01" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Bill amount for {{ item.description|escape('html_attr') }}"/>
+							</td>
 							<td class="align-right" data-col="cumulative_amount">{{ item.cumulative_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right" data-col="balance_amount">{{ item.balance_amount|number_format(2, '.', ',') }}</td>
 						</tr>
@@ -745,7 +762,7 @@
 				{% endif %}
 			</table>
 		</div>
-		
+
 		{# Add Item Button Row #}
 		<div class="ra-add-item-row">
 			<button type="button" class="ra-btn ra-btn-add-item" onclick="raOpenAddItemModal()">
@@ -772,7 +789,8 @@
 			</div>
 
 			<form id="ra-add-item-form" onsubmit="raSubmitAddItem(event)">
-				<div class="ra-form-grid">
+				<div
+					class="ra-form-grid">
 					<!-- Item Code and Part Number -->
 					<div class="ra-form-group ra-col-span-6">
 						<label class="ra-form-label" for="ra-input-code">Item Code / Sl.No</label>
@@ -785,7 +803,9 @@
 
 					<!-- Description -->
 					<div class="ra-form-group ra-col-span-12">
-						<label class="ra-form-label" for="ra-input-desc">Description <span style="color: #dc2626;">*</span></label>
+						<label class="ra-form-label" for="ra-input-desc">Description
+							<span style="color: #dc2626;">*</span>
+						</label>
 						<input type="text" class="ra-form-input" id="ra-input-desc" placeholder="e.g. Media filter feed pumps" required/>
 					</div>
 
@@ -804,13 +824,17 @@
 						</select>
 					</div>
 					<div class="ra-form-group ra-col-span-6">
-						<label class="ra-form-label" for="ra-input-rate">Unit Rate (₹) <span style="color: #dc2626;">*</span></label>
+						<label class="ra-form-label" for="ra-input-rate">Unit Rate (₹)
+							<span style="color: #dc2626;">*</span>
+						</label>
 						<input type="number" step="0.01" class="ra-form-input" id="ra-input-rate" placeholder="0.00" required/>
 					</div>
 
 					<!-- PO Approved Quantity and Quantity in This Bill -->
 					<div class="ra-form-group ra-col-span-6">
-						<label class="ra-form-label" for="ra-input-approved">PO Approved Qty <span style="color: #dc2626;">*</span></label>
+						<label class="ra-form-label" for="ra-input-approved">PO Approved Qty
+							<span style="color: #dc2626;">*</span>
+						</label>
 						<input type="number" step="any" class="ra-form-input" id="ra-input-approved" placeholder="0" required/>
 					</div>
 					<div class="ra-form-group ra-col-span-6">
@@ -836,37 +860,37 @@
 'use strict';
 
 // On load, apply localStorage preference if set
-window.addEventListener('DOMContentLoaded', function() {
-	var container = document.getElementById('ra-excel-container');
-	var nid = container ? container.getAttribute('data-nid') : '';
-	if (nid) {
-		var pref = localStorage.getItem('ra_show_part_number_' + nid);
-		var cb = document.getElementById('toggle-part-number');
-		if (pref !== null && cb) {
-			var checked = pref === '1';
-			cb.checked = checked;
-			raTogglePartNumber(checked);
-		}
-	}
+window.addEventListener('DOMContentLoaded', function () {
+var container = document.getElementById('ra-excel-container');
+var nid = container ? container.getAttribute('data-nid') : '';
+if (nid) {
+var pref = localStorage.getItem('ra_show_part_number_' + nid);
+var cb = document.getElementById('toggle-part-number');
+if (pref !== null && cb) {
+var checked = pref === '1';
+cb.checked = checked;
+raTogglePartNumber(checked);
+}
+}
 });
 
-window.raTogglePartNumber = function(checked) {
-	var container = document.getElementById('ra-excel-container');
-	var nid = container ? container.getAttribute('data-nid') : '';
-	if (container) {
-		if (checked) {
-			container.classList.add('show-part-number');
-		} else {
-			container.classList.remove('show-part-number');
-		}
-	}
-	var totalLabelCell = document.querySelector('.ra-totals-row td:first-child');
-	if (totalLabelCell) {
-		totalLabelCell.setAttribute('colspan', checked ? '6' : '5');
-	}
-	if (container && nid) {
-		localStorage.setItem('ra_show_part_number_' + nid, checked ? '1' : '0');
-	}
+window.raTogglePartNumber = function (checked) {
+var container = document.getElementById('ra-excel-container');
+var nid = container ? container.getAttribute('data-nid') : '';
+if (container) {
+if (checked) {
+container.classList.add('show-part-number');
+} else {
+container.classList.remove('show-part-number');
+}
+}
+var totalLabelCell = document.querySelector('.ra-totals-row td:first-child');
+if (totalLabelCell) {
+totalLabelCell.setAttribute('colspan', checked ? '6' : '5');
+}
+if (container && nid) {
+localStorage.setItem('ra_show_part_number_' + nid, checked ? '1' : '0');
+}
 };
 
 var dirtyFields = {};
@@ -876,32 +900,55 @@ var dirtyFields = {};
    */
 window.raMarkDirty = function (input) {
 var pid = input.getAttribute('data-paragraph-id');
-var original = parseFloat(input.getAttribute('data-original')) || 0;
-var current = parseFloat(input.value) || 0;
-var approved = parseFloat(input.getAttribute('data-approved')) || 0;
+var field = input.getAttribute('data-field') || 'current_qty';
+var original = parseFloat((input.getAttribute('data-original') || '0').toString().replace(/,/g, '')) || 0;
+var current = parseFloat((input.value || '0').toString().replace(/,/g, '')) || 0;
 var row = input.closest('tr');
 var rate = parseFloat(row.getAttribute('data-rate')) || 0;
+var qtyInput = row.querySelector('input[data-field="current_qty"]');
+var amtInput = row.querySelector('input[data-field="current_amount"]');
+var approved = parseFloat(input.getAttribute('data-approved')) || 0;
+if (! approved && qtyInput) {
+approved = parseFloat(qtyInput.getAttribute('data-approved')) || 0;
+}
+var currentQty = 0;
+var currentAmt = 0;
+
+if (field === 'current_amount') {
+currentAmt = current;
+currentQty = rate ? currentAmt / rate : 0;
+if (qtyInput) {
+qtyInput.value = currentQty.toFixed(6).replace(/\.?0+$/, '');
+}
+} else {
+currentQty = current;
+currentAmt = currentQty * rate;
+if (amtInput) {
+amtInput.value = currentAmt.toFixed(2).replace(/\.00$/, '');
+}
+}
 
 if (current !== original) {
 input.classList.add('dirty');
 input.classList.remove('saved');
-dirtyFields[pid] = current;
+dirtyFields[pid] = currentQty;
 } else {
 input.classList.remove('dirty');
 delete dirtyFields[pid];
 }
 
-// Live preview: update cumulative_qty, balance_qty, current_amount, cumulative_amount, balance_amount in-row
-var prevQty = parseFloat((row.querySelector('[data-col="prev_qty"]').textContent || '0').replace(/,/g, ''));
-var cumQty = prevQty + current;
+// Live preview: update cumulative_qty, balance_qty, cumulative_amount, balance_amount in-row
+var prevQty = parseFloat((row.querySelector('[data-col="prev_qty"]').textContent || '0').replace(/,/g, '')) || 0;
+var cumQty = prevQty + currentQty;
 var balQty = approved - cumQty;
-var curAmt = current * rate;
 var cumAmt = cumQty * rate;
 var balAmt = balQty * rate;
 
-row.querySelector('[data-col="cumulative_qty"]').textContent = formatNumber(cumQty, 0);
-row.querySelector('[data-col="balance_qty"]').textContent = formatNumber(balQty, 0);
-row.querySelector('[data-col="current_amount"]').textContent = formatNumber(curAmt, 2);
+row.querySelector('[data-col="cumulative_qty"]').textContent = formatQty(cumQty);
+row.querySelector('[data-col="balance_qty"]').textContent = formatQty(balQty);
+if (amtInput) {
+amtInput.value = currentAmt.toFixed(2);
+}
 row.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(cumAmt, 2);
 row.querySelector('[data-col="balance_amount"]').textContent = formatNumber(balAmt, 2);
 
@@ -941,6 +988,8 @@ var table = document.getElementById('ra-abstract-table');
 if (! table) 
 return;
 
+
+
 var rows = table.querySelectorAll('tbody tr[data-paragraph-id]');
 var totalPrev = 0,
 totalThis = 0,
@@ -961,12 +1010,12 @@ setTotalCell('balance_amount', totalBalance);
 }
 
 function parseCellNum(cell) {
-if (! cell) 
+if (! cell) {
 return 0;
-
-
-
-return parseFloat(cell.textContent.replace(/,/g, '')) || 0;
+}
+var input = cell.querySelector('input');
+var text = input ? input.value : cell.textContent;
+return parseFloat(text.toString().replace(/,/g, '')) || 0;
 }
 
 function setTotalCell(name, val) {
@@ -982,6 +1031,13 @@ function formatNumber(num, decimals) {
 return num.toLocaleString('en-IN', {
 minimumFractionDigits: decimals,
 maximumFractionDigits: decimals
+});
+}
+
+function formatQty(num) {
+return num.toLocaleString('en-IN', {
+minimumFractionDigits: 0,
+maximumFractionDigits: 6
 });
 }
 
@@ -1025,37 +1081,78 @@ var tr = document.querySelector('tr[data-paragraph-id="' + row.paragraph_id + '"
 if (! tr) 
 return;
 
+
+
 var approved = parseFloat(tr.querySelector('.ra-qty-input').getAttribute('data-approved')) || 0;
 var balQty = approved - row.cumulative_qty;
 var rate = parseFloat(tr.getAttribute('data-rate')) || 0;
 var balAmt = balQty * rate;
 
-tr.querySelector('[data-col="prev_qty"]').textContent = formatNumber(row.prev_qty, 0);
-tr.querySelector('[data-col="cumulative_qty"]').textContent = formatNumber(row.cumulative_qty, 0);
-tr.querySelector('[data-col="balance_qty"]').textContent = formatNumber(balQty, 0);
+tr.querySelector('[data-col="prev_qty"]').textContent = formatQty(row.prev_qty);
+tr.querySelector('[data-col="cumulative_qty"]').textContent = formatQty(row.cumulative_qty);
+tr.querySelector('[data-col="balance_qty"]').textContent = formatQty(balQty);
 tr.querySelector('[data-col="prev_amount"]').textContent = formatNumber(row.prev_amount, 2);
-tr.querySelector('[data-col="current_amount"]').textContent = formatNumber(row.current_amount, 2);
+var currentAmountInput = tr.querySelector('.ra-amt-input');
+var qtyInput = tr.querySelector('.ra-qty-input');
+if (qtyInput) {
+qtyInput.value = row.current_qty.toFixed(6).replace(/\.?0+$/, '');
+qtyInput.setAttribute('data-original', row.current_qty);
+}
+if (currentAmountInput) {
+currentAmountInput.value = Number(row.current_amount).toFixed(2).replace(/\.00$/, '');
+currentAmountInput.setAttribute('data-original', row.current_amount);
+}
 tr.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(row.cumulative_amount, 2);
 tr.querySelector('[data-col="balance_amount"]').textContent = formatNumber(balAmt, 2);
 
 // Update validation class & warning style
 var warningDiv = tr.querySelector('.ra-qty-warning');
-var input = tr.querySelector('.ra-qty-input');
 if (row.validation_status === 'over_claimed') {
-if (input) input.classList.add('over-claimed');
-if (warningDiv) warningDiv.style.display = 'block';
+if (qtyInput) 
+qtyInput.classList.add('over-claimed');
+
+
+
+if (currentAmountInput) 
+currentAmountInput.classList.add('over-claimed');
+
+
+
+if (warningDiv) 
+warningDiv.style.display = 'block';
+
+
+
 } else {
-if (input) input.classList.remove('over-claimed');
-if (warningDiv) warningDiv.style.display = 'none';
+if (qtyInput) 
+qtyInput.classList.remove('over-claimed');
+
+
+
+if (currentAmountInput) 
+currentAmountInput.classList.remove('over-claimed');
+
+
+
+if (warningDiv) 
+warningDiv.style.display = 'none';
+
+
+
 }
 
-// Update input original value and mark as saved
-if (input) {
-input.setAttribute('data-original', row.current_qty);
-input.classList.remove('dirty');
-input.classList.add('saved');
+if (qtyInput) {
+qtyInput.classList.remove('dirty');
+qtyInput.classList.add('saved');
 setTimeout(function () {
-input.classList.remove('saved');
+qtyInput.classList.remove('saved');
+}, 2000);
+}
+if (currentAmountInput) {
+currentAmountInput.classList.remove('dirty');
+currentAmountInput.classList.add('saved');
+setTimeout(function () {
+currentAmountInput.classList.remove('saved');
 }, 2000);
 }
 });
@@ -1096,130 +1193,115 @@ toast.classList.remove('show');
 }
 
 window.raOpenAddItemModal = function () {
-  document.getElementById('ra-add-item-modal').classList.add('show');
+document.getElementById('ra-add-item-modal').classList.add('show');
 };
 
 window.raCloseAddItemModal = function () {
-  document.getElementById('ra-add-item-modal').classList.remove('show');
-  document.getElementById('ra-add-item-form').reset();
+document.getElementById('ra-add-item-modal').classList.remove('show');
+document.getElementById('ra-add-item-form').reset();
 };
 
 function escapeHtml(str) {
-  if (!str) return '';
-  return String(str)
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+if (! str) 
+return '';
+
+
+
+return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
 }
 
 window.raSubmitAddItem = function (event) {
-  event.preventDefault();
-  
-  var currentQty = parseFloat(document.getElementById('ra-input-qty').value) || 0;
-  var code = document.getElementById('ra-input-code').value;
-  var partNumber = document.getElementById('ra-input-part-number').value;
-  var desc = document.getElementById('ra-input-desc').value;
-  var uom = document.getElementById('ra-input-uom').value;
-  var rate = parseFloat(document.getElementById('ra-input-rate').value) || 0;
-  var approved = parseFloat(document.getElementById('ra-input-approved').value) || 0;
-  
-  if (!desc) {
-    showToast('Please enter a description.', 'error');
-    return;
-  }
-  
-  var payload = {
-    current_qty: currentQty,
-    item_code: code,
-    part_number: partNumber,
-    description: desc,
-    uom: uom,
-    rate: rate,
-    approved_qty: approved
-  };
-  
-  var container = document.getElementById('ra-excel-container');
-  var nid = container.getAttribute('data-nid');
-  var url = '/admin/ra-bills/' + nid + '/add-item';
-  
-  var submitBtn = document.getElementById('ra-modal-submit-btn');
-  submitBtn.disabled = true;
-  submitBtn.textContent = 'Adding...';
-  
-  fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest'
-    },
-    body: JSON.stringify(payload)
-  })
-  .then(function (response) {
-    return response.json();
-  })
-  .then(function (data) {
-    if (data.success) {
-      var item = data.item;
-      
-      // Append row to table
-      var tr = document.createElement('tr');
-      tr.setAttribute('data-paragraph-id', item.paragraph_id);
-      tr.setAttribute('data-rate', item.rate);
-      
-      var index = document.querySelectorAll('#ra-abstract-table tbody tr[data-paragraph-id]').length + 1;
-      
-      tr.innerHTML = 
-        '<td class="align-center text-bold">' + index + '</td>' +
-        '<td class="align-left part-number-col">' + escapeHtml(item.part_number || '') + '</td>' +
-        '<td class="align-left desc-cell">' + escapeHtml(item.description) + '</td>' +
-        '<td class="align-center">' + escapeHtml(item.uom) + '</td>' +
-        '<td class="align-right">' + formatNumber(item.approved_qty, 0) + '</td>' +
-        '<td class="align-right">' + formatNumber(item.rate, 2) + '</td>' +
-        '<td class="align-right">' + formatNumber(item.po_amount, 0) + '</td>' +
-        '<td class="align-right" data-col="prev_qty">' + formatNumber(item.prev_qty, 0) + '</td>' +
-        '<td class="align-center highlight-cell" data-col="current_qty">' +
-          '<input type="number" class="ra-qty-input ' + (item.validation_status === 'over_claimed' ? 'over-claimed' : '') + '" value="' + item.current_qty + '" data-original="' + item.current_qty + '" data-approved="' + item.approved_qty + '" data-paragraph-id="' + item.paragraph_id + '" min="0" step="1" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for ' + escapeHtml(item.description) + '"/>' +
-          '<div class="ra-qty-warning" style="' + (item.validation_status !== 'over_claimed' ? 'display: none;' : '') + ' color: #dc2626; font-size: 10px; font-weight: bold; margin-top: 4px;">Quantity exceeds approved limit.</div>' +
-        '</td>' +
-        '<td class="align-right" data-col="cumulative_qty">' + formatNumber(item.cumulative_qty, 0) + '</td>' +
-        '<td class="align-right" data-col="balance_qty">' + formatNumber(item.balance_qty, 0) + '</td>' +
-        '<td class="align-right" data-col="prev_amount">' + formatNumber(item.prev_amount, 2) + '</td>' +
-        '<td class="align-right highlight-cell" data-col="current_amount">' + formatNumber(item.current_amount, 2) + '</td>' +
-        '<td class="align-right" data-col="cumulative_amount">' + formatNumber(item.cumulative_amount, 2) + '</td>' +
-        '<td class="align-right" data-col="balance_amount">' + formatNumber(item.balance_amount, 2) + '</td>';
-      
-      var tbody = document.querySelector('#ra-abstract-table tbody');
-      var emptyRow = tbody.querySelector('tr td[colspan]');
-      if (emptyRow && emptyRow.closest('tr')) {
-        emptyRow.closest('tr').remove();
-      }
-      tbody.appendChild(tr);
-      
-      // Update totals
-      if (data.totals) {
-        setTotalCell('prev_amount', data.totals.total_prev_amount);
-        setTotalCell('this_bill_amount', data.totals.total_this_bill_amount);
-        setTotalCell('upto_date_amount', data.totals.total_upto_date_amount);
-        setTotalCell('po_amount', data.totals.total_po_amount);
-        var totalBalance = data.totals.total_po_amount - data.totals.total_upto_date_amount;
-        setTotalCell('balance_amount', totalBalance);
-      }
-      
-      raCloseAddItemModal();
-      showToast('Item added successfully!', 'success');
-    } else {
-      showToast('Error: ' + (data.error || 'Unknown error'), 'error');
-    }
-  })
-  .catch(function (err) {
-    showToast('Network error: ' + err.message, 'error');
-  })
-  .finally(function () {
-    submitBtn.disabled = false;
-    submitBtn.textContent = 'Add to Bill';
-  });
+event.preventDefault();
+
+var currentQty = parseFloat(document.getElementById('ra-input-qty').value) || 0;
+var code = document.getElementById('ra-input-code').value;
+var partNumber = document.getElementById('ra-input-part-number').value;
+var desc = document.getElementById('ra-input-desc').value;
+var uom = document.getElementById('ra-input-uom').value;
+var rate = parseFloat(document.getElementById('ra-input-rate').value) || 0;
+var approved = parseFloat(document.getElementById('ra-input-approved').value) || 0;
+
+if (! desc) {
+showToast('Please enter a description.', 'error');
+return;
+}
+
+var payload = {
+current_qty: currentQty,
+item_code: code,
+part_number: partNumber,
+description: desc,
+uom: uom,
+rate: rate,
+approved_qty: approved
+};
+
+var container = document.getElementById('ra-excel-container');
+var nid = container.getAttribute('data-nid');
+var url = '/admin/ra-bills/' + nid + '/add-item';
+
+var submitBtn = document.getElementById('ra-modal-submit-btn');
+submitBtn.disabled = true;
+submitBtn.textContent = 'Adding...';
+
+fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'X-Requested-With': 'XMLHttpRequest'
+},
+body: JSON.stringify(payload)
+}).then(function (response) {
+return response.json();
+}).then(function (data) {
+if (data.success) {
+var item = data.item;
+
+// Append row to table
+var tr = document.createElement('tr');
+tr.setAttribute('data-paragraph-id', item.paragraph_id);
+tr.setAttribute('data-rate', item.rate);
+
+var index = document.querySelectorAll('#ra-abstract-table tbody tr[data-paragraph-id]').length + 1;
+
+tr.innerHTML = '<td class="align-center text-bold">' + index + '</td>' + '<td class="align-left part-number-col">' + escapeHtml(item.part_number || '') + '</td>' + '<td class="align-left desc-cell">' + escapeHtml(item.description) + '</td>' + '<td class="align-center">' + escapeHtml(item.uom) + '</td>' + '<td class="align-right">' + formatQty(item.approved_qty) + '</td>' + '<td class="align-right">' + formatNumber(item.rate, 2) + '</td>' + '<td class="align-right">' + formatNumber(item.po_amount, 0) + '</td>' + '<td class="align-right" data-col="prev_qty">' + formatQty(item.prev_qty) + '</td>' + '<td class="align-center highlight-cell" data-col="current_qty">' + '<input type="number" class="ra-qty-input ' + (
+item.validation_status === 'over_claimed' ? 'over-claimed' : ''
+) + '" value="' + formatQty(item.current_qty) + '" data-original="' + item.current_qty + '" data-approved="' + item.approved_qty + '" data-paragraph-id="' + item.paragraph_id + '" data-field="current_qty" min="0" step="any" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Quantity for ' + escapeHtml(item.description) + '"/>' + '<div class="ra-qty-warning" style="' + (
+item.validation_status !== 'over_claimed' ? 'display: none;' : ''
+) + ' color: #dc2626; font-size: 10px; font-weight: bold; margin-top: 4px;">Quantity exceeds approved limit.</div>' + '</td>' + '<td class="align-right" data-col="cumulative_qty">' + formatQty(item.cumulative_qty) + '</td>' + '<td class="align-right" data-col="balance_qty">' + formatQty(item.balance_qty) + '</td>' + '<td class="align-right" data-col="prev_amount">' + formatNumber(item.prev_amount, 2) + '</td>' + '<td class="align-right highlight-cell" data-col="current_amount">' + '<input type="number" class="ra-amt-input ' + (
+item.validation_status === 'over_claimed' ? 'over-claimed' : ''
+) + '" value="' + Number(item.current_amount).toFixed(2).replace(/\.00$/, '') + '" data-original="' + item.current_amount + '" data-approved="' + item.approved_qty + '" data-paragraph-id="' + item.paragraph_id + '" data-field="current_amount" min="0" step="0.01" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Bill amount for ' + escapeHtml(item.description) + '"/>' + '</td>' + '<td class="align-right" data-col="cumulative_amount">' + formatNumber(item.cumulative_amount, 2) + '</td>' + '<td class="align-right" data-col="balance_amount">' + formatNumber(item.balance_amount, 2) + '</td>';
+
+var tbody = document.querySelector('#ra-abstract-table tbody');
+var emptyRow = tbody.querySelector('tr td[colspan]');
+if (emptyRow && emptyRow.closest('tr')) {
+emptyRow.closest('tr').remove();
+}
+tbody.appendChild(tr);
+
+// Update totals
+if (data.totals) {
+setTotalCell('prev_amount', data.totals.total_prev_amount);
+setTotalCell('this_bill_amount', data.totals.total_this_bill_amount);
+setTotalCell('upto_date_amount', data.totals.total_upto_date_amount);
+setTotalCell('po_amount', data.totals.total_po_amount);
+var totalBalance = data.totals.total_po_amount - data.totals.total_upto_date_amount;
+setTotalCell('balance_amount', totalBalance);
+}
+
+raCloseAddItemModal();
+showToast('Item added successfully!', 'success');
+} else {
+showToast('Error: ' + (
+data.error || 'Unknown error'
+), 'error');
+}
+}).catch(function (err) {
+showToast('Network error: ' + err.message, 'error');
+}). finally(function () {
+submitBtn.disabled = false;
+submitBtn.textContent = 'Add to Bill';
+});
 };
 })();
 </script>

@@ -75,12 +75,13 @@ class InvoiceGenerationController extends ControllerBase
 
     // ── Duplicate Invoice Prevention ──
     // Check if an invoice already exists for this RA Bill with the same total amount.
-    $existing_invoices = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
+    $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(FALSE)
-      ->condition('type', 'invoice')
-      ->condition('title', '%RA Bill%' . ($ra_formatted ?: $ra_no) . '%', 'LIKE')
-      ->condition('field_purchase_order', $po_id ?? 0)
-      ->execute();
+      ->condition('type', 'invoice');
+    $orGroup = $query->orConditionGroup()
+      ->condition('field_ra_bill', $node->id())
+      ->condition('title', '%RA Bill%' . ($ra_formatted ?: $ra_no) . '%', 'LIKE');
+    $existing_invoices = $query->condition($orGroup)->execute();
 
     if (!empty($existing_invoices)) {
       foreach ($existing_invoices as $existing_id) {
@@ -155,13 +156,22 @@ class InvoiceGenerationController extends ControllerBase
     try {
       $invoice->save();
 
-      // Unpublish existing invoices for this RA Bill since a new one is created
+      // Delete existing invoices for this RA Bill since a new one is created
       if (!empty($existing_invoices)) {
         foreach ($existing_invoices as $existing_id) {
+          if ($existing_id == $invoice->id()) {
+            continue;
+          }
           $existing_invoice = Node::load($existing_id);
-          if ($existing_invoice && $existing_invoice->isPublished()) {
-            $existing_invoice->setUnpublished();
-            $existing_invoice->save();
+          if ($existing_invoice) {
+            // Delete invoice line items (paragraphs) first to prevent orphans
+            if ($existing_invoice->hasField('field_invoice_items') && !$existing_invoice->get('field_invoice_items')->isEmpty()) {
+              $p_items = $existing_invoice->get('field_invoice_items')->referencedEntities();
+              foreach ($p_items as $p_item) {
+                $p_item->delete();
+              }
+            }
+            $existing_invoice->delete();
           }
         }
       }

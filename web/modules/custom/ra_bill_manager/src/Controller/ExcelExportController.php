@@ -15,12 +15,14 @@ use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 /**
  * Controller to handle exporting RA Bills to styled Excel sheets.
  */
-class ExcelExportController extends ControllerBase {
+class ExcelExportController extends ControllerBase
+{
 
   /**
    * Generates and downloads the Excel file for all RA Bills (Bulk Report).
    */
-  public function export() {
+  public function export()
+  {
     $query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
       ->accessCheck(FALSE)
       ->condition('type', 'ra_bill')
@@ -38,7 +40,8 @@ class ExcelExportController extends ControllerBase {
   /**
    * Generates and downloads the Excel file for a single RA Bill (matching input format).
    */
-  public function exportSingle($node) {
+  public function exportSingle($node)
+  {
     if (is_numeric($node)) {
       $node = Node::load($node);
     }
@@ -54,7 +57,8 @@ class ExcelExportController extends ControllerBase {
   /**
    * Shared bulk workbook generator.
    */
-  protected function generateBulkWorkbook(array $bills, $filename) {
+  protected function generateBulkWorkbook(array $bills, $filename)
+  {
     $spreadsheet = new Spreadsheet();
 
     // --- SHEET 1: SUMMARY ---
@@ -158,7 +162,7 @@ class ExcelExportController extends ControllerBase {
       $bill_no = $bill->get('field_bill_number')->value ?? '';
       $vendor = $vendor_node ? $vendor_node->label() : '';
       $project = $project_node ? $project_node->label() : '';
-      
+
       $date_val = $bill->get('field_bill_date')->value;
       $date = $date_val ? date('d-M-Y', strtotime($date_val)) : '';
 
@@ -205,7 +209,7 @@ class ExcelExportController extends ControllerBase {
     $sheet1->setCellValue('A' . $row, 'Total');
     $sheet1->mergeCells("A$row:E$row");
     $sheet1->getStyle("A$row:E$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-    
+
     $sheet1->setCellValue('F' . $row, $totalBasic);
     $sheet1->setCellValue('G' . $row, $totalCgst);
     $sheet1->setCellValue('H' . $row, $totalSgst);
@@ -304,8 +308,8 @@ class ExcelExportController extends ControllerBase {
           $sheet2->getStyle("A$row2:M$row2")->applyFromArray($dataStyle);
           $sheet2->getStyle("G$row2")->getNumberFormat()->setFormatCode('"₹"#,##0.00');
           $sheet2->getStyle("L$row2")->getNumberFormat()->setFormatCode('"₹"#,##0.00');
-          $sheet2->getStyle("H$row2:K$row2")->getNumberFormat()->setFormatCode('#,##0.00');
-          
+          $sheet2->getStyle("H$row2:K$row2")->getNumberFormat()->setFormatCode('#,##0.######');
+
           $sheet2->getStyle("A$row2:B$row2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
           $sheet2->getStyle("D$row2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
           $sheet2->getStyle("F$row2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
@@ -321,7 +325,7 @@ class ExcelExportController extends ControllerBase {
     $sheet2->setCellValue('A' . $row2, 'Total Claimed');
     $sheet2->mergeCells("A$row2:K$row2");
     $sheet2->getStyle("A$row2:K$row2")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
-    
+
     $sheet2->setCellValue('L' . $row2, $grandClaimed);
 
     $sheet2->getStyle("A$row2:M$row2")->applyFromArray($totalStyle);
@@ -335,7 +339,7 @@ class ExcelExportController extends ControllerBase {
 
     // Output as downloadable file response
     $writer = new Xlsx($spreadsheet);
-    
+
     $response = new Response();
     $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
@@ -353,7 +357,8 @@ class ExcelExportController extends ControllerBase {
    * Generates and downloads the Excel file for a single RA Bill
    * matching the exact Abstract/Invoice format from the standard template.
    */
-  protected function generateSingleWorkbook($bill, $filename) {
+  protected function generateSingleWorkbook($bill, $filename)
+  {
     $spreadsheet = new Spreadsheet();
 
     // ── Style Definitions ──
@@ -517,16 +522,14 @@ class ExcelExportController extends ControllerBase {
     $po_no = '';
     if ($po_node && $po_node->hasField('field_po_number') && !$po_node->get('field_po_number')->isEmpty()) {
       $po_no = $po_node->get('field_po_number')->value;
-    }
-    elseif ($po_node) {
+    } elseif ($po_node) {
       $po_no = $po_node->label();
     }
 
     $po_date = '';
     if ($po_node && $po_node->hasField('field_start_date') && !$po_node->get('field_start_date')->isEmpty()) {
       $po_date = date('d F, Y', strtotime($po_node->get('field_start_date')->value));
-    }
-    elseif ($po_node && $po_node->hasField('field_po_date') && !$po_node->get('field_po_date')->isEmpty()) {
+    } elseif ($po_node && $po_node->hasField('field_po_date') && !$po_node->get('field_po_date')->isEmpty()) {
       $po_date = date('d F, Y', strtotime($po_node->get('field_po_date')->value));
     }
 
@@ -683,8 +686,7 @@ class ExcelExportController extends ControllerBase {
       $col_current_amount = 'L';
       $col_cumulative_amount = 'M';
       $last_col_letter = 'M';
-    }
-    else {
+    } else {
       $col_sl_no = 'A';
       $col_part_number = NULL;
       $col_desc = 'B';
@@ -729,8 +731,7 @@ class ExcelExportController extends ControllerBase {
       $sheet2->setCellValue('K3', 'INVOICE Date :');
       $sheet2->setCellValue('L3', $bill_date);
       $sheet2->mergeCells('L3:M3');
-    }
-    else {
+    } else {
       $sheet2->setCellValue('A2', 'CLIENT:');
       $sheet2->setCellValue('B2', $client_name);
       $sheet2->mergeCells('B2:C2');
@@ -759,8 +760,7 @@ class ExcelExportController extends ControllerBase {
       $sheet2->getStyle('E2')->applyFromArray($infoLabelStyle);
       $sheet2->getStyle('H2')->applyFromArray($infoLabelStyle);
       $sheet2->getStyle('H3')->applyFromArray($infoLabelStyle);
-    }
-    else {
+    } else {
       $sheet2->getStyle('D2')->applyFromArray($infoLabelStyle);
       $sheet2->getStyle('G2')->applyFromArray($infoLabelStyle);
       $sheet2->getStyle('G3')->applyFromArray($infoLabelStyle);
@@ -887,9 +887,9 @@ class ExcelExportController extends ControllerBase {
         $sheet2->getStyle("A$dataRow:" . $last_col_letter . $dataRow)->applyFromArray($dataStyle);
         $sheet2->getStyle($col_rate . $dataRow . ':' . $col_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
         $sheet2->getStyle($col_prev_amount . $dataRow . ':' . $col_cumulative_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
-        $sheet2->getStyle($col_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
-        $sheet2->getStyle($col_prev_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
-        $sheet2->getStyle($col_cumulative_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet2->getStyle($col_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0.######');
+        $sheet2->getStyle($col_prev_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0.######');
+        $sheet2->getStyle($col_cumulative_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0.######');
 
         $sheet2->getStyle("A$dataRow")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
         if ($has_part_number) {
@@ -899,7 +899,7 @@ class ExcelExportController extends ControllerBase {
 
         // Yellow highlight for "IN THIS BILL" and "THIS BILL" data cells
         $sheet2->getStyle($col_current_qty . $dataRow)->applyFromArray($highlightStyle);
-        $sheet2->getStyle($col_current_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
+        $sheet2->getStyle($col_current_qty . $dataRow)->getNumberFormat()->setFormatCode('#,##0.######');
         $sheet2->getStyle($col_current_amount . $dataRow)->applyFromArray($highlightStyle);
         $sheet2->getStyle($col_current_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
 

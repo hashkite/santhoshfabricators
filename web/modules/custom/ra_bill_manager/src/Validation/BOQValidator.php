@@ -7,7 +7,8 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 /**
  * Service to validate RA Bill Item quantities against BOQ Items.
  */
-class BOQValidator {
+class BOQValidator
+{
 
   /**
    * The entity type manager.
@@ -19,7 +20,8 @@ class BOQValidator {
   /**
    * Constructs a new BOQValidator.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager)
+  {
     $this->entityTypeManager = $entity_type_manager;
   }
 
@@ -42,14 +44,15 @@ class BOQValidator {
    * @return \Drupal\node\NodeInterface
    *   The BOQ Item node.
    */
-   public function getOrCreateBOQItem($project_id, $item_code, $description, $uom = 'Nos', $approved_qty = 0.0, $rate = 0.0, $part_number = '') {
+  public function getOrCreateBOQItem($project_id, $item_code, $description, $uom = 'Nos', $approved_qty = 0.0, $rate = 0.0, $part_number = '')
+  {
     $node_storage = $this->entityTypeManager->getStorage('node');
     $description = trim($description);
     $item_code = trim($item_code);
     $uom = $this->normalizeUom($uom);
 
     // Helper to populate part number on existing node if empty
-    $update_part_no = function($node) use ($part_number) {
+    $update_part_no = function ($node) use ($part_number) {
       if ($node && !empty($part_number) && $node->hasField('field_part_number') && $node->get('field_part_number')->isEmpty()) {
         $node->set('field_part_number', $part_number);
         $node->save();
@@ -146,9 +149,10 @@ class BOQValidator {
    * @return float
    *   The sum of quantities in other bills.
    */
-  public function getPreviousQuantity($boq_item_id, $current_bill_id = NULL) {
+  public function getPreviousQuantity($boq_item_id, $current_bill_id = NULL)
+  {
     $paragraph_storage = $this->entityTypeManager->getStorage('paragraph');
-    
+
     $query = $paragraph_storage->getQuery()
       ->accessCheck(FALSE)
       ->condition('type', 'ra_bill_item')
@@ -160,24 +164,22 @@ class BOQValidator {
         $po_id = !$current_bill->get('field_purchase_order')->isEmpty() ? $current_bill->get('field_purchase_order')->target_id : NULL;
         $project_id = !$current_bill->get('field_project')->isEmpty() ? $current_bill->get('field_project')->target_id : NULL;
         $current_ra_num = intval($current_bill->get('field_ra_bill_number')->value ?? 0);
-        
+
         $bill_query = $this->entityTypeManager->getStorage('node')->getQuery()
           ->accessCheck(FALSE)
           ->condition('type', 'ra_bill');
-          
+
         if ($po_id) {
           $bill_query->condition('field_purchase_order', $po_id);
-        }
-        elseif ($project_id) {
+        } elseif ($project_id) {
           $bill_query->condition('field_project', $project_id);
-        }
-        else {
+        } else {
           // If no PO or Project, we cannot group, fallback to original logic
           $bill_query->condition('nid', $current_bill_id, '<>');
         }
-        
+
         $bill_ids = $bill_query->execute();
-        
+
         if (!empty($bill_ids)) {
           $bills = $this->entityTypeManager->getStorage('node')->loadMultiple($bill_ids);
           $valid_parent_ids = [];
@@ -190,17 +192,14 @@ class BOQValidator {
           }
           if (!empty($valid_parent_ids)) {
             $query->condition('parent_id', $valid_parent_ids, 'IN');
-          }
-          else {
+          } else {
             // No preceding bills found, previous quantity must be 0
             return 0.0;
           }
-        }
-        else {
+        } else {
           return 0.0;
         }
-      }
-      else {
+      } else {
         $query->condition('parent_id', $current_bill_id, '<>');
       }
     }
@@ -235,13 +234,14 @@ class BOQValidator {
    * @return array
    *   An array with 'status' (valid or over_claimed) and 'approved_qty'.
    */
-  public function validate($boq_item, $current_qty, $previous_qty) {
+  public function validate($boq_item, $current_qty, $previous_qty)
+  {
     $approved_qty = floatval($boq_item->get('field_approved_quantity')->value ?? 0.0);
     $cumulative_qty = $previous_qty + $current_qty;
 
     $status = 'valid';
     // Use epsilon for float comparison to avoid issues with double precision
-    if ($cumulative_qty - $approved_qty > 0.0001) {
+    if ($cumulative_qty - $approved_qty > 0.000001) {
       $status = 'over_claimed';
     }
 
@@ -255,7 +255,8 @@ class BOQValidator {
   /**
    * Normalizes UOM values to match Drupal field_unit allowed values keys.
    */
-  public function normalizeUom($uom) {
+  public function normalizeUom($uom)
+  {
     $uom = strtolower(trim($uom));
     $map = [
       'nos' => 'nos',

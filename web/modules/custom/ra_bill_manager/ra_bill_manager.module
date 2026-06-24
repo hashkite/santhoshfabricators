@@ -14,7 +14,8 @@ use Drupal\node\NodeInterface;
  *
  * Prepopulates Project and Purchase Order fields from a 'po' query parameter.
  */
-function ra_bill_manager_entity_prepare_form(EntityInterface $entity, $operation, FormStateInterface $form_state) {
+function ra_bill_manager_entity_prepare_form(EntityInterface $entity, $operation, FormStateInterface $form_state)
+{
   if ($entity->getEntityTypeId() === 'node' && $entity->bundle() === 'ra_bill' && $operation === 'default') {
     $request = \Drupal::request();
     $po_id = $request->query->get('po');
@@ -22,12 +23,12 @@ function ra_bill_manager_entity_prepare_form(EntityInterface $entity, $operation
       $po_node = \Drupal::entityTypeManager()->getStorage('node')->load($po_id);
       if ($po_node && $po_node->bundle() === 'purchase_order') {
         $entity->set('field_purchase_order', $po_id);
-        
+
         // Copy project reference from the Purchase Order
         if (!$po_node->get('field_project')->isEmpty()) {
           $entity->set('field_project', $po_node->get('field_project')->target_id);
         }
-        
+
         // Copy PO number
         if (!$po_node->get('field_po_number')->isEmpty()) {
           $entity->set('field_po_number', $po_node->get('field_po_number')->value);
@@ -42,7 +43,8 @@ function ra_bill_manager_entity_prepare_form(EntityInterface $entity, $operation
  *
  * Automatically parses Excel sheets, validates item quantities, and calculates totals.
  */
-function ra_bill_manager_node_presave(NodeInterface $node) {
+function ra_bill_manager_node_presave(NodeInterface $node)
+{
   if ($node->bundle() !== 'ra_bill') {
     return;
   }
@@ -54,11 +56,10 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
 
     if ($node->isNew()) {
       $file_changed = TRUE;
-    }
-    else {
+    } else {
       $original = \Drupal::entityTypeManager()->getStorage('node')->loadUnchanged($node->id());
-      $orig_file_id = $original && !$original->get('field_excel_file')->isEmpty() 
-        ? $original->get('field_excel_file')->target_id 
+      $orig_file_id = $original && !$original->get('field_excel_file')->isEmpty()
+        ? $original->get('field_excel_file')->target_id
         : NULL;
       if ($file_id != $orig_file_id) {
         $file_changed = TRUE;
@@ -76,10 +77,10 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
         if ($file_path && file_exists($file_path)) {
           /** @var \Drupal\ra_bill_manager\Parser\ExcelParser $excel_parser */
           $excel_parser = \Drupal::service('ra_bill_manager.excel_parser');
-          
+
           try {
             $parsed_data = $excel_parser->parse($file_path);
-            
+
             // Clear existing paragraphs to prevent orphaned entities
             /** @var \Drupal\ra_bill_manager\Paragraph\ParagraphManager $paragraph_creator */
             $paragraph_creator = \Drupal::service('ra_bill_manager.paragraph_creator');
@@ -92,14 +93,14 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
               $proj_query = \Drupal::entityTypeManager()->getStorage('node')->getQuery()
                 ->accessCheck(FALSE)
                 ->condition('type', 'project_sites');
-              
+
               $or_group = $proj_query->orConditionGroup()
                 ->condition('title', $proj_title)
                 ->condition('field_project_code', $proj_title);
               $proj_query->condition($or_group);
-              
+
               $proj_ids = $proj_query->execute();
-              
+
               if (!empty($proj_ids)) {
                 $project_id = reset($proj_ids);
                 $node->set('field_project', $project_id);
@@ -118,8 +119,7 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
 
               if (!empty($v_ids)) {
                 $vendor_id = reset($v_ids);
-              }
-              else {
+              } else {
                 // Auto-create Vendor node
                 $v_node = \Drupal::entityTypeManager()->getStorage('node')->create([
                   'type' => 'vendor',
@@ -140,11 +140,11 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
                 ->condition('type', 'purchase_order')
                 ->condition('field_project', $project_id);
               $po_ids = $po_query->execute();
-              
+
               if (!empty($po_ids)) {
                 $po_id = reset($po_ids);
                 $node->set('field_purchase_order', $po_id);
-                
+
                 $po_node = \Drupal::entityTypeManager()->getStorage('node')->load($po_id);
                 if ($po_node && !$po_node->get('field_po_number')->isEmpty()) {
                   $node->set('field_po_number', $po_node->get('field_po_number')->value);
@@ -184,8 +184,7 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
               );
             }
             $node->set('field_ra_bill_items', $paragraphs);
-          }
-          catch (\Exception $e) {
+          } catch (\Exception $e) {
             \Drupal::messenger()->addError(t('Failed to parse Excel file: @msg', ['@msg' => $e->getMessage()]));
           }
         }
@@ -206,8 +205,7 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
 
       if (empty($existing_nids)) {
         $node->set('field_ra_bill_number', 1);
-      }
-      else {
+      } else {
         $existing_nodes = \Drupal::entityTypeManager()->getStorage('node')->loadMultiple($existing_nids);
         $max_num = 0;
         foreach ($existing_nodes as $existing_node) {
@@ -230,7 +228,7 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
         ->condition('type', 'boq_item')
         ->condition('field_project', $project_id);
       $boq_ids = $boq_query->execute();
-      
+
       if (!empty($boq_ids)) {
         /** @var \Drupal\ra_bill_manager\Validation\BOQValidator $boq_validator */
         $boq_validator = \Drupal::service('ra_bill_manager.boq_validator');
@@ -272,11 +270,11 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
   // (Both automatically imported and manually added/edited items)
   if ($node->hasField('field_ra_bill_items') && !$node->get('field_ra_bill_items')->isEmpty()) {
     $project_id = !$node->get('field_project')->isEmpty() ? $node->get('field_project')->target_id : NULL;
-    
+
     if ($project_id) {
       /** @var \Drupal\ra_bill_manager\Validation\BOQValidator $boq_validator */
       $boq_validator = \Drupal::service('ra_bill_manager.boq_validator');
-      
+
       $items = $node->get('field_ra_bill_items')->referencedEntities();
       $has_over_claimed = FALSE;
       $calculated_basic = 0.0;
@@ -288,7 +286,7 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
 
         // Match the BOQ Item
         $boq_item_id = !$paragraph->get('field_boq_item')->isEmpty() ? $paragraph->get('field_boq_item')->target_id : NULL;
-        
+
         // If BOQ Item is missing, try to auto-find or create it
         if (!$boq_item_id) {
           $item_code = !$paragraph->get('field_item_code')->isEmpty() ? $paragraph->get('field_item_code')->value : '';
@@ -344,8 +342,7 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
       // Set node validation status based on items
       if ($has_over_claimed) {
         $node->set('field_validation_status', 'need_review');
-      }
-      else {
+      } else {
         $node->set('field_validation_status', 'verified');
       }
 
@@ -372,7 +369,8 @@ function ra_bill_manager_node_presave(NodeInterface $node) {
  *
  * Automatically populates basic details when the Excel sheet is uploaded.
  */
-function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_state, $form_id)
+{
   // Only target the ra_bill node form.
   $node = $form_state->getFormObject()->getEntity();
   if ($node->getEntityTypeId() === 'node' && $node->bundle() === 'ra_bill') {
@@ -380,7 +378,7 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
     $file_ids = $form_state->getValue(['field_excel_file', 0, 'fids']);
     if (!empty($file_ids)) {
       $fid = reset($file_ids);
-      
+
       // Store on form state to avoid parsing on every AJAX rebuild
       if ($form_state->get('parsed_excel_fid') != $fid) {
         $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
@@ -392,14 +390,14 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
               /** @var \Drupal\ra_bill_manager\Parser\ExcelParser $excel_parser */
               $excel_parser = \Drupal::service('ra_bill_manager.excel_parser');
               $parsed_data = $excel_parser->parse($file_path);
-              
+
               $form_state->set('parsed_excel_data', $parsed_data);
               $form_state->set('parsed_excel_fid', $fid);
-              
+
               // Populate form values
               $metadata = $parsed_data['metadata'];
               $input = &$form_state->getUserInput();
-              
+
               if (!empty($metadata['bill_number'])) {
                 $form_state->setValue(['field_bill_number', 0, 'value'], $metadata['bill_number']);
                 $input['field_bill_number'][0]['value'] = $metadata['bill_number'];
@@ -429,7 +427,7 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
                 $form_state->setValue(['field_total_amount', 0, 'value'], $metadata['total_amount']);
                 $input['field_total_amount'][0]['value'] = $metadata['total_amount'];
               }
-              
+
               // Auto-populate Project reference if found
               if (!empty($metadata['project_code'])) {
                 $proj_title = $metadata['project_code'];
@@ -441,7 +439,7 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
                   ->condition('field_project_code', $proj_title);
                 $proj_query->condition($or_group);
                 $proj_ids = $proj_query->execute();
-                
+
                 if (!empty($proj_ids)) {
                   $proj_id = reset($proj_ids);
                   $proj_node = \Drupal::entityTypeManager()->getStorage('node')->load($proj_id);
@@ -452,7 +450,7 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
                   }
                 }
               }
-              
+
               // Auto-populate Vendor reference if found
               if (!empty($metadata['vendor_name'])) {
                 $vendor_name = $metadata['vendor_name'];
@@ -461,7 +459,7 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
                   ->condition('type', 'vendor')
                   ->condition('title', $vendor_name);
                 $v_ids = $v_query->execute();
-                
+
                 if (!empty($v_ids)) {
                   $v_id = reset($v_ids);
                   $v_node = \Drupal::entityTypeManager()->getStorage('node')->load($v_id);
@@ -472,8 +470,7 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
                   }
                 }
               }
-            }
-            catch (\Exception $e) {
+            } catch (\Exception $e) {
               \Drupal::logger('ra_bill_manager')->error('Form alter parsing failed: @msg', ['@msg' => $e->getMessage()]);
             }
           }
@@ -486,7 +483,8 @@ function ra_bill_manager_form_node_form_alter(&$form, FormStateInterface $form_s
 /**
  * Implements hook_views_data_alter().
  */
-function ra_bill_manager_views_data_alter(array &$data) {
+function ra_bill_manager_views_data_alter(array &$data)
+{
   $data['views']['expression'] = [
     'title' => t('Math expression'),
     'help' => t('Evaluates a math expression using views tokens.'),
@@ -499,7 +497,8 @@ function ra_bill_manager_views_data_alter(array &$data) {
 /**
  * Implements hook_theme().
  */
-function ra_bill_manager_theme($existing, $type, $theme, $path) {
+function ra_bill_manager_theme($existing, $type, $theme, $path)
+{
   return [
     'ra_bill_excel_view' => [
       'variables' => [
@@ -519,7 +518,8 @@ function ra_bill_manager_theme($existing, $type, $theme, $path) {
 /**
  * Implements hook_ENTITY_TYPE_view() for node entities.
  */
-function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode) {
+function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal\Core\Entity\Display\EntityViewDisplayInterface $display, $view_mode)
+{
   if ($node->bundle() === 'ra_bill' && $view_mode === 'full') {
     // Hide standard elements to avoid double display
     $build['field_ra_bill_items']['#access'] = FALSE;
@@ -558,8 +558,7 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
     $po_date = '';
     if ($po_node && $po_node->hasField('field_start_date') && !$po_node->get('field_start_date')->isEmpty()) {
       $po_date = date('d F, Y', strtotime($po_node->get('field_start_date')->value));
-    }
-    elseif ($po_node && $po_node->hasField('field_po_date') && !$po_node->get('field_po_date')->isEmpty()) {
+    } elseif ($po_node && $po_node->hasField('field_po_date') && !$po_node->get('field_po_date')->isEmpty()) {
       $po_date = date('d F, Y', strtotime($po_node->get('field_po_date')->value));
     }
 
@@ -655,11 +654,16 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
           'uom' => $uom,
           'rate' => $unit_rate,
           'approved_qty' => $approved_qty,
+          'approved_qty_formatted' => rtrim(rtrim(number_format($approved_qty, 6, '.', ','), '0'), '.'),
           'po_amount' => $po_amount,
           'prev_qty' => $prev_qty,
+          'prev_qty_formatted' => rtrim(rtrim(number_format($prev_qty, 6, '.', ','), '0'), '.'),
           'current_qty' => $current_qty,
+          'current_qty_formatted' => rtrim(rtrim(number_format($current_qty, 6, '.', ','), '0'), '.'),
           'cumulative_qty' => $cumulative_qty,
+          'cumulative_qty_formatted' => rtrim(rtrim(number_format($cumulative_qty, 6, '.', ','), '0'), '.'),
           'balance_qty' => $balance_qty,
+          'balance_qty_formatted' => rtrim(rtrim(number_format($balance_qty, 6, '.', ','), '0'), '.'),
           'prev_amount' => $prev_amount,
           'current_amount' => $current_amount,
           'cumulative_amount' => $cumulative_amount,
@@ -695,7 +699,8 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
 /**
  * Implements hook_ENTITY_TYPE_insert() for node entities.
  */
-function ra_bill_manager_node_insert(NodeInterface $node) {
+function ra_bill_manager_node_insert(NodeInterface $node)
+{
   if ($node->bundle() === 'ra_bill') {
     $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
     if ($po_id) {
@@ -707,14 +712,14 @@ function ra_bill_manager_node_insert(NodeInterface $node) {
 /**
  * Implements hook_ENTITY_TYPE_update() for node entities.
  */
-function ra_bill_manager_node_update(NodeInterface $node) {
+function ra_bill_manager_node_update(NodeInterface $node)
+{
   if ($node->bundle() === 'ra_bill') {
     $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
     if ($po_id) {
       ra_bill_manager_recalculate_po_bills($po_id);
     }
-  }
-  elseif ($node->bundle() === 'boq_item') {
+  } elseif ($node->bundle() === 'boq_item') {
     // If a BOQ Item is updated, sync its description and code to all referencing paragraphs
     $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
     $p_ids = $paragraph_storage->getQuery()
@@ -764,7 +769,8 @@ function ra_bill_manager_node_update(NodeInterface $node) {
 /**
  * Implements hook_ENTITY_TYPE_delete() for node entities.
  */
-function ra_bill_manager_node_delete(NodeInterface $node) {
+function ra_bill_manager_node_delete(NodeInterface $node)
+{
   if ($node->bundle() === 'ra_bill') {
     $po_id = !$node->get('field_purchase_order')->isEmpty() ? $node->get('field_purchase_order')->target_id : NULL;
     if ($po_id) {
@@ -776,7 +782,8 @@ function ra_bill_manager_node_delete(NodeInterface $node) {
 /**
  * Utility function to recalculate all RA bills sequentially for a Purchase Order.
  */
-function ra_bill_manager_recalculate_po_bills($po_id) {
+function ra_bill_manager_recalculate_po_bills($po_id)
+{
   // Prevent recursion
   static $recalculating = [];
   if (isset($recalculating[$po_id])) {
@@ -797,9 +804,9 @@ function ra_bill_manager_recalculate_po_bills($po_id) {
   }
 
   $bills = $node_storage->loadMultiple($bill_ids);
-  
+
   // Sort bills by ra_bill_number ascending.
-  usort($bills, function($a, $b) {
+  usort($bills, function ($a, $b) {
     $num_a = intval($a->get('field_ra_bill_number')->value ?? 0);
     $num_b = intval($b->get('field_ra_bill_number')->value ?? 0);
     if ($num_a === $num_b) {
@@ -849,16 +856,14 @@ function ra_bill_manager_recalculate_po_bills($po_id) {
 
         $unit_rate = $boq_item ? floatval($boq_item->get('field_unit_rate')->value ?? 0.0) : 0.0;
         $amount_claimed = $current_qty * $unit_rate;
-
         // Check validation
         $status = 'valid';
         if ($boq_item) {
           $approved_qty = floatval($boq_item->get('field_approved_quantity')->value ?? 0.0);
-          if ($cumulative_qty - $approved_qty > 0.0001) {
+          if ($cumulative_qty - $approved_qty > 0.000001) {
             $status = 'over_claimed';
           }
         }
-
         // Compare old values to prevent unnecessary updates and database writes
         $old_prev = floatval($paragraph->get('field_previous_qty')->value ?? 0.0);
         $old_cum = floatval($paragraph->get('field_cumulative_qty')->value ?? 0.0);
@@ -910,7 +915,8 @@ function ra_bill_manager_recalculate_po_bills($po_id) {
 /**
  * Implements hook_preprocess_views_view_field().
  */
-function ra_bill_manager_preprocess_views_view_field(&$variables) {
+function ra_bill_manager_preprocess_views_view_field(&$variables)
+{
   $view = $variables['view'];
   $field = $variables['field'];
   if ($view->id() === 'ra_bills' && $field->field === 'field_ra_bill_number') {
@@ -972,12 +978,13 @@ function ra_bill_manager_preprocess_views_view_field(&$variables) {
 /**
  * Format currency in Indian numbering system format.
  */
-function _ra_bill_manager_format_currency($number) {
+function _ra_bill_manager_format_currency($number)
+{
   $number = (float) $number;
   if ($number == 0) {
     return '₹0.00';
   }
-  
+
   $decimal = "";
   if (strpos((string) $number, '.') !== FALSE) {
     list($num_part, $dec_part) = explode('.', sprintf("%.2f", $number));

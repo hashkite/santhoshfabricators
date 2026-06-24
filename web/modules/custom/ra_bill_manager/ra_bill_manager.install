@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the RA Bill Manager module.
+ */
+
+/**
+ * Update RA Bill Item quantity fields to 6 decimal places.
+ */
+function ra_bill_manager_update_10001()
+{
+  $database = \Drupal::database();
+
+  // 1. Modify DB columns in paragraph tables to DECIMAL(20, 6) to avoid out of range errors.
+  $database->query("ALTER TABLE paragraph__field_previous_qty MODIFY field_previous_qty_value DECIMAL(20, 6)");
+  $database->query("ALTER TABLE paragraph_revision__field_previous_qty MODIFY field_previous_qty_value DECIMAL(20, 6)");
+
+  $database->query("ALTER TABLE paragraph__field_current_qty MODIFY field_current_qty_value DECIMAL(20, 6)");
+  $database->query("ALTER TABLE paragraph_revision__field_current_qty MODIFY field_current_qty_value DECIMAL(20, 6)");
+
+  $database->query("ALTER TABLE paragraph__field_cumulative_qty MODIFY field_cumulative_qty_value DECIMAL(20, 6)");
+  $database->query("ALTER TABLE paragraph_revision__field_cumulative_qty MODIFY field_cumulative_qty_value DECIMAL(20, 6)");
+
+  // 2. Update active configurations
+  $config_factory = \Drupal::configFactory();
+
+  $config_prev = $config_factory->getEditable('field.storage.paragraph.field_previous_qty');
+  $config_prev->set('settings.precision', 20);
+  $config_prev->set('settings.scale', 6);
+  $config_prev->save(TRUE);
+
+  $config_curr = $config_factory->getEditable('field.storage.paragraph.field_current_qty');
+  $config_curr->set('settings.precision', 20);
+  $config_curr->set('settings.scale', 6);
+  $config_curr->save(TRUE);
+
+  $config_cum = $config_factory->getEditable('field.storage.paragraph.field_cumulative_qty');
+  $config_cum->set('settings.precision', 20);
+  $config_cum->set('settings.scale', 6);
+  $config_cum->save(TRUE);
+
+  // 3. Update entity definitions installed schema repository
+  $key_value = \Drupal::keyValue('entity.definitions.installed');
+  $field_storage_definitions = $key_value->get('paragraph.field_storage_definitions', []);
+
+  $fields_to_update = ['field_previous_qty', 'field_current_qty', 'field_cumulative_qty'];
+  foreach ($fields_to_update as $field_name) {
+    if (isset($field_storage_definitions[$field_name])) {
+      $settings = $field_storage_definitions[$field_name]->getSettings();
+      $settings['precision'] = 20;
+      $settings['scale'] = 6;
+      $field_storage_definitions[$field_name]->setSettings($settings);
+    }
+  }
+
+  $key_value->set('paragraph.field_storage_definitions', $field_storage_definitions);
+
+  // Clear cached definitions
+  \Drupal::service('entity_field.manager')->clearCachedFieldDefinitions();
+}
