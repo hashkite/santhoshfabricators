@@ -916,14 +916,13 @@ class ExcelExportController extends ControllerBase
     $sheet2->mergeCells('A' . $dataRow . ':' . $col_rate . $dataRow);
     $sheet2->getStyle('A' . $dataRow . ':' . $col_rate . $dataRow)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-    $sheet2->setCellValue($col_amount . $dataRow, '=SUM(' . $col_amount . $firstDataRow . ':' . $col_amount . $lastDataRow . ')');
-    $sheet2->setCellValue($col_prev_amount . $dataRow, '=SUM(' . $col_prev_amount . $firstDataRow . ':' . $col_prev_amount . $lastDataRow . ')');
-    $sheet2->setCellValue($col_current_amount . $dataRow, '=SUM(' . $col_current_amount . $firstDataRow . ':' . $col_current_amount . $lastDataRow . ')');
-    $sheet2->setCellValue($col_cumulative_amount . $dataRow, '=SUM(' . $col_cumulative_amount . $firstDataRow . ':' . $col_cumulative_amount . $lastDataRow . ')');
+    $sheet2->setCellValue($col_amount . $dataRow, '=ROUNDUP(SUM(' . $col_amount . $firstDataRow . ':' . $col_amount . $lastDataRow . '),0)');
+    $sheet2->setCellValue($col_prev_amount . $dataRow, '=ROUNDUP(SUM(' . $col_prev_amount . $firstDataRow . ':' . $col_prev_amount . $lastDataRow . '),0)');
+    $sheet2->setCellValue($col_current_amount . $dataRow, '=ROUNDUP(SUM(' . $col_current_amount . $firstDataRow . ':' . $col_current_amount . $lastDataRow . '),0)');
+    $sheet2->setCellValue($col_cumulative_amount . $dataRow, '=ROUNDUP(SUM(' . $col_cumulative_amount . $firstDataRow . ':' . $col_cumulative_amount . $lastDataRow . '),0)');
 
     $sheet2->getStyle("A$dataRow:" . $last_col_letter . $dataRow)->applyFromArray($totalStyle);
-    $sheet2->getStyle($col_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
-    $sheet2->getStyle($col_prev_amount . $dataRow . ':' . $col_cumulative_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0.00');
+    $sheet2->getStyle($col_amount . $dataRow . ':' . $col_cumulative_amount . $dataRow)->getNumberFormat()->setFormatCode('#,##0');
 
     // ── Link Invoice sheet G14 to Abs totals "THIS BILL" ──
     $sheet1->setCellValue('G14', '=Abs!' . $col_current_amount . $dataRow);

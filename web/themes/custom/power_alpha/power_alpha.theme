@@ -461,9 +461,12 @@ function power_alpha_preprocess_node(&$variables)
     $is_intra_state = ($seller_state === $buyer_state && !empty($seller_state));
     $variables['is_intra_state'] = $is_intra_state;
 
+    // Round up only basic value
+    $basic_val = ceil($basic_value);
+
     if ($is_intra_state) {
-      $cgst_val = $basic_value * 0.09;
-      $sgst_val = $basic_value * 0.09;
+      $cgst_val = $basic_val * 0.09;
+      $sgst_val = $basic_val * 0.09;
       $igst_val = 0.0;
       $variables['cgst_rate'] = '9%';
       $variables['sgst_rate'] = '9%';
@@ -473,7 +476,7 @@ function power_alpha_preprocess_node(&$variables)
     } else {
       $cgst_val = 0.0;
       $sgst_val = 0.0;
-      $igst_val = $basic_value * 0.18;
+      $igst_val = $basic_val * 0.18;
       $variables['cgst_rate'] = '0%';
       $variables['sgst_rate'] = '0%';
       $variables['cgst_val_formatted'] = '0.00';
@@ -481,7 +484,9 @@ function power_alpha_preprocess_node(&$variables)
       $variables['igst_val_formatted'] = power_alpha_format_indian_currency($igst_val);
     }
 
-    $total_val = $basic_value + $cgst_val + $sgst_val + $igst_val;
+    $total_val = $basic_val + $cgst_val + $sgst_val + $igst_val;
+
+    $variables['basic_value_formatted'] = power_alpha_format_indian_currency($basic_val);
     $variables['total_value_formatted'] = power_alpha_format_indian_currency($total_val);
 
     // In Words
@@ -501,7 +506,7 @@ function power_alpha_preprocess_node(&$variables)
     $variables['tds_amount_raw'] = $tds_raw;
     $variables['tds_paid'] = $node->hasField('field_tds_paid') && !$node->get('field_tds_paid')->isEmpty()
       ? (bool) $node->get('field_tds_paid')->value : FALSE;
-    $variables['basic_value_raw'] = $basic_value;
+    $variables['basic_value_raw'] = $basic_val;
     $variables['retention_amount_formatted'] = power_alpha_format_indian_currency($retention_raw);
     $variables['retention_amount_raw'] = $retention_raw;
     $variables['expected_payment_formatted'] = power_alpha_format_indian_currency($expected_payment_raw);
@@ -841,16 +846,24 @@ function power_alpha_theme_suggestions_page_alter(array &$suggestions, array $va
 /**
  * Format currency in Indian numbering system format (e.g. 49,28,456.80).
  */
-function power_alpha_format_indian_currency($number)
+function power_alpha_format_indian_currency($number, $decimals = 2)
 {
   $number = (float) $number;
+  if (floor($number) == $number) {
+    $decimals = 0;
+  }
+
   $decimal = "";
-  if (strpos((string) $number, '.') !== FALSE) {
-    list($num_part, $dec_part) = explode('.', sprintf("%.2f", $number));
-    $decimal = "." . $dec_part;
+  if ($decimals > 0) {
+    if (strpos((string) $number, '.') !== FALSE) {
+      list($num_part, $dec_part) = explode('.', sprintf("%." . $decimals . "f", $number));
+      $decimal = "." . $dec_part;
+    } else {
+      $decimal = "." . str_repeat('0', $decimals);
+      $num_part = (string) $number;
+    }
   } else {
-    $decimal = ".00";
-    $num_part = (string) $number;
+    $num_part = (string) round($number);
   }
 
   $number_val = (int) $num_part;

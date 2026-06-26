@@ -531,6 +531,7 @@
       font-weight: $font-weight-medium;
       color: $color-secondary;
       transition: $transition-base;
+      white-space: nowrap;
     }
 
     tbody tr {

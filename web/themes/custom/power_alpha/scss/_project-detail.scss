@@ -708,6 +708,7 @@
       color: $color-secondary !important;
       background: $color-white !important;
       transition: $transition-base !important;
+      white-space: nowrap !important;
     }
 
     tbody tr:hover td {

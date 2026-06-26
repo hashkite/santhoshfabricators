@@ -674,11 +674,11 @@ function ra_bill_manager_node_view(array &$build, EntityInterface $node, \Drupal
     }
 
     // Add totals to metadata
-    $metadata['total_po_amount'] = $total_po_amount;
-    $metadata['total_prev_amount'] = $total_prev_amount;
-    $metadata['total_this_bill_amount'] = $total_this_bill_amount;
-    $metadata['total_upto_date_amount'] = $total_upto_date_amount;
-    $metadata['total_balance_amount'] = $total_po_amount - $total_upto_date_amount;
+    $metadata['total_po_amount'] = ceil($total_po_amount);
+    $metadata['total_prev_amount'] = ceil($total_prev_amount);
+    $metadata['total_this_bill_amount'] = ceil($total_this_bill_amount);
+    $metadata['total_upto_date_amount'] = ceil($total_upto_date_amount);
+    $metadata['total_balance_amount'] = ceil($total_po_amount - $total_upto_date_amount);
     $metadata['has_part_number'] = $has_part_number;
 
     $build['ra_bill_excel_view'] = [

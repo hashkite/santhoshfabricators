@@ -70,8 +70,8 @@ class InvoiceGenerationController extends ControllerBase
       }
     }
 
-    $final_basic = $calculated_basic > 0 ? $calculated_basic : $basic_amount;
-    $final_total = $total_amount > 0 ? $total_amount : ($final_basic * 1.18);
+    $final_basic = ceil($calculated_basic > 0 ? $calculated_basic : $basic_amount);
+    $final_total = $final_basic * 1.18;
 
     // ── Duplicate Invoice Prevention ──
     // Check if an invoice already exists for this RA Bill with the same total amount.

@@ -734,7 +734,6 @@
 							<td class="align-right" data-col="prev_amount">{{ item.prev_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right highlight-cell" data-col="current_amount">
 								<input type="number" class="ra-amt-input {% if item.validation_status == 'over_claimed' %}over-claimed{% endif %}" value="{{ item.current_amount|number_format(2, '.', '')|replace({'.00': ''}) }}" data-original="{{ item.current_amount|number_format(2, '.', '')|replace({'.00': ''}) }}" data-approved="{{ item.approved_qty }}" data-paragraph-id="{{ item.paragraph_id }}" data-field="current_amount" min="0" step="0.01" onchange="raMarkDirty(this)" onkeyup="raMarkDirty(this)" aria-label="Bill amount for {{ item.description|escape('html_attr') }}"/>
-							</td>
 							<td class="align-right" data-col="cumulative_amount">{{ item.cumulative_amount|number_format(2, '.', ',') }}</td>
 							<td class="align-right" data-col="balance_amount">{{ item.balance_amount|number_format(2, '.', ',') }}</td>
 						</tr>
@@ -747,16 +746,16 @@
 				{% if items %}
 					<tfoot>
 						<tr class="ra-totals-row">
-							<td colspan="{% if metadata.has_part_number %}6{% else %}5{% endif %}" class="align-right text-bold">Total</td>
-							<td class="align-right text-bold" data-total="po_amount">{{ metadata.total_po_amount|number_format(2, '.', ',') }}</td>
+							<td id="ra-totals-label-cell" colspan="{% if metadata.has_part_number %}6{% else %}5{% endif %}" class="align-right text-bold">Total</td>
+							<td class="align-right text-bold" data-total="po_amount">{{ metadata.total_po_amount|number_format(0, '.', ',') }}</td>
 							<td class="align-right"></td>
 							<td class="align-center highlight-cell"></td>
 							<td class="align-right"></td>
 							<td class="align-right"></td>
-							<td class="align-right text-bold" data-total="prev_amount">{{ metadata.total_prev_amount|number_format(2, '.', ',') }}</td>
-							<td class="align-right highlight-cell text-bold" data-total="this_bill_amount">{{ metadata.total_this_bill_amount|number_format(2, '.', ',') }}</td>
-							<td class="align-right text-bold" data-total="upto_date_amount">{{ metadata.total_upto_date_amount|number_format(2, '.', ',') }}</td>
-							<td class="align-right text-bold" data-total="balance_amount">{{ metadata.total_balance_amount|number_format(2, '.', ',') }}</td>
+							<td class="align-right text-bold" data-total="prev_amount">{{ metadata.total_prev_amount|number_format(0, '.', ',') }}</td>
+							<td class="align-right highlight-cell text-bold" data-total="this_bill_amount">{{ metadata.total_this_bill_amount|number_format(0, '.', ',') }}</td>
+							<td class="align-right text-bold" data-total="upto_date_amount">{{ metadata.total_upto_date_amount|number_format(0, '.', ',') }}</td>
+							<td class="align-right text-bold" data-total="balance_amount">{{ metadata.total_balance_amount|number_format(0, '.', ',') }}</td>
 						</tr>
 					</tfoot>
 				{% endif %}
@@ -884,7 +883,7 @@ container.classList.add('show-part-number');
 container.classList.remove('show-part-number');
 }
 }
-var totalLabelCell = document.querySelector('.ra-totals-row td:first-child');
+var totalLabelCell = document.getElementById('ra-totals-label-cell');
 if (totalLabelCell) {
 totalLabelCell.setAttribute('colspan', checked ? '6' : '5');
 }
@@ -946,9 +945,6 @@ var balAmt = balQty * rate;
 
 row.querySelector('[data-col="cumulative_qty"]').textContent = formatQty(cumQty);
 row.querySelector('[data-col="balance_qty"]').textContent = formatQty(balQty);
-if (amtInput) {
-amtInput.value = currentAmt.toFixed(2);
-}
 row.querySelector('[data-col="cumulative_amount"]').textContent = formatNumber(cumAmt, 2);
 row.querySelector('[data-col="balance_amount"]').textContent = formatNumber(balAmt, 2);
 
@@ -1020,11 +1016,9 @@ return parseFloat(text.toString().replace(/,/g, '')) || 0;
 
 function setTotalCell(name, val) {
 var cell = document.querySelector('[data-total="' + name + '"]');
-if (cell) 
-cell.textContent = formatNumber(val, 2);
-
-
-
+if (cell) {
+cell.textContent = formatNumber(Math.ceil(val), 0);
+}
 }
 
 function formatNumber(num, decimals) {

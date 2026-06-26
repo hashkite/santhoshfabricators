@@ -570,10 +570,10 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
       }
 
       if ($has_items || !empty($user_input['field_invoice_items'])) {
-        $formatted_basic = number_format($items_total, 2, '.', '');
-        $form['field_basic_value']['widget'][0]['value']['#value'] = $formatted_basic;
+        $rounded_basic = ceil($items_total);
+        $form['field_basic_value']['widget'][0]['value']['#value'] = number_format($rounded_basic, 2, '.', '');
 
-        $total_gst = $items_total * 1.18;
+        $total_gst = $rounded_basic * 1.18;
         $formatted_gst = number_format($total_gst, 2, '.', '');
         if (substr($formatted_gst, -3) === '.00') {
           $formatted_gst = number_format($total_gst, 0, '.', '');
@@ -590,7 +590,10 @@ function power_alpha_helper_form_alter(&$form, FormStateInterface $form_state, $
         $basic_value = (float) $basic_value;
 
         if ($basic_value > 0 || isset($user_input['field_basic_value'])) {
-          $total = $basic_value * 1.18;
+          $rounded_basic = ceil($basic_value);
+          $form['field_basic_value']['widget'][0]['value']['#value'] = number_format($rounded_basic, 2, '.', '');
+
+          $total = $rounded_basic * 1.18;
           $formatted_total = number_format($total, 2, '.', '');
           if (substr($formatted_total, -3) === '.00') {
             $formatted_total = number_format($total, 0, '.', '');
